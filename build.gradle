@@ -49,7 +49,9 @@ dependencies {
 	compile "org.hibernate:hibernate-core:5.2.10.Final"
 	compile "org.hibernate:hibernate-validator:5.4.1.Final"
 	compile "org.hibernate:hibernate-spatial:5.2.10.Final"
-  	
+    compile group: 'org.hibernate', name: 'hibernate-c3p0', version: '5.2.10.Final'
+  	compile "com.bedatadriven:jackson-datatype-jts:2.2"
+  	 
 	// for connection pooling
 	runtime "org.apache.tomcat:tomcat-jdbc:8.5.0"
 	runtime "org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.0"
@@ -89,4 +91,10 @@ dependencies {
     tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
            "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
            "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+}
+tomcat {
+    httpPort = 8090
+    //httpsPort = 8099
+    //enableSSL = true
+    contextPath = 'biodiv-api'
 }

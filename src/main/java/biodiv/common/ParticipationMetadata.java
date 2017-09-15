@@ -1,13 +1,18 @@
 package biodiv.common;
 
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 
 import org.hibernate.validator.constraints.NotBlank;
 
 import biodiv.user.User;
 
+@MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public abstract class ParticipationMetadata extends Metadata {
 	
@@ -20,11 +25,12 @@ public abstract class ParticipationMetadata extends Metadata {
 	int featureCount = 0;
 	boolean isDeleted = false;
 
-/*TODO:    static mapping = {
-        tablePerHierarchy false
-    }
-*/
-    @Column
+	public ParticipationMetadata() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "author_id", nullable = false)
 	public User getAuthor() {
 		return author;
 	}
@@ -33,7 +39,7 @@ public abstract class ParticipationMetadata extends Metadata {
 		this.author = author;
 	}
 
-	@Column
+	@Column(name = "original_author")
 	public String getOriginalAuthor() {
 		return originalAuthor;
 	}
@@ -42,7 +48,7 @@ public abstract class ParticipationMetadata extends Metadata {
 		this.originalAuthor = originalAuthor;
 	}
 
-	@Column
+	@Column(name = "rating", nullable = false)
 	public int getRating() {
 		return rating;
 	}
@@ -51,7 +57,7 @@ public abstract class ParticipationMetadata extends Metadata {
 		this.rating = rating;
 	}
 
-	@Column
+	@Column(name = "visit_count")
 	public long getVisitCount() {
 		return visitCount;
 	}
@@ -60,7 +66,7 @@ public abstract class ParticipationMetadata extends Metadata {
 		this.visitCount = visitCount;
 	}
 
-	@Column
+	@Column(name = "flag_count")
 	public int getFlagCount() {
 		return flagCount;
 	}
@@ -69,7 +75,7 @@ public abstract class ParticipationMetadata extends Metadata {
 		this.flagCount = flagCount;
 	}
 
-	@Column(nullable = false)
+	@Column(name = "feature_count")
 	public int getFeatureCount() {
 		return featureCount;
 	}
@@ -78,7 +84,7 @@ public abstract class ParticipationMetadata extends Metadata {
 		this.featureCount = featureCount;
 	}
 
-	@Column
+	@Column(name = "is_deleted")
 	public boolean isDeleted() {
 		return isDeleted;
 	}

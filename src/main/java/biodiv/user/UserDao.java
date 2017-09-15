@@ -12,34 +12,16 @@ import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 
 
-class UserDao extends AbstractDao implements DaoInterface<User, Long>{
+class UserDao extends AbstractDao<User, Long> implements DaoInterface<User, Long>{
 	
-	public void persist(User entity) {
-		getCurrentSession().save(entity);
-	}
+	/*protected UserDao(Class<User> clazz) {
+		super(clazz.getClass());
+	}*/
 
-	public void update(User entity) {
-		getCurrentSession().update(entity);
-	}
-
+	@Override
 	public User findById(Long id) {
-		User user = (User) getCurrentSession().get(User.class, id);
-		return user; 
-	}
-
-	public void delete(User entity) {
-		getCurrentSession().delete(entity);
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<User> findAll(int limit, int offset) {
-		List<User> users = (List<User>) getCurrentSession().createQuery("from User")
-				.setFirstResult(offset)
-				.setMaxResults(limit)
-				.list();
-		
-	        System.out.println(users);
-		return users;
+		User entity = (User) getCurrentSession().get(User.class, id);
+		return entity;
 	}
 
 	public User findByEmail(String email) {

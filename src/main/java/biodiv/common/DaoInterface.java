@@ -13,6 +13,6 @@ public interface DaoInterface <T, Id extends Serializable> {
 	
 	public T findById(Id id);
 	
-	public List<T> findAll(int limit, int offset);
+	public List<T> findAll();
 	
 }

@@ -1,6 +1,8 @@
 package biodiv.auth;
 
 import java.util.Set;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
@@ -10,6 +12,7 @@ import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.definition.CommonProfileDefinition;
+import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,19 +57,11 @@ public class SimpleUsernamePasswordAuthenticator implements Authenticator<Userna
         else if(!passwordEncoder.isPasswordValid(user.getPassword(), password, null)) {
         	throwsException("Password is not valid");
         } else {
-        	final CommonProfile profile = new CommonProfile();
-        	profile.setId(user.getId());
-        	profile.addAttribute(Pac4jConstants.USERNAME, user.getUsername());
-        	profile.addAttribute(CommonProfileDefinition.EMAIL, user.getEmail());
-        	Set<Role> roles = user.getRoles();
-        	for(Role role : roles) {
-        		profile.addRole(role.getAuthority());
-        	}
-        	log.debug("Setting profile in the context: "+profile);
-        	
+        	CommonProfile profile = AuthUtils.createUserProfile(user);
+        	log.debug("Setting profile in the context: "+profile);        	
         	credentials.setUserProfile(profile);
         }
-    }
+    }  
 
     protected void throwsException(final String message) throws CredentialsException {
         throw new CredentialsException(message);

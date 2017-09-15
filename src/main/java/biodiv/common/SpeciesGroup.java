@@ -47,7 +47,7 @@ public class SpeciesGroup implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_group_id")
 	public SpeciesGroup getSpeciesGroup() {
 		return this.speciesGroup;

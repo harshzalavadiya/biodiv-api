@@ -19,6 +19,7 @@ import biodiv.common.Language;
 import biodiv.common.License;
 import biodiv.common.Ufile;
 import biodiv.common.eml.Contact;
+import biodiv.observation.Observation;
 import biodiv.user.User;
 
 @Entity
@@ -50,9 +51,7 @@ public class Dataset implements java.io.Serializable {
 	private String viaCode;
 	private String viaId;
 	private String attribution;
-	private Set documents = new HashSet(0);
-	private Set observations = new HashSet(0);
-	private Set observations_1 = new HashSet(0);
+	//private Set<Observation> observation = new HashSet<Observation>(0);
 
 	public Dataset() {
 	}
@@ -80,7 +79,7 @@ public class Dataset implements java.io.Serializable {
 			Contact contact, Ufile ufile, Language languageByDataLanguageId, String additionalInfo, Date createdOn,
 			String description, String externalId, String externalUrl, String geographicDescription, boolean isDeleted,
 			Date lastRevised, Date publicationDate, String purpose, String rights, String title, String type,
-			String viaCode, String viaId, String attribution, Set documents, Set observations, Set observations_1) {
+			String viaCode, String viaId, String attribution) {
 		this.id = id;
 		this.languageByLanguageId = languageByLanguageId;
 		this.license = license;
@@ -105,9 +104,6 @@ public class Dataset implements java.io.Serializable {
 		this.viaCode = viaCode;
 		this.viaId = viaId;
 		this.attribution = attribution;
-		this.documents = documents;
-		this.observations = observations;
-		this.observations_1 = observations_1;
 	}
 
 	@Id
@@ -348,31 +344,13 @@ public class Dataset implements java.io.Serializable {
 		this.attribution = attribution;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "dataset")
-	public Set getDocuments() {
-		return this.documents;
+/*	@OneToMany(fetch = FetchType.LAZY, mappedBy = "dataset")
+	public Set<Observation> getObservation() {
+		return this.observation;
 	}
 
-	public void setDocuments(Set documents) {
-		this.documents = documents;
+	public void setObservation(Set<Observation> observation) {
+		this.observation = observation;
 	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "dataset")
-	public Set getObservations() {
-		return this.observations;
-	}
-
-	public void setObservations(Set observations) {
-		this.observations = observations;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "dataset")
-	public Set getObservations_1() {
-		return this.observations_1;
-	}
-
-	public void setObservations_1(Set observations_1) {
-		this.observations_1 = observations_1;
-	}
-
+*/
 }

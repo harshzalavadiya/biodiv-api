@@ -21,8 +21,6 @@ public class Ufile implements java.io.Serializable {
 	private String path;
 	private String size;
 	private int weight;
-	private Set datasets = new HashSet(0);
-	private Set documents = new HashSet(0);
 
 	public Ufile() {
 	}
@@ -34,16 +32,13 @@ public class Ufile implements java.io.Serializable {
 		this.weight = weight;
 	}
 
-	public Ufile(long id, Integer downloads, String mimetype, String path, String size, int weight, Set datasets,
-			Set documents) {
+	public Ufile(long id, Integer downloads, String mimetype, String path, String size, int weight) {
 		this.id = id;
 		this.downloads = downloads;
 		this.mimetype = mimetype;
 		this.path = path;
 		this.size = size;
 		this.weight = weight;
-		this.datasets = datasets;
-		this.documents = documents;
 	}
 
 	@Id
@@ -112,22 +107,10 @@ public class Ufile implements java.io.Serializable {
 		this.weight = weight;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "ufile")
-	public Set getDatasets() {
-		return this.datasets;
+	@Override
+	public String toString() {
+		return "Ufile [id=" + id + ", path=" + path + ", size=" + size + "]";
 	}
 
-	public void setDatasets(Set datasets) {
-		this.datasets = datasets;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "ufile")
-	public Set getDocuments() {
-		return this.documents;
-	}
-
-	public void setDocuments(Set documents) {
-		this.documents = documents;
-	}
 
 }

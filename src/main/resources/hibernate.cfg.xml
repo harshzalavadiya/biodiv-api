@@ -13,7 +13,7 @@
 		<property name="connection.password">biodiv</property>
 
 		<!-- JDBC connection pool (use the built-in) -->
-		<property name="connection.pool_size">1</property>
+		<!--property name="connection.pool_size">1</property-->
 
 		<!-- SQL dialect -->
 		<property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
@@ -24,6 +24,18 @@
 
 		<!-- Echo all executed SQL to stdout -->
 		<property name="show_sql">true</property>
+        
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">20</property>
+        <property name="hibernate.c3p0.timeout">300</property>
+        <property name="hibernate.c3p0.max_statements">50</property>
+        <property name="hibernate.c3p0.idle_test_period">3000</property>
+        <property name="hibernate.c3p0.testConnectionOnCheckout">true</property>
+        <property name="hibernate.c3p0.preferredTestQuery">SELECT 1</property>
+        <property name="hibernate.c3p0.numHelperThreads">5</property>
+        <property name="hibernate.c3p0.unreturnedConnectionTimeout">90</property>
+        <property name="hibernate.c3p0.maxConnectionAge">1800</property>
+        <property name="hibernate.c3p0.debugUnreturnedConnectionStackTraces">true</property>
 
 		<!-- Drop and re-create the database schema on startup -->
 		<property name="hbm2ddl.auto">update</property>
@@ -32,12 +44,25 @@
 
 		<!-- Mappings -->
 		<!-- mapping package="biodiv"/ -->
-
+		<mapping class="biodiv.common.ExternalLinks" />
+		<mapping class="biodiv.common.Habitat" />
 		<mapping class="biodiv.common.Language" />
+		<mapping class="biodiv.common.License" />
+		<mapping class="biodiv.common.SpeciesGroup" />
+		<mapping class="biodiv.common.Ufile" />		
+		<mapping class="biodiv.common.eml.Contact" />
+		<mapping class="biodiv.dataset.Dataset" />
+		<mapping class="biodiv.dataset.Datasource" />
+		<mapping class="biodiv.observation.Annotation" />
 		<mapping class="biodiv.observation.Observation" />
+		<mapping class="biodiv.observation.Recommendation" />
+		<mapping class="biodiv.observation.RecommendationVote" />
+		<mapping class="biodiv.resource.Resource" />
+		<mapping class="biodiv.taxon.TaxonomyDefinition" />
 		<mapping class="biodiv.user.User" />
 		<mapping class="biodiv.user.Role" />
-
+		<mapping class="biodiv.userGroup.UserGroup" />
+		<mapping class="biodiv.auth.token.Token" />
 	</session-factory>
 
 </hibernate-configuration>

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,6 +19,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -30,6 +32,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import biodiv.auth.token.Token;
 import biodiv.common.Language;
 
 
@@ -68,8 +71,10 @@ public class User implements Principal {
 	private Double latitude;
 	private Double longitude;
 	private Set<Role> roles = new HashSet<Role>(0);
+	@JsonIgnore
+	private Token token;
 
-	private User() {
+	public User() {
 	}
 
 	public User(long id, Language language, boolean accountExpired, boolean accountLocked, boolean enabled,
@@ -404,6 +409,15 @@ public class User implements Principal {
 		return false;
 	}
 	
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	public Token getToken() {
+		return token;
+	}
+
+	public void setToken(Token token) {
+		this.token = token;
+	}
+
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", email=" + email + "]";

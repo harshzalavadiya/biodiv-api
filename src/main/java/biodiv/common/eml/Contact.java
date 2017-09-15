@@ -33,7 +33,6 @@ public class Contact implements java.io.Serializable {
 	private String postalCode;
 	private String role;
 	private String state;
-	private Set datasets = new HashSet(0);
 
 	public Contact() {
 	}
@@ -55,26 +54,6 @@ public class Contact implements java.io.Serializable {
 		this.postalCode = postalCode;
 		this.role = role;
 		this.state = state;
-	}
-
-	public Contact(long id, User user, String address, String city, String country, String deliveryPoint,
-			String description, String firstName, String lastName, String name, String organization, String postalCode,
-			String role, String state, Set datasets) {
-		this.id = id;
-		this.user = user;
-		this.address = address;
-		this.city = city;
-		this.country = country;
-		this.deliveryPoint = deliveryPoint;
-		this.description = description;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.name = name;
-		this.organization = organization;
-		this.postalCode = postalCode;
-		this.role = role;
-		this.state = state;
-		this.datasets = datasets;
 	}
 
 	@Id
@@ -216,13 +195,5 @@ public class Contact implements java.io.Serializable {
 		this.state = state;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "contact")
-	public Set getDatasets() {
-		return this.datasets;
-	}
-
-	public void setDatasets(Set datasets) {
-		this.datasets = datasets;
-	}
 
 }

@@ -1,20 +1,33 @@
 package biodiv.observation;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 import biodiv.common.DataObject;
 import biodiv.resource.Resource;
+import biodiv.userGroup.UserGroup;
 
 @Entity
 @Table(name = "observation", uniqueConstraints = { @UniqueConstraint(columnNames = "id"), })
@@ -136,46 +149,48 @@ public class Observation extends DataObject {
 		}
 	}
 
-	String notes;
+	private String notes;
 	// boolean isDeleted = false;
-	String searchText;
+	private String searchText;
 	// if observation locked due to pulling of images in species
-	boolean isLocked = false;
-	Recommendation maxVotedReco;
-	boolean agreeTerms = false;
+	private boolean isLocked = false;
+	private Recommendation maxVotedReco;
+	private boolean agreeTerms = false;
 
 	// if true observation comes on view otherwise not
-	boolean isShowable;
+	private boolean isShowable;
 	// if observation representing checklist then this flag is true
-	boolean isChecklist = false;
+	private boolean isChecklist = false;
 	// observation generated from checklist will have source as
 	// checklist other will point to themself
-	Long sourceId;
+	private Long sourceId;
 
 	// column to store checklist key value pair in serialized object
-	String checklistAnnotations;
-	BasisOfRecord basisOfRecord = BasisOfRecord.HUMAN_OBSERVATION;
-	ProtocolType protocol = ProtocolType.SINGLE_OBSERVATION;
-	String externalDatasetKey;
-	Date lastCrawled;
-	String catalogNumber;
-	String publishingCountry = "IN";
-	String accessRights;
-	String informationWithheld;
+	private String checklistAnnotations;
+	private BasisOfRecord basisOfRecord = BasisOfRecord.HUMAN_OBSERVATION;
+	private ProtocolType protocol = ProtocolType.SINGLE_OBSERVATION;
+	private String externalDatasetKey;
+	private Date lastCrawled;
+	private String catalogNumber;
+	private String publishingCountry = "IN";
+	private String accessRights;
+	private String informationWithheld;
 
-	Resource reprImage;
+	private Resource reprImage;
 
-	int noOfImages = 0;
-	int noOfVideos = 0;
-	int noOfAudio = 0;
-	int noOfIdentifications = 0;
+	private int noOfImages = 0;
+	private int noOfVideos = 0;
+	private int noOfAudio = 0;
+	private int noOfIdentifications = 0;
 
-//	static hasMany=[userGroups:UserGroup,resource:Resource,recommendationVote:RecommendationVote,annotations:Annotation];static belongsTo=[SUser,UserGroup,Checklists,Dataset]
+	private Set resources = new HashSet(0);
+	private Set recommendationVotes = new HashSet(0);
+	private Set userGroups = new HashSet(0);
+	private Set annotations = new HashSet(0);
+	
+//	static hasMany=[userGroups:UserGroup,resource:Resource,recommendationVote:RecommendationVote,annotations:Annotation];
+//	static belongsTo=[SUser,UserGroup,Checklists,Dataset]
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "observation_generator")
-	@SequenceGenerator(name = "observation_generator", sequenceName = "observation_id_seq")
-	@Column(name = "id", unique = true, updatable = false, nullable = false)
 	private Long id;
 
 	public Observation() {
@@ -185,7 +200,12 @@ public class Observation extends DataObject {
 	public Observation(Map properties) {
 		// map properties of observation using reflection to the keys of the map
 	}
+	
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "observation_generator")
+	@SequenceGenerator(name = "observation_generator", sequenceName = "observation_id_seq")
+	@Column(name = "id", unique = true, updatable = false, nullable = false)
 	public Long getId() {
 		return id;
 	}
@@ -193,6 +213,254 @@ public class Observation extends DataObject {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+	@Column(name = "notes", columnDefinition="text")
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
+	@Column(name = "search_text", columnDefinition="text")
+	public String getSearchText() {
+		return searchText;
+	}
+
+	public void setSearchText(String searchText) {
+		this.searchText = searchText;
+	}
+
+	@Column(name = "is_locked")
+	public boolean isLocked() {
+		return isLocked;
+	}
+	
+	
+	public void setLocked(boolean isLocked) {
+		this.isLocked = isLocked;
+	}
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "max_voted_reco_id")
+	public Recommendation getMaxVotedReco() {
+		return maxVotedReco;
+	}
+
+	public void setMaxVotedReco(Recommendation maxVotedReco) {
+		this.maxVotedReco = maxVotedReco;
+	}
+
+	@Column(name = "agree_terms")
+	public boolean isAgreeTerms() {
+		return agreeTerms;
+	}
+
+	public void setAgreeTerms(boolean agreeTerms) {
+		this.agreeTerms = agreeTerms;
+	}
+
+	@Column(name = "is_showable")
+	public boolean isShowable() {
+		return isShowable;
+	}
+
+	public void setShowable(boolean isShowable) {
+		this.isShowable = isShowable;
+	}
+	
+	@Column(name = "is_checklist")
+	public boolean isChecklist() {
+		return isChecklist;
+	}
+
+	public void setChecklist(boolean isChecklist) {
+		this.isChecklist = isChecklist;
+	}
+
+	@Column(name = "source_id")
+	public Long getSourceId() {
+		return sourceId;
+	}
+
+	public void setSourceId(Long sourceId) {
+		this.sourceId = sourceId;
+	}
+
+	@Column(name = "checklist_annotations", columnDefinition="text")
+	public String getChecklistAnnotations() {
+		return checklistAnnotations;
+	}
+
+	public void setChecklistAnnotations(String checklistAnnotations) {
+		this.checklistAnnotations = checklistAnnotations;
+	}
+
+	@Column(name = "basis_of_record", nullable = false)
+	@Enumerated(EnumType.STRING)
+	public BasisOfRecord getBasisOfRecord() {
+		return basisOfRecord;
+	}
+
+	public void setBasisOfRecord(BasisOfRecord basisOfRecord) {
+		this.basisOfRecord = basisOfRecord;
+	}
+
+	@Column(name = "protocol", nullable = false)
+	@Enumerated(EnumType.STRING)
+	public ProtocolType getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(ProtocolType protocol) {
+		this.protocol = protocol;
+	}
+
+	@Column(name = "external_dataset_key")
+	public String getExternalDatasetKey() {
+		return externalDatasetKey;
+	}
+
+	public void setExternalDatasetKey(String externalDatasetKey) {
+		this.externalDatasetKey = externalDatasetKey;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_crawled")
+	public Date getLastCrawled() {
+		return lastCrawled;
+	}
+
+	public void setLastCrawled(Date lastCrawled) {
+		this.lastCrawled = lastCrawled;
+	}
+
+	@Column(name = "catalog_number")
+	public String getCatalogNumber() {
+		return catalogNumber;
+	}
+
+	public void setCatalogNumber(String catalogNumber) {
+		this.catalogNumber = catalogNumber;
+	}
+
+	@Column(name = "publishing_country")
+	public String getPublishingCountry() {
+		return publishingCountry;
+	}
+
+	public void setPublishingCountry(String publishingCountry) {
+		this.publishingCountry = publishingCountry;
+	}
+
+	
+	@Column(name = "access_rights")
+	public String getAccessRights() {
+		return accessRights;
+	}
+
+	public void setAccessRights(String accessRights) {
+		this.accessRights = accessRights;
+	}
+
+	@Column(name = "information_withheld")
+	public String getInformationWithheld() {
+		return informationWithheld;
+	}
+
+	public void setInformationWithheld(String informationWithheld) {
+		this.informationWithheld = informationWithheld;
+	}
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "repr_image_id")
+	public Resource getReprImage() {
+		return reprImage;
+	}
+
+	public void setReprImage(Resource reprImage) {
+		this.reprImage = reprImage;
+	}
+
+	@Column(name = "no_of_images", nullable = false)
+	public int getNoOfImages() {
+		return noOfImages;
+	}
+
+	public void setNoOfImages(int noOfImages) {
+		this.noOfImages = noOfImages;
+	}
+
+	@Column(name = "no_of_videos", nullable = false)
+	public int getNoOfVideos() {
+		return noOfVideos;
+	}
+
+	public void setNoOfVideos(int noOfVideos) {
+		this.noOfVideos = noOfVideos;
+	}
+
+	@Column(name = "no_of_audio", nullable = false)
+	public int getNoOfAudio() {
+		return noOfAudio;
+	}
+
+	public void setNoOfAudio(int noOfAudio) {
+		this.noOfAudio = noOfAudio;
+	}
+
+	@Column(name = "no_of_identifications", nullable = false)
+	public int getNoOfIdentifications() {
+		return noOfIdentifications;
+	}
+
+	public void setNoOfIdentifications(int noOfIdentifications) {
+		this.noOfIdentifications = noOfIdentifications;
+	}
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "observation_resource", schema = "public", joinColumns = {
+			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
+					@JoinColumn(name = "resource_id", nullable = false, updatable = false) })
+	public Set<Resource> getResources() {
+		return null;//this.resources;
+	}
+	
+	public void setResources(Set<Resource> resources) {
+		this.resources = resources;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "observation")
+	public Set<RecommendationVote> getRecommendationVotes() {
+		return null;//this.recommendationVotes;
+	}
+	
+	public void setRecommendationVotes(Set<RecommendationVote> recommendationVotes) {
+		this.recommendationVotes = recommendationVotes;
+	}
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "user_group_observations", schema = "public", joinColumns = {
+			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
+					@JoinColumn(name = "user_group_id", nullable = false, updatable = false) })
+	public Set<UserGroup> getUserGroups() {
+		return null;//this.userGroups;
+	}
+
+	public void setUserGroups(Set<UserGroup> userGroups) {
+		this.userGroups = userGroups;
+	}
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "observation")
+	public Set<Annotation> getAnnotations() {
+		return null;//this.annotations;
+	}
+	
+	public void setAnnotations(Set<Annotation> annotations) {
+		this.annotations = annotations;
+	}
+	
 
 	public String toString() {
 		return "Observation [id=" + id + "]";

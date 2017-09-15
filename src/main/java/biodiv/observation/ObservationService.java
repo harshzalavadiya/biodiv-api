@@ -1,55 +1,24 @@
 package biodiv.observation;
 
-import java.util.List;
-import java.util.Map;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import biodiv.observation.Observation;
-import biodiv.observation.ObservationDao;
-import biodiv.util.HibernateUtil;
+import biodiv.common.AbstractService;
 
-public class ObservationService {
+public class ObservationService extends AbstractService<Observation> {
 
-	private static ObservationDao observationDao;
 
+	private static final Logger log = LoggerFactory.getLogger(ObservationService.class);
+
+	private ObservationDao observationDao;
+	
 	public ObservationService() {
-		observationDao = new ObservationDao();
+		this.observationDao = new ObservationDao();		
 	}
-
-	public void persist(Observation entity) {
-		observationDao.openCurrentSessionwithTransaction();
-		observationDao.persist(entity);
-		observationDao.closeCurrentSessionwithTransaction();
-	}
-
-	public void update(Observation entity) {
-		observationDao.openCurrentSessionwithTransaction();
-		observationDao.update(entity);
-		observationDao.closeCurrentSessionwithTransaction();
-	}
-
-	public Observation findById(Long id) {
-		observationDao.openCurrentSession();
-		Observation Observation = observationDao.findById(id);
-		observationDao.closeCurrentSession();
-		return Observation;
-	}
-
-	public void delete(String id) {
-		observationDao.openCurrentSessionwithTransaction();
-		Observation Observation = observationDao.findById(Long.parseLong(id));
-		observationDao.delete(Observation);
-		observationDao.closeCurrentSessionwithTransaction();
-	}
-
-	public List<Observation> findAll(int limit, int offset) {
-		observationDao.openCurrentSession();
-		List<Observation> observations = observationDao.findAll(limit, offset);
-		observationDao.closeCurrentSession();
-		return observations;
+	
+	public ObservationDao getDao() {
+		return observationDao;
 	}
 
 /*    public List<Observation> find(Map<String, String> params){

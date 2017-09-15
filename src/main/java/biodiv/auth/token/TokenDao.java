@@ -17,6 +17,12 @@ public class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<T
 
 	private static final Logger log = LoggerFactory.getLogger(TokenDao.class);
 
+	@Override
+	public Token findById(Long id) {
+		Token entity = (Token) getCurrentSession().get(Token.class, id);
+		return entity;
+	}
+	
 	public List<Token> findByUser(User user) {
 		Query q = getCurrentSession().createQuery("from Token where user=:user");
 		q.setParameter("user", user);
@@ -24,11 +30,14 @@ public class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<T
 		return tokens;
 	}
 	
-	public List<Token> findByValueAndUser(String value, User user) {
+	public Token findByValueAndUser(String value, User user) {
 		Query q = getCurrentSession().createQuery("from Token where value=:value and user=:user");
 		q.setParameter("value", value);
 		q.setParameter("user", user);
 		List<Token> tokens = q.getResultList();
-		return tokens;
+		if(tokens.size() == 0) 
+			return null;
+		else
+			return tokens.get(0);
 	}
 }

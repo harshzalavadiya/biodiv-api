@@ -7,6 +7,11 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bedatadriven.jackson.datatype.jts.JtsModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import biodiv.common.JTSObjectMapperProvider;
+
 @ApplicationPath("/")
 public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Application
 														// {
@@ -24,6 +29,9 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 		register(org.glassfish.jersey.filter.LoggingFilter.class);
 		// register(org.glassfish.jersey.server.validation.ValidationFeature.class);
 		// register(org.glassfish.jersey.server.spring.SpringComponentProvider.class);
+		
+		register(JTSObjectMapperProvider.class);
+
 		register(org.glassfish.jersey.jackson.JacksonFeature.class);
 
 		// optimization to disable scanning all packages for providers and

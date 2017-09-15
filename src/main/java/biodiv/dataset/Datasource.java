@@ -173,11 +173,11 @@ public class Datasource implements java.io.Serializable {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "datasource")
-	public Set getDatasets() {
+	public Set<Dataset> getDatasets() {
 		return this.datasets;
 	}
 
-	public void setDatasets(Set datasets) {
+	public void setDatasets(Set<Dataset> datasets) {
 		this.datasets = datasets;
 	}
 
