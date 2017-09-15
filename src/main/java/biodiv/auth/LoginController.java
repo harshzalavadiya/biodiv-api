@@ -35,6 +35,7 @@ import biodiv.auth.token.TokenService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import biodiv.auth.token.Token;
 
 @Path("/login")
 public class LoginController {
@@ -118,11 +119,11 @@ public class LoginController {
             Token refreshTokenInstance = tokenService.findByValue(refreshToken);
 			//User user = tokenService.findUser(refreshToken)//jwtAuthenticator.getProfileId(accessToken);
 			//User user = userService.findById(Long.parseLong(userId));			
-			//CommonProfile profile = AuthUtils.createUserProfile(user);
+			CommonProfile profile = AuthUtils.createUserProfile(refreshTokenInstance.getUser());
 
 			// get user details from access token and validate if the refresh
 			// token was given to this user.
-			if (refreshTokenInstance && tokenService.isValidRefreshToken(refreshToken, refreshToken.user.getId())) {
+			if (refreshTokenInstance != null && tokenService.isValidRefreshToken(refreshToken, refreshTokenInstance.getUser())) {
 				Map result = tokenService.buildTokenResponse(profile, false);
 				return Response.ok(result).build();
 			} else {

@@ -30,6 +30,14 @@ public class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<T
 		return tokens;
 	}
 	
+    public Token findByValue(String value) {
+		Query q = getCurrentSession().createQuery("from Token where value=:value");
+		q.setParameter("value", value);
+		List<Token> tokens = q.getResultList();
+		if(tokens.size() == 1) return  tokens.get(0);
+		else throw new NotFoundException("No token found with value : "+value);
+	}
+
 	public Token findByValueAndUser(String value, User user) {
 		Query q = getCurrentSession().createQuery("from Token where value=:value and user=:user");
 		q.setParameter("value", value);

@@ -60,13 +60,13 @@ public class TokenService extends AbstractService<Token> {
 			if (getNewRefreshToken) {
 
                 // Removing all existing refreshTokens
-                List<Token> existingRefreshToken = tokenDao.findByUser(user);
+                /*List<Token> existingRefreshToken = tokenDao.findByUser(user);
                 for (Token t : existingRefreshToken) {
                     user.setToken(null);
                     tokenDao.delete(t);
                 }
                 tokenDao.getCurrentSession().flush();
-
+                */
 
 				// Generating a fresh refreshToken
 				String refreshToken = generateRefreshToken();
@@ -124,6 +124,10 @@ public class TokenService extends AbstractService<Token> {
 	 */
 	public boolean isValidRefreshToken(String refreshToken, Long userId) {
 		User user = tokenDao.openCurrentSession().get(User.class, userId);
+        return isValidRefreshToken(refreshToken, user);
+    }
+
+	public boolean isValidRefreshToken(String refreshToken, User user) {
 		Token token = tokenDao.findByValueAndUser(refreshToken, user);
 		if (token == null) {
 			log.warn("Refresh token is invalid.");
@@ -158,4 +162,12 @@ public class TokenService extends AbstractService<Token> {
 			throw e;
 		}
 	}
+
+	public Token findByValue(String value) {
+		tokenDao.openCurrentSession();
+		Token token = tokenDao.findByValue(value);
+		tokenDao.closeCurrentSession();
+		return token;
+	}
+
 }

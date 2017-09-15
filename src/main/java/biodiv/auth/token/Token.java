@@ -21,8 +21,7 @@ import javax.validation.constraints.NotNull;
 import biodiv.user.User;
 
 @Entity
-@Table(name = "token", uniqueConstraints = { @UniqueConstraint(columnNames = "id"),
-		@UniqueConstraint(columnNames = { "type", "user_id" }) })
+@Table(name = "token", uniqueConstraints = { @UniqueConstraint(columnNames = "id")})
 public class Token implements Serializable {
 
 	private static final long serialVersionUID = 1L;
