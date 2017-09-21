@@ -13,7 +13,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-import biodiv.taxon.TaxonomyDefinition;
+import biodiv.taxon.Taxon;
 
 @Entity
 @Table(name = "recommendation", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = {
@@ -30,8 +30,8 @@ public class Recommendation implements java.io.Serializable {
 	private String lowercaseName;
 	private String flaggingReason;
 	private Boolean isFlagged;
-	private TaxonomyDefinition taxonConcept;
-	private TaxonomyDefinition acceptedName;
+	private Taxon taxonConcept;
+	private Taxon acceptedName;
 	
 
 	public Recommendation() {
@@ -68,21 +68,21 @@ public class Recommendation implements java.io.Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "accepted_name_id")
-	public TaxonomyDefinition getAcceptedName() {
+	public Taxon getAcceptedName() {
 		return this.acceptedName;
 	}
 	
-	public void setAcceptedName(TaxonomyDefinition acceptedName) {
+	public void setAcceptedName(Taxon acceptedName) {
 		this.acceptedName = acceptedName;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "taxon_concept_id")
-	public TaxonomyDefinition getTaxonConcept() {
+	public Taxon getTaxonConcept() {
 		return this.taxonConcept;
 	}
 
-	public void setTaxonConcept(TaxonomyDefinition taxonConcept) {
+	public void setTaxonConcept(Taxon taxonConcept) {
 		this.taxonConcept = taxonConcept;
 	}
 

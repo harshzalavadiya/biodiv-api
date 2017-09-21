@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import biodiv.taxon.Taxon;
+
 @Entity
 @Table(name = "species_group", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class SpeciesGroup implements java.io.Serializable {
@@ -20,6 +22,7 @@ public class SpeciesGroup implements java.io.Serializable {
 	private SpeciesGroup speciesGroup;
 	private String name;
 	private Integer groupOrder;
+	private Set<Taxon> taxons = new HashSet<Taxon>(0);
 
 	public SpeciesGroup() {
 	}
@@ -73,6 +76,15 @@ public class SpeciesGroup implements java.io.Serializable {
 
 	public void setGroupOrder(Integer groupOrder) {
 		this.groupOrder = groupOrder;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "speciesGroup")
+	public Set<Taxon> getTaxons() {
+		return taxons;
+	}
+
+	public void setTaxons(Set<Taxon> taxons) {
+		this.taxons = taxons;
 	}
 
 	@Override

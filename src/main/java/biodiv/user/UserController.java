@@ -33,7 +33,6 @@ public class UserController {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
 	public User show(@PathParam("id") long id) {
 		User user = userService.findById(Long.valueOf(id));
 		return user;

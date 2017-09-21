@@ -20,8 +20,10 @@ class UserDao extends AbstractDao<User, Long> implements DaoInterface<User, Long
 
 	@Override
 	public User findById(Long id) {
+		
 		User entity = (User) getCurrentSession().get(User.class, id);
 		return entity;
+		
 	}
 
 	public User findByEmail(String email) {

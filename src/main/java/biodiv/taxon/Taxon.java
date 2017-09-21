@@ -1,7 +1,8 @@
 package biodiv.taxon;
 
-import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,32 +10,41 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import biodiv.common.ExternalLinks;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import biodiv.common.SpeciesGroup;
 import biodiv.user.User;
 
 
 @Entity
 @Table(name = "taxonomy_definition", schema = "public")
-public class TaxonomyDefinition implements java.io.Serializable {
+public class Taxon implements java.io.Serializable {
 
 	private long id;
+	private String canonicalForm;
+	private String name;
+	private int rank;
+	
 	private SpeciesGroup speciesGroup;
+	private String italicisedForm;
+	private Date uploadTime;
+	private String statue;
+	private String defaultHierarchy1;
+	private String status;
+	private String colNameStatus1;
+	@JsonIgnore
 	private User user;
+	@JsonIgnore
 	private ExternalLinks externalLinks;
 	private String binomialForm;
-	private String canonicalForm;
-	private String italicisedForm;
-	private String name;
 	private String normalizedForm;
-	private int rank;
 	private String threatenedStatus;
-	private Date uploadTime;
-	private String status;
 	private String position;
 	private String authorYear;
 	private String matchDatabaseName;
@@ -46,7 +56,7 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	private String colNameStatus;
 	private String oldId;
 	private String relationship;
-	//private String class_;
+	private String class_;
 	private String flaggingReason;
 	private Integer noOfcolmatches;
 	private Boolean isDeleted;
@@ -54,9 +64,10 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	private String activityDescription;
 	private String defaultHierarchy;
 	private String nameSourceId;
-	private Serializable traits;
-	private Serializable traitsJson;
-	/*private Set commonNameses = new HashSet(0);
+	private String traits;
+	private String traitsJson;
+	/*
+	private Set commonNameses = new HashSet(0);
 	private Set namePermissionsForNodeId = new HashSet(0);
 	private Set taxonomyRegistriesForParentTaxonDefinitionId = new HashSet(0);
 	private Set recommendationsForTaxonConceptId = new HashSet(0);
@@ -75,63 +86,15 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	private Set taxonomyDefinitionAuthors = new HashSet(0);
 	private Set taxonomyDefinitionUsers = new HashSet(0);
 	private Set specieses = new HashSet(0);
-*/
-	public TaxonomyDefinition() {
+	private User User;
+ */
+	public Taxon() {
+		//used by hibernate
 	}
-
-	public TaxonomyDefinition(long id, String canonicalForm, String name, int rank) {
-		this.id = id;
-		this.canonicalForm = canonicalForm;
-		this.name = name;
-		this.rank = rank;
-	}
-
-	public TaxonomyDefinition(long id, SpeciesGroup speciesGroup, User user,
-			ExternalLinks externalLinks, String binomialForm, String canonicalForm, String italicisedForm, String name,
-			String normalizedForm, int rank, String threatenedStatus, Date uploadTime, String status, String position,
-			String authorYear, String matchDatabaseName, String matchId, String ibpSource, String viaDatasource,
-			Boolean isFlagged, String lowercaseMatchName, String colNameStatus, String oldId, String relationship,
-			String flaggingReason, Integer noOfcolmatches, Boolean isDeleted, String dirtyListReason,
-			String activityDescription, String defaultHierarchy, String nameSourceId, Serializable traits,
-			Serializable traitsJson) {
-		this.id = id;
-		this.speciesGroup = speciesGroup;
-		this.user = user;
-		this.externalLinks = externalLinks;
-		this.binomialForm = binomialForm;
-		this.canonicalForm = canonicalForm;
-		this.italicisedForm = italicisedForm;
-		this.name = name;
-		this.normalizedForm = normalizedForm;
-		this.rank = rank;
-		this.threatenedStatus = threatenedStatus;
-		this.uploadTime = uploadTime;
-		this.status = status;
-		this.position = position;
-		this.authorYear = authorYear;
-		this.matchDatabaseName = matchDatabaseName;
-		this.matchId = matchId;
-		this.ibpSource = ibpSource;
-		this.viaDatasource = viaDatasource;
-		this.isFlagged = isFlagged;
-		this.lowercaseMatchName = lowercaseMatchName;
-		this.colNameStatus = colNameStatus;
-		this.oldId = oldId;
-		this.relationship = relationship;
-		//this.class_ = class_;
-		this.flaggingReason = flaggingReason;
-		this.noOfcolmatches = noOfcolmatches;
-		this.isDeleted = isDeleted;
-		this.dirtyListReason = dirtyListReason;
-		this.activityDescription = activityDescription;
-		this.defaultHierarchy = defaultHierarchy;
-		this.nameSourceId = nameSourceId;
-		this.traits = traits;
-		this.traitsJson = traitsJson;
-	}
-
+	
+	
+	
 	@Id
-
 	@Column(name = "id", unique = true, nullable = false)
 	public long getId() {
 		return this.id;
@@ -140,64 +103,7 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "group_id")
-	public SpeciesGroup getSpeciesGroup() {
-		return this.speciesGroup;
-	}
-
-	public void setSpeciesGroup(SpeciesGroup speciesGroup) {
-		this.speciesGroup = speciesGroup;
-	}
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "uploader_id")
-	public User getUser() {
-		return this.user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "external_links_id")
-	public ExternalLinks getExternalLinks() {
-		return this.externalLinks;
-	}
-
-	public void setExternalLinks(ExternalLinks externalLinks) {
-		this.externalLinks = externalLinks;
-	}
-
-	@Column(name = "binomial_form")
-	public String getBinomialForm() {
-		return this.binomialForm;
-	}
-
-	public void setBinomialForm(String binomialForm) {
-		this.binomialForm = binomialForm;
-	}
-
-	@Column(name = "canonical_form", nullable = false)
-	public String getCanonicalForm() {
-		return this.canonicalForm;
-	}
-
-	public void setCanonicalForm(String canonicalForm) {
-		this.canonicalForm = canonicalForm;
-	}
-
-	@Column(name = "italicised_form")
-	public String getItalicisedForm() {
-		return this.italicisedForm;
-	}
-
-	public void setItalicisedForm(String italicisedForm) {
-		this.italicisedForm = italicisedForm;
-	}
-
+	
 	@Column(name = "name", nullable = false)
 	public String getName() {
 		return this.name;
@@ -207,15 +113,18 @@ public class TaxonomyDefinition implements java.io.Serializable {
 		this.name = name;
 	}
 
-	@Column(name = "normalized_form")
-	public String getNormalizedForm() {
-		return this.normalizedForm;
+	
+	@Column(name = "canonical_form", nullable = false)
+	public String getCanonicalForm() {
+		return this.canonicalForm;
 	}
 
-	public void setNormalizedForm(String normalizedForm) {
-		this.normalizedForm = normalizedForm;
+	public void setCanonicalForm(String canonicalForm) {
+		this.canonicalForm = canonicalForm;
 	}
-
+	
+	
+	
 	@Column(name = "rank", nullable = false)
 	public int getRank() {
 		return this.rank;
@@ -224,16 +133,17 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	public void setRank(int rank) {
 		this.rank = rank;
 	}
-
-	@Column(name = "threatened_status")
-	public String getThreatenedStatus() {
-		return this.threatenedStatus;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "group_id")
+	public SpeciesGroup getSpeciesGroup() {
+		return this.speciesGroup;
 	}
 
-	public void setThreatenedStatus(String threatenedStatus) {
-		this.threatenedStatus = threatenedStatus;
+	public void setSpeciesGroup(SpeciesGroup speciesGroup) {
+		this.speciesGroup = speciesGroup;
 	}
-
+	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "upload_time", length = 29)
 	public Date getUploadTime() {
@@ -252,6 +162,91 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
+	@Column(name = "col_name_status")
+	public String getColNameStatus() {
+		return this.colNameStatus1;
+	}
+
+	public void setColNameStatus(String colNameStatus) {
+		this.colNameStatus1 = colNameStatus;
+	}
+	
+	@Column(name = "default_hierarchy")
+	public String getDefaultHierarchy() {
+		return this.defaultHierarchy1;
+	}
+
+	public void setDefaultHierarchy(String defaultHierarchy) {
+		this.defaultHierarchy1 = defaultHierarchy;
+	}
+	
+	
+
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "uploader_id")
+	public User getUser() {
+		return this.user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "external_links_id")
+	public ExternalLinks getExternalLinks() {
+		return this.externalLinks;
+	}
+
+	public void setExternalLinks(ExternalLinks externalLinks) {
+		this.externalLinks = externalLinks;
+	}
+
+	@Column(name = "binomial_form")
+	public String getBinomialForm() {
+		return this.binomialForm;
+	}
+
+	public void setBinomialForm(String binomialForm) {
+		this.binomialForm = binomialForm;
+	}
+
+	
+
+	@Column(name = "italicised_form")
+	public String getItalicisedForm() {
+		return this.italicisedForm;
+	}
+
+	public void setItalicisedForm(String italicisedForm) {
+		this.italicisedForm = italicisedForm;
+	}
+
+	
+
+	@Column(name = "normalized_form")
+	public String getNormalizedForm() {
+		return this.normalizedForm;
+	}
+
+	public void setNormalizedForm(String normalizedForm) {
+		this.normalizedForm = normalizedForm;
+	}
+
+	
+
+	@Column(name = "threatened_status")
+	public String getThreatenedStatus() {
+		return this.threatenedStatus;
+	}
+
+	public void setThreatenedStatus(String threatenedStatus) {
+		this.threatenedStatus = threatenedStatus;
+	}
+
+	
 
 	@Column(name = "position")
 	public String getPosition() {
@@ -325,14 +320,7 @@ public class TaxonomyDefinition implements java.io.Serializable {
 		this.lowercaseMatchName = lowercaseMatchName;
 	}
 
-	@Column(name = "col_name_status")
-	public String getColNameStatus() {
-		return this.colNameStatus;
-	}
-
-	public void setColNameStatus(String colNameStatus) {
-		this.colNameStatus = colNameStatus;
-	}
+	
 
 	@Column(name = "old_id")
 	public String getOldId() {
@@ -397,14 +385,7 @@ public class TaxonomyDefinition implements java.io.Serializable {
 		this.activityDescription = activityDescription;
 	}
 
-	@Column(name = "default_hierarchy")
-	public String getDefaultHierarchy() {
-		return this.defaultHierarchy;
-	}
-
-	public void setDefaultHierarchy(String defaultHierarchy) {
-		this.defaultHierarchy = defaultHierarchy;
-	}
+	
 
 	@Column(name = "name_source_id")
 	public String getNameSourceId() {
@@ -416,21 +397,22 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	}
 
 	@Column(name = "traits")
-	public Serializable getTraits() {
+	public String getTraits() {
 		return this.traits;
 	}
 
-	public void setTraits(Serializable traits) {
+	public void setTraits(String traits) {
 		this.traits = traits;
 	}
 
 	@Column(name = "traits_json")
-	public Serializable getTraitsJson() {
+	public String getTraitsJson() {
 		return this.traitsJson;
 	}
 
-	public void setTraitsJson(Serializable traitsJson) {
+	public void setTraitsJson(String traitsJson) {
 		this.traitsJson = traitsJson;
 	}
 
 }
+
