@@ -1,8 +1,15 @@
 package biodiv.user;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -15,6 +22,7 @@ public class Role implements java.io.Serializable {
 
 	private long id;
 	private String authority;
+	private Set<User> users = new HashSet(0);
 
 	public Role() {
 	}
@@ -43,6 +51,18 @@ public class Role implements java.io.Serializable {
 		this.authority = authority;
 	}
 
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "suser_role", schema = "public", joinColumns = {
+			@JoinColumn(name = "role_id", nullable = false, updatable = false) }, inverseJoinColumns = {
+					@JoinColumn(name = "s_user_id", nullable = false, updatable = false) })
+	public Set<User> getUsers() {
+		return this.users;
+	}
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+	
 	@Override
 	public String toString() {
 		return "Role [id=" + id + ", authority=" + authority + "]";

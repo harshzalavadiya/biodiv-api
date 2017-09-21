@@ -8,6 +8,8 @@
 		</layout>
 	</appender>
 
+
+	<logger name="com.mchange" level="WARN" additivity="false"></logger>
 	<logger name="org.hibernate" level="ALL" additivity="false"></logger>
 	<logger name="biodiv.*" level="ALL" additivity="false"></logger>
 

@@ -1,52 +1,86 @@
 package biodiv.auth;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.HeaderParam;
+import java.util.Optional;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Providers;
 
-import org.pac4j.jax.rs.annotations.Pac4JLogout;
+import org.pac4j.core.config.Config;
+import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.engine.DefaultLogoutLogic;
+import org.pac4j.core.engine.LogoutLogic;
+import org.pac4j.core.http.HttpActionAdapter;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.jax.rs.annotations.Pac4JProfile;
+import org.pac4j.jax.rs.annotations.Pac4JSecurity;
+import org.pac4j.jax.rs.filters.JaxRsHttpActionAdapter;
+import org.pac4j.jax.rs.pac4j.JaxRsContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.auth.token.TokenService;
 import biodiv.common.ResponseModel;
-import biodiv.user.User;
-import biodiv.user.UserService;
 
 @Path("/logout")
 public class LogoutController {
 
-	private final Logger log = LoggerFactory.getLogger(LogoutController.class);
-	private TokenService tokenService = new TokenService();
-	private UserService userService = new UserService();
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	@DELETE
-	@Pac4JLogout
+	private static final DefaultLogoutLogic<Object, JaxRsContext> DEFAULT_LOGIC = new BiodivLogoutLogic<Object, JaxRsContext>();
+
+	private String defaultUrl = "/";
+
+	private String logoutUrlPattern = "/logout";
+
+	private Boolean localLogout = true;
+
+	private Boolean destroySession = false;
+
+	private Boolean centralLogout = false;
+
+	static {
+		DEFAULT_LOGIC.setProfileManagerFactory(BiodivJaxRsProfileManager::new);
+	}
+
+	@Context
+	private Providers providers;
+
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response logout(@HeaderParam("X-AUTH-TOKEN") String accessToken) {
-		if (accessToken != null) {
-			try {
-				CustomJwtAuthenticator jwtAuthenticator = new CustomJwtAuthenticator(
-						new org.pac4j.jwt.config.signature.SecretSignatureConfiguration(Constants.JWT_SALT));
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
+	public Response logout(@Pac4JProfile Optional<CommonProfile> profile,
+			@Context final ContainerRequestContext requestContext, @Context SessionStore<WebContext> sessionStore) {
 
-				String userId = jwtAuthenticator.getProfileId(accessToken);
-				User user = userService.findById(Long.parseLong(userId));
+		log.debug("Logging out : " + profile);
 
-				tokenService.removeRefreshToken(user);
+		try {
 
-				ResponseModel responseModel = new ResponseModel(Response.Status.OK, "Successfully logged out...");
-				return Response.status(Response.Status.OK).entity(responseModel).build();
-			} catch (Exception e) {
-				e.printStackTrace();
-				ResponseModel responseModel = new ResponseModel(Response.Status.BAD_REQUEST, e.getMessage());
-				return Response.status(Response.Status.BAD_REQUEST).entity(responseModel).build();
+			Config config = AuthUtils.getConfig();
+
+			LogoutLogic<Object, JaxRsContext> ll = DEFAULT_LOGIC;
+
+			final HttpActionAdapter adapter;
+			if (config.getHttpActionAdapter() != null) {
+				adapter = config.getHttpActionAdapter();
+			} else {
+				adapter = JaxRsHttpActionAdapter.INSTANCE;
 			}
-		} else {
-			ResponseModel responseModel = new ResponseModel(Response.Status.BAD_REQUEST,
-					"Access token is required to identify the user");
+
+			ll.perform((new JaxRsContext(providers, requestContext, sessionStore)), config, adapter, null, "/logout",
+					localLogout, destroySession, centralLogout);
+
+			ResponseModel responseModel = new ResponseModel(Response.Status.OK, "Successfully logged out...");
+			return Response.status(Response.Status.OK).entity(responseModel).build();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseModel responseModel = new ResponseModel(Response.Status.BAD_REQUEST, e.getMessage());
 			return Response.status(Response.Status.BAD_REQUEST).entity(responseModel).build();
 		}
 	}

@@ -4,7 +4,6 @@ package biodiv.user;
 import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -19,13 +18,11 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
@@ -41,7 +38,6 @@ import biodiv.common.Language;
 public class User implements Principal {
 
 	private long id;
-	@JsonIgnore
 	private Language language;
 	private boolean accountExpired;
 	private boolean accountLocked;
@@ -72,7 +68,7 @@ public class User implements Principal {
 	private Double longitude;
 	private Set<Role> roles = new HashSet<Role>(0);
 	@JsonIgnore
-	private Token token;
+	private Set<Token> tokens;
 
 	public User() {
 	}
@@ -203,7 +199,7 @@ public class User implements Principal {
 		this.username = username;
 	}
 
-	@Column(name = "about_me")
+	@Column(name = "about_me", columnDefinition="text")
 	public String getAboutMe() {
 		return this.aboutMe;
 	}
@@ -388,7 +384,7 @@ public class User implements Principal {
 		this.longitude = longitude;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "suser_role", schema = "public", joinColumns = {
 			@JoinColumn(name = "s_user_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "role_id", nullable = false, updatable = false) })
@@ -396,7 +392,7 @@ public class User implements Principal {
 		return this.roles;
 	}
 	
-	public void setRoles(Set roles) {
+	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
 	
@@ -409,13 +405,13 @@ public class User implements Principal {
 		return false;
 	}
 	
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	public Token getToken() {
-		return token;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	public Set<Token> getTokens() {
+		return this.tokens;
 	}
 
-	public void setToken(Token token) {
-		this.token = token;
+	public void setTokens(Set<Token> tokens) {
+		this.tokens = tokens;
 	}
 
 	@Override

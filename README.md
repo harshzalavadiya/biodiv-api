@@ -1,2 +1,2 @@
 # biodiv-api
-Postman Collection : https://www.getpostman.com/collections/e4b45c8dd555f498ee0c
+Postman Collection : https://documenter.getpostman.com/view/2454815/local-biodiv-api/6nBvAMe

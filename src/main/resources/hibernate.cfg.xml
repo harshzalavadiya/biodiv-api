@@ -39,7 +39,6 @@
 
 		<!-- Drop and re-create the database schema on startup -->
 		<property name="hbm2ddl.auto">update</property>
-
 		<property name="hibernate.id.new_generator_mappings">true</property>
 
 		<!-- Mappings -->
