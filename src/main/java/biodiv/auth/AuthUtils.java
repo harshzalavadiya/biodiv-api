@@ -50,7 +50,13 @@ public class AuthUtils {
 	
 	public static CommonProfile createUserProfile(User user) {
 		if(user == null) return null;
-		final CommonProfile profile = new CommonProfile();
+		CommonProfile profile = new CommonProfile();
+		updateUserProfile(profile, user);
+		return profile;
+	}
+	
+	public static void updateUserProfile(CommonProfile profile, User user) {
+		if(user == null || profile == null) return;
 		profile.setId(user.getId());
 		profile.addAttribute(Pac4jConstants.USERNAME, user.getUsername());
 		profile.addAttribute(CommonProfileDefinition.EMAIL, user.getEmail());
@@ -59,14 +65,13 @@ public class AuthUtils {
 		for (Role role : roles) {
 			profile.addRole(role.getAuthority());
 		}
-		return profile;
 	}
 
 	public static Date getAccessTokenExpiryDate() {
 		Calendar cal = Calendar.getInstance();
 		// cal.add(Calender.DATE, 7);
-		cal.add(Calendar.SECOND, 60);
-		//cal.add(Calendar.HOUR_OF_DAY, EXPIRY_TIME_IN_HOURS);
+		//cal.add(Calendar.SECOND, 120);
+		cal.add(Calendar.HOUR_OF_DAY, EXPIRY_TIME_IN_HOURS);
 		return cal.getTime();
 	}
 	

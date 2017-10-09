@@ -1,5 +1,6 @@
 package biodiv.auth;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
 import org.pac4j.core.context.WebContext;
@@ -23,12 +24,34 @@ public class BiodivJaxRsProfileManager extends JaxRsProfileManager {
 	public void logout() {
 		SecurityContext securityContext = getJaxRsContext().getRequestContext().getSecurityContext();
 
-		System.out.println(securityContext.getUserPrincipal().getName());
-		System.out.println(securityContext.getUserPrincipal().getClass());
+        //TODO:delete only refresh token if refreshtoken was provided in the request
+		//tokenService.removeRefreshToken(Long.parseLong(securityContext.getUserPrincipal().getName()));
+        MultivaluedMap<String, String> queryParams = getJaxRsContext().getRequestContext().getUriInfo().getQueryParameters();
+        String refreshToken = null;
+        if(queryParams.containsKey("refresh_token")) {
+            refreshToken = queryParams.get("refresh_token").get(0);
+        } 
+        
+        if(refreshToken != null)
+		    tokenService.removeRefreshToken(refreshToken);
+        //TODO: get userId and remove token for user and refreshToken
+        /*org.pac4j.jax.rs.pac4j.JaxRsProfileManager.PrincipalImpl profile = securityContext.getUserPrincipal();
+        if(profile) {      
+            String email = null;        
+            if(profile instanceof org.pac4j.oauth.profile.google2.Google2Profile) {                                                                 
+                final List list = profile.getEmails(); 
+                println list;                   
+                if (list != null && !list.isEmpty()) {
+                    email= list.get(0).email;   
+                }          
+            } else {
+                email = profile.email;      
+            }              
+            User user = userService.findByEmail(email);
+		    tokenService.removeRefreshToken(user.id, getJaxRsContext().getRequestContext().getProperty("refresh_token"));
+        }*/
 
-		tokenService.removeRefreshToken(Long.parseLong(securityContext.getUserPrincipal().getName()));
-
-		//TODO:HACK to avoid null pointer at org.pac4j.core.context.WebContext.setSessionAttribute(WebContext.java:84)
+        //TODO:HACK to avoid null pointer at org.pac4j.core.context.WebContext.setSessionAttribute(WebContext.java:84)
 		//super.logout();
 	}
 }

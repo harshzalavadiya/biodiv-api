@@ -101,7 +101,7 @@ public class Token implements Serializable {
 		this.type = type;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id")
 	@NotNull
 	public User getUser() {

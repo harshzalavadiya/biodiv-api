@@ -10,7 +10,7 @@ import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 import biodiv.user.User;
 
-public class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterface<Observation, Long> {
+class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterface<Observation, Long> {
 	
 	private static final Logger log = LoggerFactory.getLogger(ObservationDao.class);
 
