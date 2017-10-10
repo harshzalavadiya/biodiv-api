@@ -1,5 +1,4 @@
 package biodiv.common;
-// Generated 31 Jul, 2017 7:18:53 AM by Hibernate Tools 3.5.0.Final
 
 import java.util.Random;
 
@@ -20,7 +19,6 @@ import org.hibernate.validator.constraints.NotBlank;
 public class Language {
 
 	public static final String DEFAULT_LANGUAGE = "English";
-	private static final Random NUMBER_GENERATOR = new Random();
 
 	private long id;
 	private String name;
@@ -28,21 +26,20 @@ public class Language {
 	private String twoLetterCode;
 	private Boolean isDirty = false;
 	private String region;
-
-	private static transient Language defaultLanguage;
+	
+	private LanguageService languageService = new LanguageService();
 
 	public Language() {
 	}
 
-	public Language(long id, String name, String threeLetterCode) {
-		this.id = id;
+	public Language(String name, String threeLetterCode, boolean isDirty) {
 		this.name = name;
 		this.threeLetterCode = threeLetterCode;
+		this.isDirty = isDirty;
 	}
 
-	public Language(long id, String name, String threeLetterCode, String twoLetterCode, Boolean isDirty,
+	public Language(String name, String threeLetterCode, String twoLetterCode, boolean isDirty,
 			String region) {
-		this.id = id;
 		this.name = name;
 		this.threeLetterCode = threeLetterCode;
 		this.twoLetterCode = twoLetterCode;
@@ -111,8 +108,7 @@ public class Language {
 
 	@Transient
 	public Language getDefaultLanguage() {
-		//TODO
-		return null;
+		return languageService.findByName(Language.DEFAULT_LANGUAGE);
 	}
 	
 	@Override

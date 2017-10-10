@@ -4,12 +4,20 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.ws.rs.NotFoundException;
+
+import org.hamcrest.Condition;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.user.User;
 import biodiv.util.HibernateUtil;
 
 public abstract class AbstractDao<T, K extends Serializable> {
@@ -64,7 +72,7 @@ public abstract class AbstractDao<T, K extends Serializable> {
 		this.currentTransaction = currentTransaction;
 	}
 
-	public void persist(T entity) {
+	public void save(T entity) {
 		getCurrentSession().save(entity);
 	}
 
@@ -88,6 +96,40 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	public List<T> findAll(int limit, int offset) {
 		return (List<T>) getCurrentSession().createCriteria(daoType)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).setFirstResult(offset).setMaxResults(limit).list();
+	}
+	
+	//TODO:improve this to do dynamic finder on any property
+	public T findByPropertyWithCondition(String property, String value, String condition) {
+		
+/*		CriteriaBuilder builder = getCurrentSession().getCriteriaBuilder();
+		
+		//create criteria query
+		CriteriaQuery<? extends T> criteria = builder.createQuery( daoType );
+		
+		//create root class
+		Root<? extends T> root = criteria.from( daoType );
+			
+		criteria.select( root );
+		
+		criteria.where( builder.equal( root.get( daoType.getField(property) ), value ) );
+		
+		T entity = getCurrentSession().createQuery( criteria ).getSingleResult();
+*/
+		org.hibernate.query.Query query = getCurrentSession().createQuery(
+			    "select t " +
+			    "from "+daoType+" t " +
+			    "where t."+property+" "+condition+" :value" );
+		query.setParameter(property, value);
+		
+		T entity = (T) query.getSingleResult();
+		
+		return entity;
+		/*
+		
+		if(entities.size() == 1) return  entities.get(0);
+		
+		else throw new NotFoundException("No entity found with property : "+property+"  with value : "+value);
+		*/
 	}
 
 }

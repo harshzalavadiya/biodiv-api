@@ -3,7 +3,9 @@ package biodiv.user;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.auth.register.RegistrationCode;
 import biodiv.common.AbstractService;
+import biodiv.common.Language;
 
 public class UserService extends AbstractService<User> {
 
@@ -15,6 +17,7 @@ public class UserService extends AbstractService<User> {
 		this.userDao = new UserDao();
 	}
 
+	@Override
 	public UserDao getDao() {
 		return userDao;
 	}
@@ -22,7 +25,7 @@ public class UserService extends AbstractService<User> {
 	public User findByEmail(String email) {
 		try {
 			userDao.openCurrentSession();
-			User user = userDao.findByEmail(email);
+			User user = userDao.findByPropertyWithCondition("email", email, "=");
 			return user;
 		} catch (Exception e) {
 			throw e;
@@ -41,6 +44,22 @@ public class UserService extends AbstractService<User> {
 			throw e;
 		} finally {
 			userDao.closeCurrentSession();
+		}
+	}
+
+	public RegistrationCode register(String email) {
+		if(email == null) return null;
+		try {
+			RegistrationCode registrationCode = new RegistrationCode(email);
+			userDao.openCurrentSessionWithTransaction();
+			if (registrationCode.save() == null) {
+				log.error("Coudn't save registrationCode");
+			}
+			return registrationCode;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			userDao.closeCurrentSessionWithTransaction();
 		}
 	}
 

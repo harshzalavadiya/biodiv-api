@@ -71,7 +71,7 @@ public class TokenService extends AbstractService<Token> {
 
 				Token rToken = new Token(refreshToken, TokenType.REFRESH, user);
 
-				tokenDao.persist(rToken);
+				tokenDao.save(rToken);
 
 				result.put("refresh_token", refreshToken);
 			}
