@@ -184,8 +184,8 @@ public class TokenService extends AbstractService<Token> {
 			// Removing refreshToken
             Token existingRefreshToken = tokenDao.findByValueAndUser(refreshToken, userId);
             if(existingRefreshToken != null) {
-			    User user = userService.findById(userId);
-				user.getTokens().remove(existingRefreshToken);
+			    //User user = userService.findById(userId);
+				//user.getTokens().remove(existingRefreshToken);
 				tokenDao.delete(existingRefreshToken);
             }
 			/*List<Token> existingRefreshToken = tokenDao.findByUser(userId);

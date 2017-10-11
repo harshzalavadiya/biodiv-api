@@ -10,7 +10,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.ws.rs.NotFoundException;
 
-import org.hamcrest.Condition;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -115,11 +114,12 @@ public abstract class AbstractDao<T, K extends Serializable> {
 		
 		T entity = getCurrentSession().createQuery( criteria ).getSingleResult();
 */
-		org.hibernate.query.Query query = getCurrentSession().createQuery(
-			    "select t " +
-			    "from "+daoType+" t " +
-			    "where t."+property+" "+condition+" :value" );
-		query.setParameter(property, value);
+		String queryStr = "" +
+			    "from "+daoType.getSimpleName()+" t " +
+			    "where t."+property+" "+condition+" :value" ;
+		log.debug ("Running query : "+queryStr);
+		org.hibernate.query.Query query = getCurrentSession().createQuery(queryStr);
+		query.setParameter("value", value);
 		
 		T entity = (T) query.getSingleResult();
 		
