@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -18,23 +19,27 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
 import biodiv.user.User;
 
 @Entity
-@Table(name = "token", uniqueConstraints = { @UniqueConstraint(columnNames = "id")})
+@Table(name = "token", uniqueConstraints = { @UniqueConstraint(columnNames = "id"),
+		@UniqueConstraint(columnNames = { "user_id", "value" }) })
 public class Token implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	public enum TokenType {
-		ACCESS("Access"), REFRESH("Refresh");
+		ACCESS("access_token"), REFRESH("refresh_token");
 		private String value;
 
 		TokenType(String value) {
 			this.value = value;
 		}
 
-		String value() {
+		public String value() {
 			return this.value;
 		}
 	}
@@ -57,8 +62,18 @@ public class Token implements Serializable {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_generator")
-	@SequenceGenerator(name = "hibernate_generator", sequenceName = "hibernate_sequence")
+	@GenericGenerator(
+	        name = "hibernate_generator",
+	        strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+	        parameters = {
+	                @Parameter(name = "sequence_name", value = "hibernate_sequence"),
+	                @Parameter(name = "increment_size", value = "1"),
+                    @Parameter(name = "optimizer", value = "hilo")
+	        }
+	)
+	@GeneratedValue(generator = "hibernate_generator")
+	//@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_generator")
+	//@SequenceGenerator(name = "hibernate_generator", sequenceName = "hibernate_sequence")//, allocationSize=1)
 	@Column(name = "id", unique = true, updatable = false, nullable = false)
 	public Long getId() {
 		return id;
@@ -86,7 +101,7 @@ public class Token implements Serializable {
 		this.type = type;
 	}
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	@NotNull
 	public User getUser() {

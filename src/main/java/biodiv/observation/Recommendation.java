@@ -13,7 +13,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-import biodiv.taxon.Taxon;
+import biodiv.taxon.datamodel.dao.Taxon;
 
 @Entity
 @Table(name = "recommendation", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = {

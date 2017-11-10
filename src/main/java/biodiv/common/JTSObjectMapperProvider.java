@@ -20,9 +20,7 @@ public class JTSObjectMapperProvider implements ContextResolver<ObjectMapper> {
     }
 
     @Override
-    public ObjectMapper getContext(final Class<?> type) {
-
-       
+    public ObjectMapper getContext(final Class<?> type) {       
             return defaultObjectMapper;
     }
 

@@ -1,23 +1,15 @@
 package biodiv.auth;
 
-import java.util.Set;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.definition.CommonProfileDefinition;
-import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.user.Role;
 import biodiv.user.User;
 import biodiv.user.UserService;
 
@@ -43,9 +35,6 @@ public class SimpleUsernamePasswordAuthenticator implements Authenticator<Userna
         if (CommonHelper.isBlank(password)) {
             throwsException("Password cannot be blank");
         }
-        /*if (CommonHelper.areNotEquals(username, password)) {
-            throwsException("Username : '" + username + "' does not match password");
-        }*/
         
         log.debug("Validating credentials : "+credentials);
         

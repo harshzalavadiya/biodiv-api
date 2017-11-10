@@ -20,9 +20,9 @@ public abstract class AbstractService<T> {
 	public void persist(T entity) {
 		log.debug("persisting " + entity.getClass() + " instance " + entity);
 		try {
-			getDao().openCurrentSessionwithTransaction();
+			getDao().openCurrentSessionWithTransaction();
 			getDao().persist(entity);
-			getDao().closeCurrentSessionwithTransaction();
+			getDao().closeCurrentSessionWithTransaction();
 			log.debug("save successful");
 		} catch (RuntimeException re) {
 			log.error("persist failed", re);
@@ -33,9 +33,9 @@ public abstract class AbstractService<T> {
 	public void update(T entity) {
 		log.debug("upting " + entity.getClass() + " instance " + entity);
 		try {
-			getDao().openCurrentSessionwithTransaction();
+			getDao().openCurrentSessionWithTransaction();
 			getDao().update(entity);
-			getDao().closeCurrentSessionwithTransaction();
+			getDao().closeCurrentSessionWithTransaction();
 			log.debug("update successful");
 		} catch (RuntimeException re) {
 			log.error("update failed", re);
@@ -47,10 +47,10 @@ public abstract class AbstractService<T> {
 	public void delete(String id) {
 		log.debug("deleting " + id);
 		try {
-			getDao().openCurrentSessionwithTransaction();
+			getDao().openCurrentSessionWithTransaction();
 			T entity = (T) getDao().findById(Long.parseLong(id));
 			getDao().delete(entity);
-			getDao().closeCurrentSessionwithTransaction();
+			getDao().closeCurrentSessionWithTransaction();
 			log.debug("delete successful");
 		} catch (RuntimeException re) {
 			log.error("delete failed", re);

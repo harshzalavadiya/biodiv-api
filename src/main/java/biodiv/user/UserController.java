@@ -35,6 +35,7 @@ public class UserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public User show(@PathParam("id") long id) {
 		User user = userService.findById(Long.valueOf(id));
+		System.out.println(user);
 		return user;
 	}
 }

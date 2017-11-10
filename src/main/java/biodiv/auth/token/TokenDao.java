@@ -23,9 +23,9 @@ public class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<T
 		return entity;
 	}
 	
-	public List<Token> findByUser(User user) {
-		Query q = getCurrentSession().createQuery("from Token where user=:user");
-		q.setParameter("user", user);
+	public List<Token> findByUser(Long userId) {
+		Query q = getCurrentSession().createQuery("from Token where user.id=:userId");
+		q.setParameter("userId", userId);
 		List<Token> tokens = q.getResultList();
 		return tokens;
 	}
@@ -38,10 +38,10 @@ public class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<T
 		else throw new NotFoundException("No token found with value : "+value);
 	}
 
-	public Token findByValueAndUser(String value, User user) {
-		Query q = getCurrentSession().createQuery("from Token where value=:value and user=:user");
+	public Token findByValueAndUser(String value, Long userId) {
+		Query q = getCurrentSession().createQuery("from Token where value=:value and user.id=:userId");
 		q.setParameter("value", value);
-		q.setParameter("user", user);
+		q.setParameter("userId", userId);
 		List<Token> tokens = q.getResultList();
 		if(tokens.size() == 0) 
 			return null;

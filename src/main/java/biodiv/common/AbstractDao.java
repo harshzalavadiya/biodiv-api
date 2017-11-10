@@ -32,7 +32,7 @@ public abstract class AbstractDao<T, K extends Serializable> {
 		return currentSession;
 	}
 
-	public Session openCurrentSessionwithTransaction() {
+	public Session openCurrentSessionWithTransaction() {
 		currentSession = HibernateUtil.getSessionFactory().openSession();
 		currentTransaction = currentSession.beginTransaction();
 		return currentSession;
@@ -42,7 +42,7 @@ public abstract class AbstractDao<T, K extends Serializable> {
 		currentSession.close();
 	}
 
-	public void closeCurrentSessionwithTransaction() {
+	public void closeCurrentSessionWithTransaction() {
 		currentTransaction.commit();
 		currentSession.close();
 		log.debug("committing current transaction and closing current session");

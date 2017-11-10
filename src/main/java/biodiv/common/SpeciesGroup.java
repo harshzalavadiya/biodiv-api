@@ -2,6 +2,7 @@ package biodiv.common;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,7 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import biodiv.taxon.Taxon;
+import biodiv.taxon.datamodel.dao.Taxon;
 
 @Entity
 @Table(name = "species_group", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))

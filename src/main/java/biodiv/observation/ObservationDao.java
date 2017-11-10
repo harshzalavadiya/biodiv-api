@@ -19,8 +19,8 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		Observation entity = (Observation) getCurrentSession().get(Observation.class, id);
 		return entity;
 	}
-	
-/*	public List<Observation> findAll(int limit, int offset) {
+	/*
+	public List<Observation> findAll(int limit, int offset) {
 		List<Observation> obvs = (List<Observation>) getCurrentSession().createQuery("from Observation")
 				.setFirstResult(offset)
 				.setMaxResults(limit)
