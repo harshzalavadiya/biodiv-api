@@ -8,12 +8,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import biodiv.user.User;
-import biodiv.user.UserService;
 
 @Path("/user")
 public class UserController {

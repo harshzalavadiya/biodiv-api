@@ -6,10 +6,9 @@ import org.pac4j.core.config.Config;
 import org.pac4j.core.config.ConfigFactory;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
+import org.pac4j.http.client.direct.CookieClient;
 import org.pac4j.http.client.direct.DirectFormClient;
 import org.pac4j.http.client.direct.HeaderClient;
-import org.pac4j.http.client.direct.CookieClient;
-import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 
 public class BiodivConfigFactory implements ConfigFactory {
 

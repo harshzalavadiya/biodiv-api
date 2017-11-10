@@ -14,13 +14,12 @@ import org.pac4j.oauth.profile.creator.OAuth20ProfileCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.scribejava.core.exceptions.OAuthException;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.Token;
 
 import biodiv.user.User;
 import biodiv.user.UserService;
-
-import com.github.scribejava.core.exceptions.OAuthException;
 
 public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends CommonProfile, O extends OAuthConfiguration, T extends Token> extends OAuth20ProfileCreator<OAuth20Profile> {
 

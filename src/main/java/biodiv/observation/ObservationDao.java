@@ -1,14 +1,10 @@
 package biodiv.observation;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.auth.token.Token;
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
-import biodiv.user.User;
 
 class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterface<Observation, Long> {
 	

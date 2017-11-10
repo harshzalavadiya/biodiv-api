@@ -1,14 +1,9 @@
 package biodiv.auth;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
-import org.pac4j.core.config.Config;
-import org.pac4j.core.config.ConfigFactory;
 import org.pac4j.jax.rs.features.JaxRsConfigProvider;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;

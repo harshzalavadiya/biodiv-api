@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.Optional;
 
 import org.pac4j.core.config.Config;
 import org.pac4j.core.config.ConfigFactory;

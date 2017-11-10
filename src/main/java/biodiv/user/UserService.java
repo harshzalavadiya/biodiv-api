@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.auth.register.RegistrationCode;
 import biodiv.common.AbstractService;
-import biodiv.common.Language;
 
 public class UserService extends AbstractService<User> {
 
@@ -21,7 +20,6 @@ public class UserService extends AbstractService<User> {
 	public UserDao getDao() {
 		return userDao;
 	}
-	
 
 	public User findByEmail(String email) {
 		try {
@@ -48,7 +46,8 @@ public class UserService extends AbstractService<User> {
 	}
 
 	public RegistrationCode register(String email) {
-		if(email == null) return null;
+		if (email == null)
+			return null;
 		try {
 			RegistrationCode registrationCode = new RegistrationCode(email);
 			userDao.openCurrentSessionWithTransaction();

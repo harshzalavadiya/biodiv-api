@@ -1,7 +1,5 @@
 package biodiv.userGroup;
 
-import java.util.Map;
-
 import biodiv.common.AbstractDao;
 
 public class UserGroupService extends AbstractDao<UserGroup, Long> {

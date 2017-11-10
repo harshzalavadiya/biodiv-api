@@ -1,18 +1,16 @@
 package biodiv.auth;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Optional;
 import java.net.URI;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -53,16 +51,15 @@ public class LoginController {
 			CommonProfile profile = authenticate(username, password);
 
 			// Issue a token for the user
-<<<<<<< HEAD
-			Map<String, Object> result = tokenService.buildTokenResponse(profile, true);
+
+			//Map<String, Object> result = tokenService.buildTokenResponse(profile, true);
 	
-=======
-            // Create a proxy object for logged in user
+           // Create a proxy object for logged in user
 
 			User user = userService.findById(Long.parseLong(profile.getId()));
 			Map<String, Object> result = tokenService.buildTokenResponse(profile, user, true);
 
->>>>>>> d278fff17a405ef5937669961254d64274879185
+
 			// TODO When responding with an access token, the server must also
 			// include the additional Cache-Control: no-store and Pragma:
 			// no-cache HTTP headers to ensure clients do not cache this

@@ -4,9 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -14,17 +13,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mchange.v2.beans.BeansUtils;
-
 import biodiv.auth.LoginController;
-import biodiv.auth.token.Token;
-import biodiv.auth.token.TokenService;
 import biodiv.common.Language;
 import biodiv.common.LanguageService;
 import biodiv.common.MailService;
@@ -32,7 +25,6 @@ import biodiv.common.MessageService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
-import biodiv.userGroup.UserGroup;
 import biodiv.util.Utils;
 
 @Path("/register")
@@ -80,34 +72,32 @@ public class RegisterController {
 				userService.save(user);
 			}
 
-		    /*TODO : if(params.webaddress) {
-            UserGroup userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
-            if(userGroupInstance) {
-                if(userGroupInstance.allowUsersToJoin) {
-                    def founder = userGroupInstance.getFounders(1,0)[0];
-                    log.debug "Adding ${user} to the group ${userGroupInstance} using founder ${founder} authorities ";
-                    SpringSecurityUtils.doWithAuth(founder.email, {
-                        if(userGroupInstance.addMember(user)) {
-                            flash.message = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request));  
-                        }
-	                    });
-	                }
-	            } else {
-	                log.error "Cannot find usergroup with webaddress : "+params.webaddress;
-	            }
-	        }
-	
-	
-	        def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
-	        activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
-	        SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
-	        */
+			/*
+			 * TODO : if(params.webaddress) { UserGroup userGroupInstance =
+			 * UserGroup.findByWebaddress(params.webaddress);
+			 * if(userGroupInstance) { if(userGroupInstance.allowUsersToJoin) {
+			 * def founder = userGroupInstance.getFounders(1,0)[0]; log.debug
+			 * "Adding ${user} to the group ${userGroupInstance} using founder ${founder} authorities "
+			 * ; SpringSecurityUtils.doWithAuth(founder.email, {
+			 * if(userGroupInstance.addMember(user)) { flash.message =
+			 * messageSource.getMessage("userGroup.joined.to.contribution",
+			 * [userGroupInstance.name] as Object[], RCU.getLocale(request)); }
+			 * }); } } else { log.error
+			 * "Cannot find usergroup with webaddress : "+params.webaddress; } }
+			 * 
+			 * 
+			 * def userProfileUrl = generateLink("SUser", "show", ["id":
+			 * user.id], request) activityFeedService.addActivityFeed(user,
+			 * user, user, activityFeedService.USER_REGISTERED);
+			 * SUserService.sendNotificationMail(SUserService.NEW_USER, user,
+			 * request, userProfileUrl);
+			 */
 			if (registerCommand.openId != null) {
 				// authenticateAndRedirect user.email
 			} else {
 				registerAndEmail(user, request);
 			}
-			
+
 			Map<String, Object> result = new HashMap<String, Object>();
 			return Response.ok(result).build();
 		} catch (Exception e) {

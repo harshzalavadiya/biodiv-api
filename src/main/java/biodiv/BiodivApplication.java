@@ -2,12 +2,12 @@ package biodiv;
 
 import javax.ws.rs.ApplicationPath;
 
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -16,7 +16,6 @@ import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module.Feature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import biodiv.common.JTSObjectMapperProvider;
-import org.glassfish.jersey.logging.LoggingFeature;
 
 @ApplicationPath("/")
 public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Application

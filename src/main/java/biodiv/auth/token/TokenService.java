@@ -3,7 +3,6 @@ package biodiv.auth.token;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.pac4j.core.profile.CommonProfile;
