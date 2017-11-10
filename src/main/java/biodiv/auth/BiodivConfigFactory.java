@@ -30,6 +30,7 @@ public class BiodivConfigFactory implements ConfigFactory {
 		Google2Client google2Client = new Google2Client("317806372709-roromqiujiji1po5jh8adpcr5um895mb.apps.googleusercontent.com", "x4QjtRV6n2f6cHjH8tl5epVn");
 		//google2Client.setStateData("biodiv-api-state");
 		google2Client.setAuthenticator(new CustomOAuth20Authenticator(google2Client.getConfiguration()));
+		google2Client.setProfileCreator(new CustomOAuth2ProfileCreator(google2Client.getConfiguration()));
 		google2Client.setCallbackUrl("http://api.local.ibp.org/login/callback?client_name=google2Client");
 		
 		HeaderClient headerClient = new HeaderClient("X-AUTH-TOKEN", new CustomJwtAuthenticator(

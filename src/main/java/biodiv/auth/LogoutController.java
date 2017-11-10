@@ -75,6 +75,7 @@ public class LogoutController {
 			ll.perform((new JaxRsContext(providers, requestContext, sessionStore)), config, adapter, null, "/logout",
 					localLogout, destroySession, centralLogout);
 
+			log.debug("Successfully logged out. Sending OK response");
 			ResponseModel responseModel = new ResponseModel(Response.Status.OK, "Successfully logged out...");
 			return Response.status(Response.Status.OK).entity(responseModel).build();
 			

@@ -19,7 +19,7 @@ import biodiv.user.User;
 
 public class AuthUtils {
 
-	private static final int EXPIRY_TIME_IN_HOURS = 24;
+	private static final int ACCESS_TOKEN_EXPIRY_TIME_IN_DAYS = 2;
 	private static final int EXPIRY_TIME_IN_DAYS = -30;
 	
 	public static Config getConfig() {
@@ -50,30 +50,41 @@ public class AuthUtils {
 	
 	public static CommonProfile createUserProfile(User user) {
 		if(user == null) return null;
-		final CommonProfile profile = new CommonProfile();
+		CommonProfile profile = new CommonProfile();
+		updateUserProfile(profile, user);
+		return profile;
+	}
+	
+	public static void updateUserProfile(CommonProfile profile, User user) {
+		if(user == null || profile == null) return;
 		profile.setId(user.getId());
 		profile.addAttribute(Pac4jConstants.USERNAME, user.getUsername());
 		profile.addAttribute(CommonProfileDefinition.EMAIL, user.getEmail());
-		profile.addAttribute(JwtClaims.EXPIRATION_TIME, getAccessTokenExpiryDate());
+		profile.addAttribute(JwtClaims.EXPIRATION_TIME, getAccessTokenExpiryDate().getTime());
 		Set<Role> roles = user.getRoles();
 		for (Role role : roles) {
 			profile.addRole(role.getAuthority());
 		}
-		return profile;
 	}
 
 	public static Date getAccessTokenExpiryDate() {
 		Calendar cal = Calendar.getInstance();
-		// cal.add(Calender.DATE, 7);
-		cal.add(Calendar.SECOND, 60);
-		//cal.add(Calendar.HOUR_OF_DAY, EXPIRY_TIME_IN_HOURS);
+		Date dt = new Date();
+		cal.setTime(dt);
+		//cal.add(Calender.DATE, 7);
+		//cal.add(Calendar.SECOND, 120);
+		cal.add(Calendar.DATE, ACCESS_TOKEN_EXPIRY_TIME_IN_DAYS);
+		System.out.println("Setting access token expiry to  : "+cal.getTime());
 		return cal.getTime();
 	}
 	
 	public static Date getRefreshTokenExpiryDate() {
 		Calendar cal = Calendar.getInstance();
+		Date dt = new Date();
+		cal.setTime(dt);
 		// cal.add(Calender.DATE, 7);
 		cal.add(Calendar.DATE, EXPIRY_TIME_IN_DAYS);
+		System.out.println("Setting refresh token expiry to  : "+cal.toString());
 		return cal.getTime();
 	}
 }

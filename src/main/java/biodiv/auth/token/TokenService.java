@@ -43,15 +43,12 @@ public class TokenService extends AbstractService<Token> {
 	 * @param getNewRefreshToken
 	 * @return
 	 */
-	public Map<String, Object> buildTokenResponse(CommonProfile profile, boolean getNewRefreshToken) {
+	public Map<String, Object> buildTokenResponse(CommonProfile profile, User user, boolean getNewRefreshToken) {
 		try {
-			log.debug("Building token response for "+profile);
+			log.debug("Building token response for "+user);
 			String jwtToken = generateAccessToken(profile);
 
 			tokenDao.openCurrentSessionWithTransaction();
-			// Create a proxy object for logged in user
-			User user = tokenDao.getCurrentSession().get(User.class, Long.parseLong(profile.getId()));
-
 			// Return the access_token valid for 2 hrs and a new refreshToken on
 			// the response
 			Map<String, Object> result = new HashMap<String, Object>();
@@ -61,7 +58,7 @@ public class TokenService extends AbstractService<Token> {
 			// result.put("scope", "");
 
 			if (getNewRefreshToken) {
-				log.debug("Generating new refresh token for "+profile);
+				log.debug("Generating new refresh token for "+user);
 				// Removing all existing refreshTokens
 				/*
 				 * List<Token> existingRefreshToken = tokenDao.findByUser(user);
@@ -74,7 +71,7 @@ public class TokenService extends AbstractService<Token> {
 
 				Token rToken = new Token(refreshToken, TokenType.REFRESH, user);
 
-				tokenDao.persist(rToken);
+				tokenDao.save(rToken);
 
 				result.put("refresh_token", refreshToken);
 			}
@@ -153,19 +150,50 @@ public class TokenService extends AbstractService<Token> {
 	 * 
 	 * @param user
 	 */
-	public void removeRefreshToken(Long userId) {
-		if (userId == null)
+    public void removeRefreshToken(String refreshToken) {
+		if (refreshToken== null)
 			return;
 		try {
 			tokenDao.openCurrentSessionWithTransaction();
-			log.debug("Removing all refresh tokens for user "+userId);
-			// Removing all existing refreshTokens
-			List<Token> existingRefreshToken = tokenDao.findByUser(userId);
+			log.debug("Removing refresh token "+refreshToken);
+            // Removing refreshToken
+            Token existingRefreshToken = tokenDao.findByValue(refreshToken);
+            if(existingRefreshToken != null) {
+			    //User user = userService.findById(userId);
+				//user.setTokens().remove(existingRefreshToken);
+				tokenDao.delete(existingRefreshToken);
+            
+			log.debug("Flushing session on delete tokens");
+			tokenDao.getCurrentSession().flush();
+            }
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			tokenDao.closeCurrentSessionWithTransaction();
+		}
+	}
+
+
+	public void removeRefreshToken(Long userId, String refreshToken) {
+		if (userId == null || refreshToken== null)
+			return;
+		try {
+			tokenDao.openCurrentSessionWithTransaction();
+			log.debug("Removing refresh token "+refreshToken+" for user "+userId);
+			// Removing refreshToken
+            Token existingRefreshToken = tokenDao.findByValueAndUser(refreshToken, userId);
+            if(existingRefreshToken != null) {
+			    //User user = userService.findById(userId);
+				//user.getTokens().remove(existingRefreshToken);
+				tokenDao.delete(existingRefreshToken);
+            }
+			/*List<Token> existingRefreshToken = tokenDao.findByUser(userId);
 			User user = userService.findById(userId);
 			for (Token t : existingRefreshToken) {
 				user.setTokens(null);
 				tokenDao.delete(t);
-			}
+			}*/
 			log.debug("Flushing session on delete tokens");
 			tokenDao.getCurrentSession().flush();
 
@@ -180,12 +208,11 @@ public class TokenService extends AbstractService<Token> {
 		try {
 			tokenDao.openCurrentSession();
 			Token token = tokenDao.findByValue(value);
-			tokenDao.closeCurrentSession();
 			return token;
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			tokenDao.closeCurrentSessionWithTransaction();
+			tokenDao.closeCurrentSession();
 		}
 	}
 

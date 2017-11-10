@@ -17,11 +17,11 @@ public abstract class AbstractService<T> {
 		this.dao = dao;
 	}*/
 	
-	public void persist(T entity) {
+	public void save(T entity) {
 		log.debug("persisting " + entity.getClass() + " instance " + entity);
 		try {
 			getDao().openCurrentSessionWithTransaction();
-			getDao().persist(entity);
+			getDao().save(entity);
 			getDao().closeCurrentSessionWithTransaction();
 			log.debug("save successful");
 		} catch (RuntimeException re) {
@@ -83,4 +83,5 @@ public abstract class AbstractService<T> {
 			throw re;
 		}
 	}
+	
 }

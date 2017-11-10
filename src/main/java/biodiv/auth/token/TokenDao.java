@@ -13,7 +13,7 @@ import biodiv.common.DaoInterface;
 import biodiv.user.User;
 
 
-public class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<Token, Long> {
+class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<Token, Long> {
 
 	private static final Logger log = LoggerFactory.getLogger(TokenDao.class);
 

@@ -16,7 +16,7 @@ import biodiv.user.UserService;
 
 public class SimpleUsernamePasswordAuthenticator implements Authenticator<UsernamePasswordCredentials> {
 
-	private final Logger log = LoggerFactory.getLogger(SimpleUsernamePasswordAuthenticator.class);
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	UserService userService = new UserService();
 	MessageDigestPasswordEncoder passwordEncoder = new MessageDigestPasswordEncoder("MD5");

@@ -1,16 +1,21 @@
 package biodiv.auth;
 
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Optional;
+import java.net.URI;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.CredentialsException;
@@ -23,12 +28,15 @@ import org.slf4j.LoggerFactory;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenService;
 import biodiv.common.ResponseModel;
+import biodiv.user.User;
+import biodiv.user.UserService;
 
 @Path("/login")
 public class LoginController {
 
 	private final Logger log = LoggerFactory.getLogger(LoginController.class);
 	private TokenService tokenService = new TokenService();
+	private UserService userService = new UserService();
 
 	/**
 	 * 
@@ -45,8 +53,16 @@ public class LoginController {
 			CommonProfile profile = authenticate(username, password);
 
 			// Issue a token for the user
+<<<<<<< HEAD
 			Map<String, Object> result = tokenService.buildTokenResponse(profile, true);
 	
+=======
+            // Create a proxy object for logged in user
+
+			User user = userService.findById(Long.parseLong(profile.getId()));
+			Map<String, Object> result = tokenService.buildTokenResponse(profile, user, true);
+
+>>>>>>> d278fff17a405ef5937669961254d64274879185
 			// TODO When responding with an access token, the server must also
 			// include the additional Cache-Control: no-store and Pragma:
 			// no-cache HTTP headers to ensure clients do not cache this
@@ -90,15 +106,37 @@ public class LoginController {
 			if (profile.isPresent()) {
 
 				// Issue a token for the user
-				Map<String, Object> result = tokenService.buildTokenResponse(profile.get(), true);
+			    User user = userService.findByEmail(profile.get().getEmail());
+                if(user != null) {
+				Map<String, Object> result = tokenService.buildTokenResponse(profile.get(), user, true);
 
-				return Response.ok(result).build();
+                log.debug(result.toString());
+                UriBuilder targetURIForRedirection = UriBuilder.fromPath("http://localhost.indiabiodiversity.org/openId/checkauth");
+                Iterator it = result.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    targetURIForRedirection.queryParam((String)pair.getKey(), pair.getValue());
+                    it.remove(); // avoids a ConcurrentModificationException
+                }
+                return Response.temporaryRedirect(targetURIForRedirection.build()).build();
+                } else {
+                    //redirect to createAccount url with details from facebook profile
+                	URI targetURIForRedirection = UriBuilder.fromUri(new URI("http://localhost.indiabiodiversity.org/login/createFacebookAccount")).build();
+                    return Response.temporaryRedirect(targetURIForRedirection).build();
+                }
+				//return Response.ok(result).build();
+                //return result;
 			} else {
 				throw new CredentialsException("Invalid credentials");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, e.getMessage());
+            /*Map result = new HashMap();
+            result.put("status", "403");
+            result.put("message", e.getMessage());
+            return result;
+			*/
+            ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, e.getMessage());
 			return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
 		}
 	}
@@ -111,10 +149,12 @@ public class LoginController {
 	 */
 	@Path("/token")
 	@POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response token(@QueryParam("grant_type") String grantType,
-			@QueryParam("refresh_token") String refreshToken) {
+	public Response token(@FormParam("grant_type") String grantType,
+			@FormParam("refresh_token") String refreshToken) {
 		try {
+            log.debug ("Getting new "+grantType);
 			if (refreshToken == null) {
 				ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, "Invalid refresh token");
 				return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
@@ -138,7 +178,9 @@ public class LoginController {
 			// token was given to this user.
 			if (refreshTokenInstance != null
 					&& tokenService.isValidRefreshToken(refreshToken, refreshTokenInstance.getUser().getId())) {
-				Map<String, Object> result = tokenService.buildTokenResponse(profile,
+
+			    User user = userService.findById(Long.parseLong(profile.getId()));
+				Map<String, Object> result = tokenService.buildTokenResponse(profile, user,
 						grantType.equalsIgnoreCase(Token.TokenType.REFRESH.value()) ? true : false);
 				return Response.ok(result).build();
 			} else {
