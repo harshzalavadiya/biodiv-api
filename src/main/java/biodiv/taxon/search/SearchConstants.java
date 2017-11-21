@@ -1,5 +1,6 @@
 package biodiv.taxon.search;
 
-public class TaxonSearch {
+public class SearchConstants {
 
+	
 }

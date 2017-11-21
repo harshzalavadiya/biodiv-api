@@ -86,6 +86,18 @@ dependencies {
 	compile group: 'org.antlr', name: 'stringtemplate', version: '4.0.2'
 	compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
 	
+	//compile group: 'org.apache.lucene', name: 'lucene-core', version: '7.0.0'
+	//compile group: 'org.apache.lucene', name: 'lucene-queryparser', version: '7.0.0'
+	// https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch
+	compile group: 'org.elasticsearch', name: 'elasticsearch', version: '5.6.4'
+
+	compile group: 'org.elasticsearch.client', name: 'transport', version: '5.6.4'
+	//compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:6.0.0'
+	//compile 'org.elasticsearch.client:elasticsearch-rest-client:6.0.0'
+	// https://mvnrepository.com/artifact/org.yaml/snakeyaml
+	compile group: 'org.yaml', name: 'snakeyaml', version: '1.18'
+	
+	
 }
 
 

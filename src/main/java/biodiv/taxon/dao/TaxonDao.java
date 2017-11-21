@@ -33,7 +33,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 			}
 		}
 		if ((parent == null && taxonIds == null)) {
-			q = getCurrentSession().createQuery("select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent"
+			q = getCurrentSession().createQuery("select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent,t.position,t.speciesId"
 					+ " from Taxon as t, TaxonomyRegistry as tR"
 					+ " where t.id=tR.taxonDefinitionId" + " and t.isDeleted=false"
 					+ " and tR.classificationId=:classificationId" + " and t.rank=0 and t.isDeleted=false order by t.name");
@@ -42,7 +42,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 		}
 
 		if (parent != null) {
-			q = getCurrentSession().createQuery("select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent"
+			q = getCurrentSession().createQuery("select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent,t.position,t.speciesId"
 					+ " from Taxon as t, TaxonomyRegistry as tR"
 					+ " where t.id=tR.taxonDefinitionId" + "  "
 					+ " and tR.classificationId=:classificationId" + " and tR.parent=:parent and t.isDeleted=false order by t.name");
@@ -70,7 +70,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 			queryForLike = queryForLike + local;
 		}
 		queryForLike = queryForLike + " or t.rank=0";
-		q = getCurrentSession().createQuery("select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent"
+		q = getCurrentSession().createQuery("select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent,t.position,t.speciesId"
 				+ " from Taxon as t, TaxonomyRegistry as tR" + " where t.id=tR.taxonDefinitionId" + ""
 				+ " and tR.classificationId=:classificationId and t.isDeleted=false and" + "(" + queryForLike + ") order by t.rank,t.name");
 		result = q.setParameter("classificationId", classificationId).getResultList();
@@ -115,23 +115,28 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 
 	}
 
-	public List<Object[]> search(Long classificationId, String term) {
+	public List<Object[]> search(String term) {
 		List<Object[]> results = new ArrayList<Object[]>();
 		Query q;
 		q = getCurrentSession()
-				.createQuery("select t.name,t.status,t.position from Taxon as t where lower(t.name) like :term").setMaxResults(10);
-		results = q.setParameter("term", term.toLowerCase()+'%').getResultList();
+				.createQuery("select t.name,t.status,t.position,t.id,t.rank from Taxon as t where lower(t.name) like :term order by t.name").setMaxResults(10);
+		results = q.setParameter("term", term.toLowerCase().trim()+'%').getResultList();
 		
 		return results;
 	}
 
-	public List<Object[]> specificSearch(Long classificationId, String term) {
+	public List<Object[]> specificSearch(Long classificationId, String term,Long taxonid) {
 
 		List<Object[]> results = new ArrayList<Object[]>();
 		Query q;
-		q = getCurrentSession().createQuery("select t.id,t.status from Taxon as t where lower(t.name) like lower ('"+term+"')");
+		if(taxonid!=null){
+			q = getCurrentSession().createQuery("select t.id,t.status from Taxon as t where t.id=:taxonid and lower(t.name) like lower ('"+term+"')");
+			q.setParameter("taxonid", taxonid);
+		}
+		else{
+			q = getCurrentSession().createQuery("select t.id,t.status from Taxon as t where lower(t.name) like lower ('"+term+"')");
+		}
 		results = q.getResultList();
-		System.out.println(results);
 		return results;
 	}
 
@@ -170,6 +175,15 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 		q=getCurrentSession().createQuery("from Classification where name=:name");
 		List<Classification> results =q.setParameter("name", name).getResultList();
 
+		return results;
+	}
+
+	public List<Object[]> getTaxonData(Integer offset, Integer limit) {
+		// TODO Auto-generated method stub
+		Query q;
+		
+		q=getCurrentSession().createQuery("select name,id,status,position,rank from Taxon order by id").setFirstResult(offset).setMaxResults(limit);
+		List<Object[]> results =q.getResultList();
 		return results;
 	}
 

@@ -1,5 +1,10 @@
 package biodiv;
 
+import java.io.FileReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import javax.ws.rs.ApplicationPath;
 
 import org.glassfish.jersey.logging.LoggingFeature;
@@ -7,6 +12,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,11 +28,21 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 														// {
 
 	private final Logger log = LoggerFactory.getLogger(BiodivApplication.class);
-
+	private Map<String,Object> getConfig= new HashMap<String,Object>();
+	
 	public BiodivApplication() {
 
 		System.out.println("Starting Biodiv Api Application");
-
+		 Yaml yaml = new Yaml(); 
+		 try { 
+	    	 Map<String, Object> list = (HashMap<String, Object>) yaml.load(new FileReader("/home/sunil/git/biodiv-api/conf/Config.yml")); 
+	    	 for (Map.Entry<String, Object> entry : list.entrySet()){
+	    	     System.out.println(entry.getKey() + "/" + entry.getValue());
+	    	 }
+	    	 
+	    }catch(Exception e){
+	    	System.out.println(e);
+	    }
 		// auto scanning of all classed for resources providers and features
 		packages("biodiv");
 		register(RolesAllowedDynamicFeature.class);
@@ -65,6 +81,12 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 		// optimization to disable scanning all packages for providers and
 		// features
 		// property(ServerProperties.METAINF_SERVICES_LOOKUP_DISABLE, true);
+	}
+	public Map<String, Object> getGetConfig() {
+		return getConfig;
+	}
+	public void setGetConfig(Map<String, Object> getConfig) {
+		this.getConfig = getConfig;
 	}
 
 	/*

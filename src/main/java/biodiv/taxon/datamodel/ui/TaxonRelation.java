@@ -17,13 +17,15 @@ public class TaxonRelation {
 		private long classification;
 		private long id;
 		private int rank;
+		private String position;
+		private long specieId;
 		Set <String> ids=new HashSet<String>();
 		
 		@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	    private List<TaxonRelation> children = new ArrayList<>();
 		
 	    public TaxonRelation(long taxonid, String path, long parent, String text, long classification, long id,
-				int rank,Set<String> data) {
+				int rank, String position, long speciesId, Set<String> data) {
 			super();
 			this.taxonid = taxonid;
 			this.path = path;
@@ -32,6 +34,8 @@ public class TaxonRelation {
 			this.classification = classification;
 			this.id = id;
 			this.rank = rank;
+			this.position=position;
+			this.specieId=speciesId;
 			this.ids=data;
 		}
 
@@ -95,6 +99,22 @@ public class TaxonRelation {
 
 		public void setIds(Set<String> ids) {
 			this.ids = ids;
+		}
+
+		public String getPosition() {
+			return position;
+		}
+
+		public void setPosition(String position) {
+			this.position = position;
+		}
+
+		public long getSpecieId() {
+			return specieId;
+		}
+
+		public void setSpecieId(long specieId) {
+			this.specieId = specieId;
 		}
 	
 }

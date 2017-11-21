@@ -28,7 +28,7 @@ public class Taxon implements java.io.Serializable {
 	private SpeciesGroup speciesGroup;
 	private String italicisedForm;
 	private Date uploadTime;
-	private String statue;
+	private long speciesId;
 	
 	private String defaultHierarchy1;
 	
@@ -364,12 +364,23 @@ public class Taxon implements java.io.Serializable {
 //	public void setTaxonomyRegistries(Set<TaxonomyRegistry> taxonomyRegistries) {
 //		this.taxonomyRegistries = taxonomyRegistries;
 //	}
+	@Column(name = "species_id")
+	public long getSpeciesId() {
+		return speciesId;
+	}
 
+
+	public void setSpeciesId(long speciesId) {
+		this.speciesId = speciesId;
+	}
 
 	@Override
 	public String toString() {
 		return "Taxon [id=" + id + ", name=" + name + ", rank=" + rank+"]";
 	}
+
+
+	
 
 }
 

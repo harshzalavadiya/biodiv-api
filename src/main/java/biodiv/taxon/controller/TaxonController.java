@@ -34,7 +34,8 @@ public class TaxonController {
 	 * @param classificationId
 	 * @param taxonIds
 	 * @param expand_taxon
-	 * @return
+	 * @return List<TaxonRelation>
+	 * method is responsible for displaying taxon list
 	 */
 	@GET
 	@Path("/list")
@@ -69,30 +70,58 @@ public class TaxonController {
 		return taxons;
 
 	}
-
+	
+	/**
+	 * Seacrh the databse on the basis of a paticular name
+	 * 
+	 * @param term
+	 * @param classificationId
+	 * @return the list of rows, those matches the name
+	 */
+	
 	@GET
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Map<String, String>> search(@QueryParam("term") String term,
-		@QueryParam("classification") Long classificationId) {
-        if(classificationId==null){
-		classificationId=taxonService.classificationIdByName(IBP);
-		}
-		List<Map<String, String>> data = taxonService.search(classificationId, term);
-		return data;
+	public List<Map<String, Object>> search(@QueryParam("term") String term){
+        
+		 List<Map<String, Object>> name=taxonService.search(term);
+		 return name;
+		
 	}
-
+	
+	/**
+	 * 
+	 * @param term
+	 * @param classificationId
+	 * @return The taxoid of the node, corresponding to particular taxon name provided by the user
+	 */
+	
+	
 	@GET
 	@Path("/retrieve/specificSearch")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Set<String> specificSearch(@QueryParam("term") String term,
-		@QueryParam("classification") Long classificationId) {
+		@QueryParam("classification") Long classificationId,
+		@QueryParam("taxonid") Long taxonid) {
 		if(classificationId==null){
 			classificationId=taxonService.classificationIdByName(IBP);
 		}
-		Set<String> data = taxonService.specificSearch(classificationId, term);
+		if(taxonid==null){
+			Set<String> data = taxonService.specificSearch(classificationId, term,null);
+			return data;
+		}
+		Set<String> data = taxonService.specificSearch(classificationId, term,taxonid);
 		return data;
+		
+		
+		
 	}
+	
+	/**
+	 * 
+	 * @return By default return the list of all classification 
+	 */
+	
 	@GET
 	@Path("/classification/list")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -100,6 +129,12 @@ public class TaxonController {
 		List<Classification> data = taxonService.classification();
 		return data;
 	}
+	/**
+	 * 
+	 * @param name
+	 * @return find classificationId corresponding to a particular name
+	 */
+	
 	@GET
 	@Path("/classification/list/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
