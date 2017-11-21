@@ -12,7 +12,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
+//import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,16 +33,16 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 	public BiodivApplication() {
 
 		System.out.println("Starting Biodiv Api Application");
-		 Yaml yaml = new Yaml(); 
-		 try { 
-	    	 Map<String, Object> list = (HashMap<String, Object>) yaml.load(new FileReader("/home/sunil/git/biodiv-api/conf/Config.yml")); 
-	    	 for (Map.Entry<String, Object> entry : list.entrySet()){
-	    	     System.out.println(entry.getKey() + "/" + entry.getValue());
-	    	 }
-	    	 
-	    }catch(Exception e){
-	    	System.out.println(e);
-	    }
+//		 Yaml yaml = new Yaml(); 
+//		 try { 
+//	    	 Map<String, Object> list = (HashMap<String, Object>) yaml.load(new FileReader("/home/sunil/git/biodiv-api/conf/Config.yml")); 
+//	    	 for (Map.Entry<String, Object> entry : list.entrySet()){
+//	    	     System.out.println(entry.getKey() + "/" + entry.getValue());
+//	    	 }
+//	    	 
+//	    }catch(Exception e){
+//	    	System.out.println(e);
+//	    }
 		// auto scanning of all classed for resources providers and features
 		packages("biodiv");
 		register(RolesAllowedDynamicFeature.class);

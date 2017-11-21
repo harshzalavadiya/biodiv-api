@@ -27,7 +27,7 @@ import biodiv.taxon.service.TaxonService;
 public class SearchTaxon {
 	
 	TaxonService taxonService = new TaxonService();
-	BiodivApplication config =new BiodivApplication();
+
 	
 	private void publishSearchIndex(TransportClient client) {
 		// TODO Auto-generated method stub
@@ -69,8 +69,8 @@ public class SearchTaxon {
 	}
 
 	public List<Map<String, Object>> search(String data) {
-		Map<String,Object> setting=config.getGetConfig();
-		Boolean call=true;
+		
+		Boolean call=false;
 		Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
 		TransportClient client = new PreBuiltTransportClient(settings);
 		try {
