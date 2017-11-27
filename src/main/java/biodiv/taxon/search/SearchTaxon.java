@@ -18,6 +18,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 
@@ -83,9 +84,9 @@ public class SearchTaxon {
 			publishSearchIndex(client);
 		}
 		//publishSearchIndex(client);
+		
 		SearchResponse result = client.prepareSearch("biodiv").setTypes("taxon")
-
-				.setQuery(QueryBuilders.matchPhraseQuery("name", data))
+				.setQuery(QueryBuilders.matchQuery("name", data))
 				.execute().actionGet();
 		List<Map<String, Object>> esData = new ArrayList<Map<String, Object>>();
 		for (SearchHit hit : result.getHits()) {
