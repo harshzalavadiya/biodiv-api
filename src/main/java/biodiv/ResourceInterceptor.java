@@ -40,7 +40,8 @@ public class ResourceInterceptor implements MethodInterceptor {
     		return result;
     		
     	}
-    	catch(Throwable Ex){
+    	catch(Throwable e){
+    		e.printStackTrace();
     		try {  
                 log.warn("Trying to rollback database transaction after exception");  
                 sf.getCurrentSession().getTransaction().rollback();  
