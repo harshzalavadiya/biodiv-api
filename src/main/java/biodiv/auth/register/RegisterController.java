@@ -72,34 +72,32 @@ public class RegisterController {
 				userService.save(user);
 			}
 
-		    /*TODO : if(params.webaddress) {
-            UserGroup userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
-            if(userGroupInstance) {
-                if(userGroupInstance.allowUsersToJoin) {
-                    def founder = userGroupInstance.getFounders(1,0)[0];
-                    log.debug "Adding ${user} to the group ${userGroupInstance} using founder ${founder} authorities ";
-                    SpringSecurityUtils.doWithAuth(founder.email, {
-                        if(userGroupInstance.addMember(user)) {
-                            flash.message = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request));  
-                        }
-	                    });
-	                }
-	            } else {
-	                log.error "Cannot find usergroup with webaddress : "+params.webaddress;
-	            }
-	        }
-	
-	
-	        def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
-	        activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
-	        SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
-	        */
+			/*
+			 * TODO : if(params.webaddress) { UserGroup userGroupInstance =
+			 * UserGroup.findByWebaddress(params.webaddress);
+			 * if(userGroupInstance) { if(userGroupInstance.allowUsersToJoin) {
+			 * def founder = userGroupInstance.getFounders(1,0)[0]; log.debug
+			 * "Adding ${user} to the group ${userGroupInstance} using founder ${founder} authorities "
+			 * ; SpringSecurityUtils.doWithAuth(founder.email, {
+			 * if(userGroupInstance.addMember(user)) { flash.message =
+			 * messageSource.getMessage("userGroup.joined.to.contribution",
+			 * [userGroupInstance.name] as Object[], RCU.getLocale(request)); }
+			 * }); } } else { log.error
+			 * "Cannot find usergroup with webaddress : "+params.webaddress; } }
+			 * 
+			 * 
+			 * def userProfileUrl = generateLink("SUser", "show", ["id":
+			 * user.id], request) activityFeedService.addActivityFeed(user,
+			 * user, user, activityFeedService.USER_REGISTERED);
+			 * SUserService.sendNotificationMail(SUserService.NEW_USER, user,
+			 * request, userProfileUrl);
+			 */
 			if (registerCommand.openId != null) {
 				// authenticateAndRedirect user.email
 			} else {
 				registerAndEmail(user, request);
 			}
-			
+
 			Map<String, Object> result = new HashMap<String, Object>();
 			return Response.ok(result).build();
 		} catch (Exception e) {

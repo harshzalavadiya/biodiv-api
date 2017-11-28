@@ -18,6 +18,11 @@ import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 import biodiv.userGroup.UserGroup;
 import biodiv.userGroup.UserGroupService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import biodiv.common.AbstractDao;
+import biodiv.common.DaoInterface;
 
 class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterface<Observation, Long> {
 	
@@ -86,6 +91,10 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 	}
 	
 /*	public List<Observation> findAll(int limit, int offset) {
+=======
+	/*
+	public List<Observation> findAll(int limit, int offset) {
+>>>>>>> b6040d04d637ec2831c0238a185df4c0d4f14f9f
 		List<Observation> obvs = (List<Observation>) getCurrentSession().createQuery("from Observation")
 				.setFirstResult(offset)
 				.setMaxResults(limit)

@@ -25,6 +25,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import biodiv.common.DataObject;
 import biodiv.resource.Resource;
 import biodiv.userGroup.UserGroup;
@@ -54,7 +56,8 @@ public class Observation extends DataObject {
 		OccurrenceStatus(String value) {
 			this.value = value;
 		}
-
+		
+		@JsonValue
 		String value() {
 			return this.value;
 		}
@@ -75,7 +78,8 @@ public class Observation extends DataObject {
 		BasisOfRecord(String value) {
 			this.value = value;
 		}
-
+		
+		@JsonValue
 		String value() {
 			return this.value;
 		}
@@ -120,6 +124,7 @@ public class Observation extends DataObject {
 
 		private String value;
 
+		@JsonValue
 		String value() {
 			return this.value;
 		}

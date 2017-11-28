@@ -66,6 +66,7 @@ public class User implements Principal {
 	private String sexType;
 	private Double latitude;
 	private Double longitude;
+	
 	private Set<Role> roles = new HashSet<Role>(0);
 	@JsonIgnore
 	private Set<Token> tokens;

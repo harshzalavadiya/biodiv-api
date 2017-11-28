@@ -13,7 +13,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-import biodiv.taxon.TaxonomyDefinition;
 
 @Entity
 @Table(name = "recommendation", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = {
@@ -30,8 +29,8 @@ public class Recommendation implements java.io.Serializable {
 	private String lowercaseName;
 	private String flaggingReason;
 	private Boolean isFlagged;
-	private TaxonomyDefinition taxonConcept;
-	private TaxonomyDefinition acceptedName;
+	//private Taxon taxonConcept;
+	//private Taxon acceptedName;
 	
 
 	public Recommendation() {
@@ -66,25 +65,25 @@ public class Recommendation implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "accepted_name_id")
-	public TaxonomyDefinition getAcceptedName() {
-		return this.acceptedName;
-	}
-	
-	public void setAcceptedName(TaxonomyDefinition acceptedName) {
-		this.acceptedName = acceptedName;
-	}
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "taxon_concept_id")
-	public TaxonomyDefinition getTaxonConcept() {
-		return this.taxonConcept;
-	}
-
-	public void setTaxonConcept(TaxonomyDefinition taxonConcept) {
-		this.taxonConcept = taxonConcept;
-	}
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "accepted_name_id")
+//	public Taxon getAcceptedName() {
+//		return this.acceptedName;
+//	}
+//	
+//	public void setAcceptedName(Taxon acceptedName) {
+//		this.acceptedName = acceptedName;
+//	}
+//
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "taxon_concept_id")
+//	public Taxon getTaxonConcept() {
+//		return this.taxonConcept;
+//	}
+//
+//	public void setTaxonConcept(Taxon taxonConcept) {
+//		this.taxonConcept = taxonConcept;
+//	}
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "last_modified", nullable = false, length = 29)

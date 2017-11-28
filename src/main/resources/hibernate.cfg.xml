@@ -59,7 +59,12 @@
 		<mapping class="biodiv.observation.Recommendation" />
 		<mapping class="biodiv.observation.RecommendationVote" />
 		<mapping class="biodiv.resource.Resource" />
-		<mapping class="biodiv.taxon.TaxonomyDefinition" />
+		<mapping class="biodiv.taxon.datamodel.dao.Taxon" />
+	 	<mapping class="biodiv.taxon.datamodel.dao.TaxonomyRegistry" />
+		<mapping class="biodiv.taxon.datamodel.dao.Classification" />
+		<mapping class="biodiv.taxon.datamodel.dao.ExternalLinks" />
+		<mapping class="biodiv.taxon.datamodel.dao.AcceptedSynonyms" />
+		
 		<mapping class="biodiv.user.User" />
 		<mapping class="biodiv.user.Role" />
 		<mapping class="biodiv.userGroup.UserGroup" />

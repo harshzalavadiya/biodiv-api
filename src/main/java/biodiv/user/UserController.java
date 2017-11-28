@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import biodiv.userGroup.UserGroup;
 import biodiv.userGroup.UserGroupService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Path("/user")
 public class UserController {
 
@@ -35,9 +38,9 @@ public class UserController {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
 	public User show(@PathParam("id") long id) {
 		User user = userService.findById(Long.valueOf(id));
+		System.out.println(user);
 		return user;
 	}
 	

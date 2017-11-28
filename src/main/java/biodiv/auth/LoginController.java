@@ -51,10 +51,14 @@ public class LoginController {
 			CommonProfile profile = authenticate(username, password);
 
 			// Issue a token for the user
-            // Create a proxy object for logged in user
+
+			//Map<String, Object> result = tokenService.buildTokenResponse(profile, true);
+	
+           // Create a proxy object for logged in user
 
 			User user = userService.findById(Long.parseLong(profile.getId()));
 			Map<String, Object> result = tokenService.buildTokenResponse(profile, user, true);
+
 
 			// TODO When responding with an access token, the server must also
 			// include the additional Cache-Control: no-store and Pragma:

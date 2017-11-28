@@ -1,5 +1,9 @@
+<<<<<<< HEAD:src/main/java/biodiv/taxon/TaxonomyDefinition.java
 package biodiv.taxon;
 
+=======
+package biodiv.taxon.datamodel.dao;
+>>>>>>> b6040d04d637ec2831c0238a185df4c0d4f14f9f:src/main/java/biodiv/taxon/datamodel/dao/Taxon.java
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -12,8 +16,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import biodiv.common.ExternalLinks;
 import biodiv.common.SpeciesGroup;
 import biodiv.user.User;
@@ -21,21 +23,28 @@ import biodiv.user.User;
 
 @Entity
 @Table(name = "taxonomy_definition", schema = "public")
-public class TaxonomyDefinition implements java.io.Serializable {
+public class Taxon implements java.io.Serializable {
 
 	private long id;
+	private String canonicalForm;
+	private String name;
+	private int rank;
+	
 	private SpeciesGroup speciesGroup;
+	private String italicisedForm;
+	private Date uploadTime;
+	private long speciesId;
+	
+	private String defaultHierarchy1;
+	
+	private String status;
+	private String colNameStatus1;
+	
 	private User user;
 	private ExternalLinks externalLinks;
 	private String binomialForm;
-	private String canonicalForm;
-	private String italicisedForm;
-	private String name;
 	private String normalizedForm;
-	private int rank;
 	private String threatenedStatus;
-	private Date uploadTime;
-	private String status;
 	private String position;
 	private String authorYear;
 	private String matchDatabaseName;
@@ -47,43 +56,24 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	private String colNameStatus;
 	private String oldId;
 	private String relationship;
-	//private String class_;
+	private String class_;
 	private String flaggingReason;
 	private Integer noOfcolmatches;
 	private Boolean isDeleted;
 	private String dirtyListReason;
 	private String activityDescription;
 	private String defaultHierarchy;
-	private String nameSourceId;
-	@JsonIgnore
-	private String traits;
-	@JsonIgnore
-	private String traitsJson;
-	/*private Set commonNameses = new HashSet(0);
-	private Set namePermissionsForNodeId = new HashSet(0);
-	private Set taxonomyRegistriesForParentTaxonDefinitionId = new HashSet(0);
-	private Set recommendationsForTaxonConceptId = new HashSet(0);
-	private Set acceptedSynonymsForSynonymId = new HashSet(0);
-	private Set namePermissionsForRootNodeId = new HashSet(0);
-	private Set speciesGroupMappings = new HashSet(0);
-	private Set speciesPermissions = new HashSet(0);
-	private Set taxonomyDefinitionYears = new HashSet(0);
-	private Set docSciNames = new HashSet(0);
-	private Set taxonomyRegistriesForTaxonDefinitionId = new HashSet(0);
-	private Set acceptedSynonymsForAcceptedId = new HashSet(0);
-	private Set synonymses = new HashSet(0);
-	private Set traitTaxonomyDefinitions = new HashSet(0);
-	private Set facts = new HashSet(0);
-	private Set recommendationsForAcceptedNameId = new HashSet(0);
-	private Set taxonomyDefinitionAuthors = new HashSet(0);
-	private Set taxonomyDefinitionUsers = new HashSet(0);
-	private Set specieses = new HashSet(0);
-*/
-	public TaxonomyDefinition() {
+	
+	//private Set <TaxonomyRegistry> taxonomyRegistries = new HashSet<TaxonomyRegistry>(0);
+	
+	private User User;
+
+	public Taxon() {
+		//used by hibernate
 	}
-
+	
+	
 	@Id
-
 	@Column(name = "id", unique = true, nullable = false)
 	public long getId() {
 		return this.id;
@@ -92,6 +82,8 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
+
+	
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "group_id")
@@ -106,11 +98,11 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "uploader_id")
 	public User getUser() {
-		return this.user;
+		return this.User;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUser(User suser) {
+		this.User = suser;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -304,6 +296,15 @@ public class TaxonomyDefinition implements java.io.Serializable {
 		this.relationship = relationship;
 	}
 
+	@Column(name = "class", nullable = false)
+	public String getClass_() {
+		return this.class_;
+	}
+
+	public void setClass_(String class_) {
+		this.class_ = class_;
+	}
+
 	@Column(name = "flagging_reason", length = 1500)
 	public String getFlaggingReason() {
 		return this.flaggingReason;
@@ -357,32 +358,34 @@ public class TaxonomyDefinition implements java.io.Serializable {
 	public void setDefaultHierarchy(String defaultHierarchy) {
 		this.defaultHierarchy = defaultHierarchy;
 	}
-
-	@Column(name = "name_source_id")
-	public String getNameSourceId() {
-		return this.nameSourceId;
+	
+	
+	
+//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "taxonomyDefinition")
+//	public Set<TaxonomyRegistry> getTaxonomyRegistries() {
+//		return this.taxonomyRegistries;
+//	}
+//
+//	public void setTaxonomyRegistries(Set<TaxonomyRegistry> taxonomyRegistries) {
+//		this.taxonomyRegistries = taxonomyRegistries;
+//	}
+	@Column(name = "species_id")
+	public long getSpeciesId() {
+		return speciesId;
 	}
 
-	public void setNameSourceId(String nameSourceId) {
-		this.nameSourceId = nameSourceId;
+
+	public void setSpeciesId(long speciesId) {
+		this.speciesId = speciesId;
 	}
 
-	@Column(name = "traits")
-	public String getTraits() {
-		return this.traits;
+	@Override
+	public String toString() {
+		return "Taxon [id=" + id + ", name=" + name + ", rank=" + rank+"]";
 	}
 
-	public void setTraits(String traits) {
-		this.traits = traits;
-	}
 
-	@Column(name = "traits_json")
-	public String getTraitsJson() {
-		return this.traitsJson;
-	}
-
-	public void setTraitsJson(String traitsJson) {
-		this.traitsJson = traitsJson;
-	}
+	
 
 }
+

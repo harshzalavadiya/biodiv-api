@@ -2,7 +2,6 @@ package biodiv.common;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -14,9 +13,10 @@ import javax.persistence.UniqueConstraint;
 public class SpeciesGroup implements java.io.Serializable {
 
 	private long id;
-	private SpeciesGroup speciesGroup;
+	//private SpeciesGroup speciesGroup;
 	private String name;
 	private Integer groupOrder;
+	//private Set<Taxon> taxons = new HashSet<Taxon>(0);
 
 	public SpeciesGroup() {
 	}
@@ -28,7 +28,7 @@ public class SpeciesGroup implements java.io.Serializable {
 
 	public SpeciesGroup(long id, SpeciesGroup speciesGroup, String name, Integer groupOrder) {
 		this.id = id;
-		this.speciesGroup = speciesGroup;
+		//this.speciesGroup = speciesGroup;
 		this.name = name;
 		this.groupOrder = groupOrder;
 	}
@@ -44,15 +44,15 @@ public class SpeciesGroup implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "parent_group_id")
-	public SpeciesGroup getSpeciesGroup() {
-		return this.speciesGroup;
-	}
-
-	public void setSpeciesGroup(SpeciesGroup speciesGroup) {
-		this.speciesGroup = speciesGroup;
-	}
+//	@ManyToOne(fetch = FetchType.EAGER)
+//	@JoinColumn(name = "parent_group_id")
+//	public SpeciesGroup getSpeciesGroup() {
+//		return this.speciesGroup;
+//	}
+//
+//	public void setSpeciesGroup(SpeciesGroup speciesGroup) {
+//		this.speciesGroup = speciesGroup;
+//	}
 
 	@Column(name = "name", unique = true, nullable = false)
 	public String getName() {
@@ -71,6 +71,15 @@ public class SpeciesGroup implements java.io.Serializable {
 	public void setGroupOrder(Integer groupOrder) {
 		this.groupOrder = groupOrder;
 	}
+
+//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "speciesGroup")
+//	public Set<Taxon> getTaxons() {
+//		return taxons;
+//	}
+//
+//	public void setTaxons(Set<Taxon> taxons) {
+//		this.taxons = taxons;
+//	}
 
 	@Override
 	public String toString() {

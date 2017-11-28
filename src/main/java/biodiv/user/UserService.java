@@ -37,7 +37,6 @@ public class UserService extends AbstractService<User> {
 		try {
 			userDao.openCurrentSession();
 			User user = userDao.findByEmailAndPassword(email, password);
-			userDao.closeCurrentSession();
 			return user;
 		} catch (Exception e) {
 			throw e;
@@ -47,7 +46,8 @@ public class UserService extends AbstractService<User> {
 	}
 
 	public RegistrationCode register(String email) {
-		if(email == null) return null;
+		if (email == null)
+			return null;
 		try {
 			RegistrationCode registrationCode = new RegistrationCode(email);
 			userDao.openCurrentSessionWithTransaction();
