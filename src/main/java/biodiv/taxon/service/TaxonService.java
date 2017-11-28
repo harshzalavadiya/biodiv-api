@@ -77,9 +77,6 @@ public class TaxonService extends AbstractService<Taxon> {
 	private List<TaxonRelation> list(Long parent, Long classificationId, Set<String> taxonIds, Boolean expand_taxon) {
 
 		try {
-
-			taxonDao.openCurrentSession();
-
 			List<Object[]> taxonList = taxonDao.list(parent, classificationId, taxonIds, expand_taxon);
 			Set<String> data = null;
 
@@ -233,7 +230,7 @@ public class TaxonService extends AbstractService<Taxon> {
 	 */
 	public Set<String> specificSearch(Long classification, String term,Long taxonids) {
 		//TODO:NULL check , FINALLY close connection, string constant
-		taxonDao.openCurrentSession();
+	
 		List<Object[]> results = new ArrayList<Object[]>();
 		if(taxonid==null){
 			results = taxonDao.specificSearch(classification, term,null);
@@ -268,7 +265,6 @@ public class TaxonService extends AbstractService<Taxon> {
 	}
 
 	public Long classificationIdByName(String name) {
-		taxonDao.openCurrentSession();
 		List<Classification> results=taxonDao.classificationIdByName(name);
 		Long id=results.get(0).getId();
 		return id;
@@ -277,7 +273,7 @@ public class TaxonService extends AbstractService<Taxon> {
 
 	public List<Object[]> getTaxonData(Integer offset, Integer limit) {
 		// TODO Auto-generated method stub
-		taxonDao.openCurrentSession();
+	
 		List<Object[]> result=taxonDao.getTaxonData(offset,limit);
 		
 		return result;

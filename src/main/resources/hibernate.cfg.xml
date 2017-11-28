@@ -70,6 +70,9 @@
 		<mapping class="biodiv.userGroup.UserGroup" />
 		<mapping class="biodiv.auth.token.Token" />
 		<mapping class="biodiv.userGroupMemberRole.UserGroupMemberRole"/>
+		<mapping class="biodiv.traits.Trait" />
+		<mapping class="biodiv.traits.Fact" />
+		<mapping class="biodiv.traits.TraitValue" />
 	</session-factory>
 
 </hibernate-configuration>

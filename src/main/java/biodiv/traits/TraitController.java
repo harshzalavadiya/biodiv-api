@@ -1,4 +1,4 @@
-package biodiv.speciesGroup;
+package biodiv.traits;
 
 import java.util.List;
 
@@ -13,20 +13,20 @@ import org.slf4j.LoggerFactory;
 import biodiv.Intercept;
 import biodiv.common.SpeciesGroup;
 
-@Path("/species")
+@Path("/trait")
 
-public class SpeciesGroupController {
-	private final Logger log = LoggerFactory.getLogger(SpeciesGroup.class);
+public class TraitController {
 	
-	SpeciesGroupService speciesGroupService=new SpeciesGroupService();
+	TraitService traitService=new TraitService();
+	
+	
 	
 	@GET
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
-	public List<SpeciesGroup> list(){
-		List<SpeciesGroup> results= speciesGroupService.list();
-		return results;
+	public List<Object[]> list(){
+		List<Object[]> traitList=traitService.list();
+		return traitList;
 	}
 }
-

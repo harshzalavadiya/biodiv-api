@@ -37,7 +37,6 @@ public class SearchTaxon {
 			results.clear();
 			results = taxonService.getTaxonData(offset, limit);
 
-			System.out.println(results.size() * count);
 
 			if (results.size() == 0) {
 				stop = false;
