@@ -1,14 +1,11 @@
 package biodiv.taxon.search;
 
-import java.io.FileReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -18,11 +15,8 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
-
-import biodiv.BiodivApplication;
 import biodiv.taxon.service.TaxonService;
 
 public class SearchTaxon {

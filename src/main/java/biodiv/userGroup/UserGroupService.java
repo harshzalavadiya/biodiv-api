@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.jvnet.hk2.annotations.Service;
-import biodiv.common.AbstractDao;
 
 import biodiv.Intercept;
 import biodiv.common.AbstractService;

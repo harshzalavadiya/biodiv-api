@@ -1,9 +1,5 @@
-<<<<<<< HEAD:src/main/java/biodiv/taxon/TaxonomyDefinition.java
-package biodiv.taxon;
 
-=======
 package biodiv.taxon.datamodel.dao;
->>>>>>> b6040d04d637ec2831c0238a185df4c0d4f14f9f:src/main/java/biodiv/taxon/datamodel/dao/Taxon.java
 import java.util.Date;
 
 import javax.persistence.Column;

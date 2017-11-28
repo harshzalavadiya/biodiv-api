@@ -1,16 +1,12 @@
 package biodiv;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Singleton;
 import javax.ws.rs.ApplicationPath;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import java.io.FileReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
-import javax.ws.rs.ApplicationPath;
-
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
