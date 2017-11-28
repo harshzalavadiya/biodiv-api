@@ -1,13 +1,15 @@
 package biodiv;
 
+import javax.inject.Singleton;
 import javax.ws.rs.ApplicationPath;
 
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -16,7 +18,7 @@ import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module.Feature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import biodiv.common.JTSObjectMapperProvider;
-import org.glassfish.jersey.logging.LoggingFeature;
+import biodiv.observation.ObservationService;
 
 @ApplicationPath("/")
 public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Application
@@ -30,6 +32,32 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 
 		// auto scanning of all classed for resources providers and features
 		packages("biodiv");
+		register(new AbstractBinder(){
+		@Override
+		protected void configure() {
+		    bind(MyInterceptionService.class)
+            .to(org.glassfish.hk2.api.InterceptionService.class)
+            .in(Singleton.class);
+		    bind(ObservationService.class)
+            .to(ObservationService.class)
+            .in(Singleton.class);
+//		    bind(UserGroupService.class)
+//            .to(UserGroupService.class)
+//            .in(Singleton.class);
+		}
+	});
+		
+//		register(new AbstractBinder(){
+//			@Override
+//			protected void configure() {
+//			    bindFactory(SessionFactoryFactory.class)
+//			            .to(SessionFactory.class)
+//			            .in(Singleton.class);
+//			    bindFactory(SFFactory.class)
+//			            .to(Session.class)
+//			            .in(RequestScoped.class);
+//			}
+//		});
 		register(RolesAllowedDynamicFeature.class);
 		register(org.glassfish.jersey.server.filter.UriConnegFilter.class);
 		register(org.glassfish.jersey.logging.LoggingFeature.class);
@@ -67,6 +95,7 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 		// features
 		// property(ServerProperties.METAINF_SERVICES_LOOKUP_DISABLE, true);
 	}
+	
 
 	/*
 	 * @Override public Set<Class<?>> getClasses() { Set<Class<?>> resources =

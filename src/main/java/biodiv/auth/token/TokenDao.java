@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
-import biodiv.user.User;
 
 
 class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<Token, Long> {

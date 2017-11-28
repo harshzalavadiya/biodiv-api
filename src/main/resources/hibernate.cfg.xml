@@ -41,6 +41,8 @@
 		<property name="hbm2ddl.auto">update</property>
 		<property name="hibernate.id.new_generator_mappings">true</property>
 
+		<property name="hibernate.transaction.coordinator_class">jdbc</property>
+		<property name="hibernate.current_session_context_class">thread</property>
 		<!-- Mappings -->
 		<!-- mapping package="biodiv"/ -->
 		<mapping class="biodiv.common.ExternalLinks" />
@@ -62,6 +64,7 @@
 		<mapping class="biodiv.user.Role" />
 		<mapping class="biodiv.userGroup.UserGroup" />
 		<mapping class="biodiv.auth.token.Token" />
+		<mapping class="biodiv.userGroupMemberRole.UserGroupMemberRole"/>
 	</session-factory>
 
 </hibernate-configuration>

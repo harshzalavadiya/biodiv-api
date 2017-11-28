@@ -88,8 +88,18 @@ dependencies {
 	compile group: 'javax.mail', name: 'mail', version: '1.5.0-b01'
 	compile group: 'org.antlr', name: 'stringtemplate', version: '4.0.2'
 	compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
-}
+	
+	
+	// https://mvnrepository.com/artifact/org.glassfish.hk2/hk2
+	compile group: 'org.glassfish.hk2', name: 'hk2', version: '2.4.0-b10'
+	
+	// https://mvnrepository.com/artifact/org.json/json
+	compile group: 'org.json', name: 'json', version: '20160810'
 
+
+	
+
+}
 
 dependencies {
     def tomcatVersion = '8.0.42'
@@ -97,6 +107,8 @@ dependencies {
            "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
            "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
 }
+
+
 tomcat {
     httpPort = 8090
     //httpsPort = 8099

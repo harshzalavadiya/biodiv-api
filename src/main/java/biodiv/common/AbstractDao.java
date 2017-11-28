@@ -4,19 +4,12 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.ws.rs.NotFoundException;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.user.User;
 import biodiv.util.HibernateUtil;
 
 public abstract class AbstractDao<T, K extends Serializable> {
@@ -24,6 +17,9 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	private static final Logger log = LoggerFactory.getLogger(AbstractDao.class);
 
 	private Session currentSession;
+	
+//	@Inject
+//	private javax.inject.Provider<Session> session;
 
 	private Transaction currentTransaction;
 
@@ -35,6 +31,7 @@ public abstract class AbstractDao<T, K extends Serializable> {
 
 
 	public Session openCurrentSession() {
+		
 		currentSession = HibernateUtil.getSessionFactory().openSession();
 		return currentSession;
 	}
@@ -46,7 +43,8 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	}
 
 	public void closeCurrentSession() {
-		currentSession.close();
+		System.out.println("ABJINAVVVVVVVVVVVVVVVVvvvvvvvvvvvvv");
+		//HibernateUtil.getSessionFactory().getCurrentSession().close();
 	}
 
 	public void closeCurrentSessionWithTransaction() {
@@ -56,7 +54,8 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	}
 
 	public Session getCurrentSession() {
-		return currentSession;
+		System.out.println(System.identityHashCode(HibernateUtil.getSessionFactory().getCurrentSession()));
+		return HibernateUtil.getSessionFactory().getCurrentSession();
 	}
 
 	public void setCurrentSession(Session currentSession) {
@@ -87,12 +86,14 @@ public abstract class AbstractDao<T, K extends Serializable> {
 
 	@SuppressWarnings("unchecked")
 	public List<T> findAll() {
+		System.out.println("findalllll");
 		return (List<T>) getCurrentSession().createCriteria(daoType)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<T> findAll(int limit, int offset) {
+		System.out.println("findalllllaa");
 		return (List<T>) getCurrentSession().createCriteria(daoType)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).setFirstResult(offset).setMaxResults(limit).list();
 	}

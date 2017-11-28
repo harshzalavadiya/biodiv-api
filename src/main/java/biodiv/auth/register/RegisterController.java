@@ -4,9 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -14,17 +13,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mchange.v2.beans.BeansUtils;
-
 import biodiv.auth.LoginController;
-import biodiv.auth.token.Token;
-import biodiv.auth.token.TokenService;
 import biodiv.common.Language;
 import biodiv.common.LanguageService;
 import biodiv.common.MailService;
@@ -32,7 +25,6 @@ import biodiv.common.MessageService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
-import biodiv.userGroup.UserGroup;
 import biodiv.util.Utils;
 
 @Path("/register")

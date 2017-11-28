@@ -14,6 +14,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vividsolutions.jts.geom.Geometry;
 
 import biodiv.dataset.Dataset;
@@ -69,6 +70,7 @@ public abstract class Metadata {
 	//XXX to be removed after locationScale migration
 	private String locationAccuracy;
 	private LocationScale locationScale;
+	@JsonIgnore
 	private Geometry topology;
      
 	private double latitude;

@@ -192,6 +192,12 @@ public class Observation extends DataObject {
 //	static belongsTo=[SUser,UserGroup,Checklists,Dataset]
 
 	private Long id;
+	
+	public String lis(){
+		System.out.println("hhhhhhhhhh");
+		String x = "abc";
+		return x;
+	}
 
 	public Observation() {
 		// this form is used by hibernate
@@ -445,7 +451,7 @@ public class Observation extends DataObject {
 			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "user_group_id", nullable = false, updatable = false) })
 	public Set<UserGroup> getUserGroups() {
-		return null;//this.userGroups;
+		return this.userGroups;
 	}
 
 	public void setUserGroups(Set<UserGroup> userGroups) {

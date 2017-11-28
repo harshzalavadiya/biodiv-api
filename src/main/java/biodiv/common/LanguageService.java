@@ -5,8 +5,6 @@ import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 
-import biodiv.user.User;
-
 public class LanguageService extends AbstractService<Language> {
 
 	private static final Random NUMBER_GENERATOR = new Random();

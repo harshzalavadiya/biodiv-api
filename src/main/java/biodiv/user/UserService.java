@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.auth.register.RegistrationCode;
 import biodiv.common.AbstractService;
-import biodiv.common.Language;
 
 public class UserService extends AbstractService<User> {
 

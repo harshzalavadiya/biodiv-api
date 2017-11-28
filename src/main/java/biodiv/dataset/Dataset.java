@@ -1,15 +1,13 @@
 package biodiv.dataset;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -19,7 +17,6 @@ import biodiv.common.Language;
 import biodiv.common.License;
 import biodiv.common.Ufile;
 import biodiv.common.eml.Contact;
-import biodiv.observation.Observation;
 import biodiv.user.User;
 
 @Entity
