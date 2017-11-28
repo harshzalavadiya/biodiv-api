@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Intercept;
 import biodiv.taxon.datamodel.dao.Classification;
 import biodiv.taxon.datamodel.ui.TaxonRelation;
 import biodiv.taxon.service.TaxonService;
@@ -39,6 +40,7 @@ public class TaxonController {
 	 */
 	@GET
 	@Path("/list")
+	@Intercept
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<TaxonRelation> list(@QueryParam("parent") Long parent,
 			@QueryParam("classification") Long classificationId,
@@ -82,6 +84,7 @@ public class TaxonController {
 	@GET
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
 	public List<Map<String, Object>> search(@QueryParam("term") String term){
         
 		 List<Map<String, Object>> name=taxonService.search(term);
@@ -100,6 +103,7 @@ public class TaxonController {
 	@GET
 	@Path("/retrieve/specificSearch")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
 	public Set<String> specificSearch(@QueryParam("term") String term,
 		@QueryParam("classification") Long classificationId,
 		@QueryParam("taxonid") Long taxonid) {
@@ -125,6 +129,7 @@ public class TaxonController {
 	@GET
 	@Path("/classification/list")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
 	public List<Classification> classification() {
 		List<Classification> data = taxonService.classification();
 		return data;
@@ -137,6 +142,7 @@ public class TaxonController {
 	
 	@GET
 	@Path("/classification/list/{name}")
+	@Intercept
 	@Produces(MediaType.APPLICATION_JSON)
 	public Long classificationIdByName(@PathParam("name") String name) {
 		Long data = taxonService.classificationIdByName(name);

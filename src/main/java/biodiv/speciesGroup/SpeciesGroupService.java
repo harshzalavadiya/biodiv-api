@@ -24,7 +24,6 @@ public class SpeciesGroupService extends AbstractService<SpeciesGroup>{
 public List<SpeciesGroup> list() {
 	// TODO Auto-generated method stub
 	try{
-		speciesGroupDao.openCurrentSession();
 		List<SpeciesGroup> results= speciesGroupDao.list();
 		return results;
 	}
@@ -33,7 +32,7 @@ public List<SpeciesGroup> list() {
 		throw e;
 	}
 	finally {
-		speciesGroupDao.closeCurrentSession();
+		
 	}
 	
 	

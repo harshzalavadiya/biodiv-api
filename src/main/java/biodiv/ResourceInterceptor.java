@@ -19,6 +19,7 @@ public class ResourceInterceptor implements MethodInterceptor {
     	Object result = null;
     	try{
     		boolean isActive = sf.getCurrentSession().getTransaction().isActive(); 
+    		System.out.println(isActive);
     		if ( !isActive) {  
                 log.debug("Starting a database transaction");  
                 sf.getCurrentSession().beginTransaction();  
