@@ -12,6 +12,8 @@
 	<logger name="com.mchange" level="WARN" additivity="false"></logger>
 	<logger name="org.hibernate" level="ALL" additivity="false"></logger>
 	<logger name="com.mchange" level="WARN" additivity="false"></logger>
+	<logger name="org.glassfish.hk2" level="ALL" additivity="false"></logger>
+	
 	<logger name="biodiv.*" level="ALL" additivity="false"></logger>
 
 	<logger name="org.pac4j.*" level="DEBUG" additivity="false" />

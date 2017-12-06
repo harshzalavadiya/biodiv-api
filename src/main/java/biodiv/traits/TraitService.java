@@ -215,8 +215,8 @@ public class TraitService extends AbstractService<Trait> {
 				throw new NotFoundException("No license find with name : ");
 			}
 
-			UserService userService = new UserService();
-			User s = userService.findById(Long.parseLong(profile.getId()));
+			User user=new User();
+			User s =  (User) user.get(Long.parseLong(profile.getId()));
 
 			for (Long traitValue : traitValues) {
 				Fact newupdated = new Fact();

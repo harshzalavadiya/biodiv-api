@@ -3,6 +3,11 @@ package biodiv.common;
 
 import java.io.Serializable;
 
+import java.util.Set;
+
+import biodiv.userGroup.UserGroup;
+
+
 /**
  * 
  * @author abhinav
@@ -37,8 +42,9 @@ public interface GenericModel<T> {
 	 * @param flush
 	 * @return
 	 */
-	public T save(boolean flush);
-	
+
+
+	public void save();
 	/**
 	 * 
 	 * @param flush
@@ -52,5 +58,6 @@ public interface GenericModel<T> {
 	 * @return
 	 */
 	public void delete();
+
 
 }

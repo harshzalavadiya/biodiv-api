@@ -27,13 +27,7 @@ public class CommonMethod<T> implements GenericModel {
 		return null;
 	}
 
-	@Override
-	public T save(boolean flush) {
-		
-		T instance = (T) HibernateUtil.getSessionFactory().getCurrentSession().save(this.getClass());
-		return instance;
-	}
-
+	
 	@Override
 	public void update(boolean flush) {
 		// TODO Auto-generated method stub
@@ -42,6 +36,12 @@ public class CommonMethod<T> implements GenericModel {
 
 	@Override
 	public void delete() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void save() {
 		// TODO Auto-generated method stub
 		
 	}

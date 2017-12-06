@@ -30,11 +30,12 @@ import org.hibernate.validator.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import biodiv.auth.token.Token;
+import biodiv.common.CommonMethod;
 import biodiv.common.Language;
 
 @Entity
 @Table(name = "suser", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-public class User implements Principal {
+public class User extends CommonMethod implements Principal {
 
 	private long id;
 	private Language language;

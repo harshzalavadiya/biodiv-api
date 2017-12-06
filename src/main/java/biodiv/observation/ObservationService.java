@@ -18,10 +18,10 @@ public class ObservationService extends AbstractService<Observation> {
 
 	private ObservationDao observationDao;
 	
-	
 	public ObservationService() {
 		this.observationDao = new ObservationDao();
 	}
+	
 	
 	@Override
 	public ObservationDao getDao() {
@@ -36,50 +36,14 @@ public class ObservationService extends AbstractService<Observation> {
 	@Intercept
 	public List<UserGroup> obvUserGroups(long id) {
 		try{
-			//observationDao.openCurrentSession();
 			List<UserGroup> usrGrps = observationDao.obvUserGroups(id);
 			return usrGrps;
 		} catch(Exception e) {
 			throw e;
 		} finally{
-			//observationDao.closeCurrentSession();
 		}
 
 	
 	}
-	
-	@Intercept
-	public Observation posttoGroups(String submitType, String objectIds, String userGroups,long userId) throws Exception {
-		
-		//boolean localTransaction = false;
-		try{
 
-			
-//			if((HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().getStatus()) != TransactionStatus.ACTIVE)
-//			{
-//				HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
-//				localTransaction = true;
-//			}
-			Observation obv  = observationDao.posttoGroups(submitType,objectIds,userGroups,userId);
-			save(obv);
-			
-//			if(localTransaction == true)
-//			{
-//				HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit(); 
-//			}
-			
-			 return obv;
-		} catch(Exception e) {
-//			if(localTransaction == true)
-//			{
-//				HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback(); 
-//			}  
-			throw e;
-		} finally{
-			
-		}
-		
-		
-	}   
-    
 }

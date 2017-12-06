@@ -69,12 +69,11 @@ public abstract class  AbstractService<T> {
 		}
 	}
 
-	@Intercept
 	public T findById(Long id) {
 		log.debug("findById " + id);
 		try {
-			System.out.println("inside findbyid");
-			HibernateUtil.getSessionFactory().getCurrentSession();
+			//System.out.println("inside findbyid");
+			//HibernateUtil.getSessionFactory().getCurrentSession();
 			//getDao().openCurrentSession();
 			T entity = (T) getDao().findById(id);
 			//getDao().closeCurrentSession();

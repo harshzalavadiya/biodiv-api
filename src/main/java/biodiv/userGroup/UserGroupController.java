@@ -1,7 +1,11 @@
 package biodiv.userGroup;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -18,6 +22,7 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Intercept;
+import biodiv.common.DataObject;
 import biodiv.observation.Observation;
 import biodiv.observation.ObservationService;
 import biodiv.user.User;
@@ -27,18 +32,18 @@ import biodiv.user.User;
 public class UserGroupController {
 	@Inject
 	ObservationService observationService;
-	
-	UserGroupService userGroupService = new UserGroupService();
+	@Inject
+	UserGroupService userGroupService;
 	
 	@Context
     private ResourceContext resourceContext;
 
-	
 	@GET
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<UserGroup> list(@QueryParam("max") int max ,@QueryParam("offset") int offset){
-		
+		System.out.println(max);
+		System.out.println(offset);
 		List<UserGroup> usrGrp = null;
 		if(max==0 && offset==0){
 			 usrGrp = userGroupService.findAll();
@@ -73,18 +78,22 @@ public class UserGroupController {
 	@Path("/bulkPost")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
-	public Observation bulkPost(@QueryParam("pullType") String pullType,@QueryParam("selectionType") String selectionType,@QueryParam("objectType") String objectType,@QueryParam("objectIds") String objectIds,@QueryParam("submitType") String submitType,@QueryParam("userGroups") String userGroups,@QueryParam("filterUrl") String filterUrl,@Pac4JProfile CommonProfile profile) throws NumberFormatException, Exception{
-		Observation obv = observationService.posttoGroups(submitType,objectIds,userGroups,Long.parseLong(profile.getId()));
+	@Intercept
+	public String bulkPost(@QueryParam("pullType") String pullType,@QueryParam("selectionType") String selectionType,@QueryParam("objectType") String objectType,@QueryParam("objectIds") String objectIds,@QueryParam("submitType") String submitType,@QueryParam("userGroups") String userGroups,@QueryParam("filterUrl") String filterUrl,@Pac4JProfile CommonProfile profile) throws NumberFormatException, Exception{
+		System.out.println("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+		System.out.println(observationService);
+		String msg = userGroupService.posttoGroups(objectType,pullType,submitType,objectIds,userGroups, Long.parseLong(profile.getId()),filterUrl);
 		//observationService.update(obv);
-		return obv;
+		return msg;
 	}
-	
-	
 	
 	
 	@Path("/{groupName}/{x}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object mapfunc(@PathParam("x") String x){	
+		//String x = "abhinav";
+		System.out.println("ggggggggggggggg");
+		//return new ObservationController();
 		Mapping m = new Mapping(x);
 	
 		return m.getObject();
