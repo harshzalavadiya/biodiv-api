@@ -23,6 +23,7 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Intercept;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenService;
 import biodiv.common.ResponseModel;
@@ -44,6 +45,7 @@ public class LoginController {
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
 	public Response auth(@FormParam("username") String username, @FormParam("password") String password) {
 
 		try {

@@ -98,7 +98,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 			path = q.setParameter("tId", tId).setParameter("classificationId", classificationId).getResultList();
 			paths = path.get(0);
 			int i = 0;
-			System.out.println(" path" + paths);
+			
 			String newString = new String();
 			for (i = 0; i < paths.length(); i++) {
 				char c = paths.charAt(i);

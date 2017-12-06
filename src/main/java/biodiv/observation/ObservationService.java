@@ -60,7 +60,6 @@ public class ObservationService extends AbstractService<Observation> {
 //				HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 //				localTransaction = true;
 //			}
-			System.out.println("ObservationService class");
 			Observation obv  = observationDao.posttoGroups(submitType,objectIds,userGroups,userId);
 			save(obv);
 			

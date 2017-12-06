@@ -52,9 +52,9 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 		    bind(MyInterceptionService.class)
             .to(org.glassfish.hk2.api.InterceptionService.class)
             .in(Singleton.class);
-		    bind(ObservationService.class)
-            .to(ObservationService.class)
-            .in(Singleton.class);
+//		    bind(ObservationService.class)
+//            .to(ObservationService.class)
+//            .in(Singleton.class);
 //		    bind(UserGroupService.class)
 //            .to(UserGroupService.class)
 //            .in(Singleton.class);

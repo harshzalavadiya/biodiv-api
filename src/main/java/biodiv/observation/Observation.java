@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -28,6 +29,7 @@ import javax.persistence.UniqueConstraint;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import biodiv.common.DataObject;
+import biodiv.common.GenericModel;
 import biodiv.resource.Resource;
 import biodiv.userGroup.UserGroup;
 
@@ -35,8 +37,11 @@ import biodiv.userGroup.UserGroup;
 @Table(name = "observation", uniqueConstraints = { @UniqueConstraint(columnNames = "id"), })
 @NamedQuery(name = Observation.QUERY_SELECT_BY_ID, query = "SELECT obv FROM Observation obv WHERE obv.id = :"
 		+ Observation.PARAM_ID)
-public class Observation extends DataObject {
 
+public class Observation extends DataObject {
+	
+//	@Inject
+//	ObservationService observationService;
 	public static final String QUERY_SELECT_BY_ID = "Observation.findById";
 	public static final String PARAM_ID = "id";
 
@@ -206,10 +211,12 @@ public class Observation extends DataObject {
 
 	public Observation() {
 		// this form is used by hibernate
+		//super(Observation.class);
 	}
 
 	public Observation(Map properties) {
 		// map properties of observation using reflection to the keys of the map
+		//super(Observation.class);
 	}
 	
 
@@ -435,7 +442,7 @@ public class Observation extends DataObject {
 			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "resource_id", nullable = false, updatable = false) })
 	public Set<Resource> getResources() {
-		return null;//this.resources;
+		return null;//this.resources;x
 	}
 	
 	public void setResources(Set<Resource> resources) {
@@ -476,5 +483,15 @@ public class Observation extends DataObject {
 	public String toString() {
 		return "Observation [id=" + id + "]";
 	}
+
+//	@Override
+//	public Observation get(long obvId) {
+//		// TODO Auto-generated method stub
+//		System.out.println("pfday");
+//		ObservationService observationService =new ObservationService();
+//		Observation result=observationService.findById(obvId);
+//		return result;
+//	}
+	
 
 }

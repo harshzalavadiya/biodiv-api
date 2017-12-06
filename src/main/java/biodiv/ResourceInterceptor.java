@@ -11,6 +11,7 @@ import biodiv.util.HibernateUtil;
 public class ResourceInterceptor implements MethodInterceptor {
 	
 	private static final Logger log = LoggerFactory.getLogger(ResourceInterceptor.class);
+	
 	private static SessionFactory sf = HibernateUtil.getSessionFactory();  
 	
     @Override

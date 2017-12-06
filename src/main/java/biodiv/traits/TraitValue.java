@@ -1,14 +1,13 @@
 package biodiv.traits;
 
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
@@ -23,7 +22,7 @@ public class TraitValue implements java.io.Serializable {
 
 	private long id;
 	private long version;
-	private Trait trait;
+	private long traitId;
 	private String description;
 	private String icon;
 	private String source;
@@ -55,7 +54,7 @@ public class TraitValue implements java.io.Serializable {
 //	}
 
 	@Id
-
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name = "id", unique = true, nullable = false)
 	public long getId() {
 		return this.id;
@@ -73,16 +72,6 @@ public class TraitValue implements java.io.Serializable {
 
 	public void setVersion(long version) {
 		this.version = version;
-	}
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trait_id", nullable = false)
-	public Trait getTrait() {
-		return this.trait;
-	}
-
-	public void setTrait(Trait trait) {
-		this.trait = trait;
 	}
 
 	@Column(name = "description")
@@ -121,14 +110,25 @@ public class TraitValue implements java.io.Serializable {
 		this.value = value;
 	}
 
-	@Column(name = "is_deleted", nullable = false)
-	public boolean isIsDeleted() {
-		return this.isDeleted;
+	
+	@Column(name = "trait_id", nullable = false)
+	public long getTraitId() {
+		return traitId;
 	}
 
-	public void setIsDeleted(boolean isDeleted) {
+	public void setTraitId(long traitId) {
+		this.traitId = traitId;
+	}
+	@Column(name = "is_deleted", nullable = false)
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
+	
+	
 
 //	@OneToMany(fetch = FetchType.LAZY, mappedBy = "traitValue")
 //	public Set getFacts() {

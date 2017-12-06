@@ -38,8 +38,7 @@ public class UserGroupController {
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<UserGroup> list(@QueryParam("max") int max ,@QueryParam("offset") int offset){
-		System.out.println(max);
-		System.out.println(offset);
+		
 		List<UserGroup> usrGrp = null;
 		if(max==0 && offset==0){
 			 usrGrp = userGroupService.findAll();
@@ -75,8 +74,6 @@ public class UserGroupController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
 	public Observation bulkPost(@QueryParam("pullType") String pullType,@QueryParam("selectionType") String selectionType,@QueryParam("objectType") String objectType,@QueryParam("objectIds") String objectIds,@QueryParam("submitType") String submitType,@QueryParam("userGroups") String userGroups,@QueryParam("filterUrl") String filterUrl,@Pac4JProfile CommonProfile profile) throws NumberFormatException, Exception{
-		System.out.println("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-		System.out.println(observationService);
 		Observation obv = observationService.posttoGroups(submitType,objectIds,userGroups,Long.parseLong(profile.getId()));
 		//observationService.update(obv);
 		return obv;
@@ -88,9 +85,6 @@ public class UserGroupController {
 	@Path("/{groupName}/{x}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object mapfunc(@PathParam("x") String x){	
-		//String x = "abhinav";
-		System.out.println("ggggggggggggggg");
-		//return new ObservationController();
 		Mapping m = new Mapping(x);
 	
 		return m.getObject();
