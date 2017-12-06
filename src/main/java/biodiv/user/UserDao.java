@@ -10,20 +10,15 @@ import javax.ws.rs.NotFoundException;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import biodiv.observation.Observation;
 
 
 class UserDao extends AbstractDao<User, Long> implements DaoInterface<User, Long>{
 	
-	/*protected UserDao(Class<User> clazz) {
-		super(clazz.getClass());
-	}*/
-
 	@Override
 	public User findById(Long id) {
-		
 		User entity = (User) getCurrentSession().get(User.class, id);
 		return entity;
-		
 	}
 
 	public User findByEmail(String email) {

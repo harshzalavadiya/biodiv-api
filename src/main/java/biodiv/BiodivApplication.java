@@ -1,5 +1,6 @@
 package biodiv;
 
+import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +25,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import biodiv.common.JTSObjectMapperProvider;
 import biodiv.observation.ObservationService;
+import biodiv.userGroup.UserGroupService;
 
 @ApplicationPath("/")
 public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Application
@@ -31,19 +34,21 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 	private final Logger log = LoggerFactory.getLogger(BiodivApplication.class);
 	private Map<String,Object> getConfig= new HashMap<String,Object>();
 	
+	
 	public BiodivApplication() {
 
 		System.out.println("Starting Biodiv Api Application");
-//		 Yaml yaml = new Yaml(); 
-//		 try { 
-//	    	 Map<String, Object> list = (HashMap<String, Object>) yaml.load(new FileReader("/home/sunil/git/biodiv-api/conf/Config.yml")); 
-//	    	 for (Map.Entry<String, Object> entry : list.entrySet()){
-//	    	     System.out.println(entry.getKey() + "/" + entry.getValue());
-//	    	 }
-//	    	 
-//	    }catch(Exception e){
-//	    	System.out.println(e);
-//	    }
+		 Yaml yaml = new Yaml(); 
+		 try { 
+	    	 Map<String, Object> list = (HashMap<String, Object>) yaml.load(new FileReader("/home/abhinav/git/biodiv-api/conf/Config.yml")); 
+	    	 for (Map.Entry<String, Object> entry : list.entrySet()){
+	    	     System.out.println(entry.getKey() + "/" + entry.getValue());
+	    	 }	    	 
+	    }catch(Exception e){
+	    	e.printStackTrace();
+	    	System.out.println(e);
+	    }
+		 
 		// auto scanning of all classed for resources providers and features
 		packages("biodiv");
 		register(new AbstractBinder(){
@@ -55,9 +60,9 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 		    bind(ObservationService.class)
             .to(ObservationService.class)
             .in(Singleton.class);
-//		    bind(UserGroupService.class)
-//            .to(UserGroupService.class)
-//            .in(Singleton.class);
+		    bind(UserGroupService.class)
+            .to(UserGroupService.class)
+            .in(Singleton.class);
 		}
 	});
 		
@@ -115,7 +120,6 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 	public void setGetConfig(Map<String, Object> getConfig) {
 		this.getConfig = getConfig;
 	}
-
 	/*
 	 * @Override public Set<Class<?>> getClasses() { Set<Class<?>> resources =
 	 * new java.util.HashSet<>();

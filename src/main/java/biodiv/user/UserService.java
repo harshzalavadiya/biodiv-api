@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.auth.register.RegistrationCode;
+import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
 
 public class UserService extends AbstractService<User> {
@@ -14,11 +15,6 @@ public class UserService extends AbstractService<User> {
 
 	public UserService() {
 		this.userDao = new UserDao();
-	}
-
-	@Override
-	public UserDao getDao() {
-		return userDao;
 	}
 
 	public User findByEmail(String email) {
@@ -60,6 +56,12 @@ public class UserService extends AbstractService<User> {
 		} finally {
 			userDao.closeCurrentSessionWithTransaction();
 		}
+	}
+
+	@Override
+	public AbstractDao<User, Long> getDao() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

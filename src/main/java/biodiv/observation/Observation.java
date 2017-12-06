@@ -1,10 +1,15 @@
 package biodiv.observation;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,20 +30,27 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+
+
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.vividsolutions.jts.geom.Geometry;
 
 import biodiv.common.DataObject;
 import biodiv.resource.Resource;
 import biodiv.userGroup.UserGroup;
+import biodiv.userGroup.UserGroupModel;
 
 @Entity
 @Table(name = "observation", uniqueConstraints = { @UniqueConstraint(columnNames = "id"), })
 @NamedQuery(name = Observation.QUERY_SELECT_BY_ID, query = "SELECT obv FROM Observation obv WHERE obv.id = :"
 		+ Observation.PARAM_ID)
-public class Observation extends DataObject {
+public class Observation  extends DataObject {
 
 	public static final String QUERY_SELECT_BY_ID = "Observation.findById";
 	public static final String PARAM_ID = "id";
+	
+//	@Inject
+//	ObservationService observationService;
 
 	public enum OccurrenceStatus {
 		ABSENT("Absent"), // http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -190,6 +202,13 @@ public class Observation extends DataObject {
 
 	private Set resources = new HashSet(0);
 	private Set recommendationVotes = new HashSet(0);
+	
+//	@SuppressWarnings("unchecked")
+//	@Access(value = AccessType.FIELD)
+//	@ManyToMany(fetch = FetchType.LAZY)
+//	@JoinTable(name = "user_group_observations", schema = "public", joinColumns = {
+//			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
+//					@JoinColumn(name = "user_group_id", nullable = false, updatable = false) })
 	private Set userGroups = new HashSet(0);
 	private Set annotations = new HashSet(0);
 	
@@ -451,18 +470,20 @@ public class Observation extends DataObject {
 		this.recommendationVotes = recommendationVotes;
 	}
 
+	@SuppressWarnings("unchecked")
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "user_group_observations", schema = "public", joinColumns = {
 			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "user_group_id", nullable = false, updatable = false) })
 	public Set<UserGroup> getUserGroups() {
+		System.out.println("aaaaye");
 		return this.userGroups;
 	}
-
+	
 	public void setUserGroups(Set<UserGroup> userGroups) {
 		this.userGroups = userGroups;
 	}
-	
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "observation")
 	public Set<Annotation> getAnnotations() {
 		return null;//this.annotations;
@@ -472,7 +493,27 @@ public class Observation extends DataObject {
 		this.annotations = annotations;
 	}
 	
+	public Observation get(long obvId,ObservationService observationService){
+		System.out.println("testing injection in observation "+ observationService);
+		Observation obv = observationService.findById(obvId);
+		return obv;
+	}
+	
+	public static boolean obvIsWithinUserGroupBoundary(Geometry topology, Geometry boundary) {
+		boolean belongs = false;
+		try{
+			belongs = boundary.covers(topology);
+			System.out.println("belongs or not " + belongs);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		
+		return belongs;
+	}
 
+	
 	public String toString() {
 		return "Observation [id=" + id + "]";
 	}

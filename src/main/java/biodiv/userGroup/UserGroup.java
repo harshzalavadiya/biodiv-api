@@ -2,12 +2,18 @@ package biodiv.userGroup;
 // Generated 31 Jul, 2017 7:18:53 AM by Hibernate Tools 3.5.0.Final
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,9 +39,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 
 import biodiv.common.Language;
+import biodiv.observation.Observation;
 import net.minidev.json.parser.JSONParser;
 
 /**
@@ -517,38 +530,52 @@ public class UserGroup implements java.io.Serializable {
 	}
 */
 
-	public static Set<UserGroup> findAllContainingObv(Geometry topology, Set<UserGroup> userGroupsWithFilterRule) throws JsonParseException, IOException {
+	public static Set<UserGroup> findAllContainingObj(String objectType,Object object, Set<UserGroup> userGroupsWithFilterRule) throws JsonParseException, IOException, ParseException {
+		
 		Set<UserGroup> allGroupsContainingObv = new HashSet<UserGroup>();
 		for(UserGroup ug : userGroupsWithFilterRule)
 		{
 			if(ug.filterRule != null)
 			{		
 				try{
-					ObjectMapper mapper = new ObjectMapper();
-					
-					JsonNode rootNode = mapper.readValue(ug.filterRule, JsonNode.class);
-					String field = "";
-					String rule = "";
-					boolean belongs = false;
-					for(int i=0; i<rootNode.size(); i++) {
-						 field = rootNode.get(i).get("fieldName").asText();
-						 rule = rootNode.get(i).get("ruleName").asText();	
-						JsonNode ruleValues = rootNode.get(i).get("ruleValues");
-						for(int j=0; j<ruleValues.size();j++) {
-							JsonNode ruleValue = ruleValues.get(i);
-							//System.out.println(ruleValue.asText());
+						ObjectMapper mapper = new ObjectMapper();
+						
+						JsonNode rootNode = mapper.readValue(ug.filterRule, JsonNode.class);
+						String field = "";
+						String rule = "";
+						JsonNode ruleValue = null;
+						boolean belongs = false;
+						for(int i=0; i<rootNode.size(); i++) {
+							 field = rootNode.get(i).get("fieldName").asText();
+							 rule = rootNode.get(i).get("ruleName").asText();	
+							JsonNode ruleValues = rootNode.get(i).get("ruleValues");
+							for(int j=0; j<ruleValues.size();j++) {
+								 ruleValue = ruleValues.get(i);
+								//System.out.println(ruleValue.asText());
+							}
+						}	
+			
+						if(field.equalsIgnoreCase("topology") && rule.equalsIgnoreCase("dwithin"))
+						{	
+							Geometry topology;
+							Geometry boundary = convertToGeometry(ruleValue.asText());
+							switch(objectType){
+							
+							case "biodiv.observation.Observation":
+								
+								topology = ((Observation) object).getTopology();
+								belongs = Observation.obvIsWithinUserGroupBoundary(topology,boundary);
+								
+							default:
+								//
+							}
+							
+							
 						}
-					}	
-					System.out.println(field);
-					System.out.println(rule);
-					if(field.equals("topology") && rule.equals("dwithin"))
-					{
-						//belongs = obvIsWithinUserGroupBoundary(topology);
-					}
-					if(belongs == true)
-					{
-						allGroupsContainingObv.add(ug);
-					}
+						if(belongs == true)
+						{
+							allGroupsContainingObv.add(ug);
+						}
 					 
 				}catch (JsonGenerationException e) {
 					e.printStackTrace();
@@ -562,8 +589,53 @@ public class UserGroup implements java.io.Serializable {
 		return allGroupsContainingObv;
 	}
 
-public static boolean obvIsWithinUserGroupBoundary(Geometry topology) {
-	// TODO Auto-generated method stub
-	return false;
+private static Geometry convertToGeometry(String ruleValue) throws ParseException {
+	GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(),4326);
+    WKTReader wkt = new WKTReader(geometryFactory);
+    Geometry boundary = null;
+    try {
+    	 boundary = wkt.read(ruleValue);
+    } catch(ParseException e) {
+        e.printStackTrace();
+    }
+    //System.out.println("geometryyyyyyyyyyyyyyyyy" + boundary);
+	return boundary;
 }
+
+//public static boolean obvIsWithinUserGroupBoundary(Geometry topology, Geometry boundary) {
+//	boolean belongs = false;
+//	try{
+//		belongs = boundary.covers(topology);
+//		System.out.println("belongs or not " + belongs);
+//	}
+//	catch(Exception e){
+//		e.printStackTrace();
+//		throw e;
+//	}
+//	
+//	return belongs;
+//}
+
+//public Map<String, List<String>> splitQuery(URL url) {
+//    if (Strings.isNullOrEmpty(url.getQuery())) {
+//        return Collections.emptyMap();
+//    }
+//    return Arrays.stream(url.getQuery().split("&"))
+//            .map(this::splitQueryParameter)
+//            .collect(Collectors.groupingBy(SimpleImmutableEntry::getKey, LinkedHashMap::new, mapping(Map.Entry::getValue, toList())));
+//}
+//
+//public SimpleImmutableEntry<String, String> splitQueryParameter(String it) {
+//    final int idx = it.indexOf("=");
+//    final String key = idx > 0 ? it.substring(0, idx) : it;
+//    final String value = idx > 0 && it.length() > idx + 1 ? it.substring(idx + 1) : null;
+//    return new SimpleImmutableEntry<>(key, value);
+//}
+
+public static Map<String, String> filterUrlParser(String uri){
+	String query =  uri.split("\\?")[1];
+	Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(query);
+	return map;
+}
+
 }
