@@ -30,12 +30,12 @@ import org.hibernate.validator.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import biodiv.auth.token.Token;
+import biodiv.common.CommonMethod;
 import biodiv.common.Language;
-
 
 @Entity
 @Table(name = "suser", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-public class User implements Principal {
+public class User extends CommonMethod implements Principal {
 
 	private long id;
 	private Language language;
@@ -50,7 +50,7 @@ public class User implements Principal {
 	private Date dateCreated = new Date();
 	private Date lastLoginDate = new Date();
 	private String email;
-	private Boolean hideEmailId = true;	
+	private Boolean hideEmailId = true;
 	private String location;
 	private String name;
 	private String profilePic;
@@ -66,7 +66,7 @@ public class User implements Principal {
 	private String sexType;
 	private Double latitude;
 	private Double longitude;
-	
+
 	private Set<Role> roles = new HashSet<Role>(0);
 	@JsonIgnore
 	private Set<Token> tokens;
@@ -124,7 +124,7 @@ public class User implements Principal {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")
-	@SequenceGenerator(name="user_generator", sequenceName = "suser_id_seq")
+	@SequenceGenerator(name = "user_generator", sequenceName = "suser_id_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	public long getId() {
 		return this.id;
@@ -200,7 +200,7 @@ public class User implements Principal {
 		this.username = username;
 	}
 
-	@Column(name = "about_me", columnDefinition="text")
+	@Column(name = "about_me", columnDefinition = "text")
 	public String getAboutMe() {
 		return this.aboutMe;
 	}
@@ -392,20 +392,20 @@ public class User implements Principal {
 	public Set<Role> getRoles() {
 		return this.roles;
 	}
-	
+
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
-	
+
 	public boolean hasRole(String role) {
-		for(Role r : this.roles) {
-			if(r.getAuthority().equalsIgnoreCase(role)){
+		for (Role r : this.roles) {
+			if (r.getAuthority().equalsIgnoreCase(role)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	public Set<Token> getTokens() {
 		return this.tokens;

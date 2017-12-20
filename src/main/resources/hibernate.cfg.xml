@@ -65,7 +65,6 @@
 		<mapping class="biodiv.taxon.datamodel.dao.Classification" />
 		<mapping class="biodiv.taxon.datamodel.dao.ExternalLinks" />
 		<mapping class="biodiv.taxon.datamodel.dao.AcceptedSynonyms" />
-		
 		<mapping class="biodiv.user.User" />
 		<mapping class="biodiv.user.Role" />
 		<mapping class="biodiv.userGroup.UserGroup" />
@@ -76,6 +75,9 @@
 		<mapping class="biodiv.traits.TraitValue" />
 		<mapping class="biodiv.activityFeed.ActivityFeed" />
 		<mapping class="biodiv.follow.Follow" />
+		<mapping class="biodiv.traits.SpeciesGroupMapping" />
+		<mapping class="biodiv.traits.TraitTaxonomyDefinition" />
+
 	</session-factory>
 
 </hibernate-configuration>

@@ -53,7 +53,6 @@ public class UserGroupService extends AbstractService<UserGroup> {
 	@Intercept
 	public List<UserGroup> userUserGroups(long userId) {
 		
-		System.out.println("abbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 		
 		//boolean localTransaction = false;
 		try{

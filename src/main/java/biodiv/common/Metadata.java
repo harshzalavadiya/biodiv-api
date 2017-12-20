@@ -22,7 +22,7 @@ import biodiv.dataset.Dataset;
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public abstract class Metadata implements GenericModel {
-	
+
 	public enum LocationScale {
 		APPROXIMATE ("Approximate"),
 		ACCURATE ("Accurate"),

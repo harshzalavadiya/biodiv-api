@@ -2,9 +2,11 @@ package biodiv.common;
 
 
 import java.io.Serializable;
+
 import java.util.Set;
 
 import biodiv.userGroup.UserGroup;
+
 
 /**
  * 
@@ -40,8 +42,9 @@ public interface GenericModel<T> {
 	 * @param flush
 	 * @return
 	 */
+
+
 	public void save();
-	
 	/**
 	 * 
 	 * @param flush
@@ -55,9 +58,6 @@ public interface GenericModel<T> {
 	 * @return
 	 */
 	public void delete();
-	
-//    public Set<UserGroup> getUserGroups();
-//    
-//    public void setUserGroups(Set<UserGroup> userGroups);
+
 
 }

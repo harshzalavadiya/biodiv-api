@@ -1,0 +1,399 @@
+create extension postgis;
+CREATE EXTENSION postgis_topology;
+CREATE EXTENSION dblink;
+\q
+\d
+\q
+alter user 'biodiv' with password 'biodiv';
+alter user biodiv with password 'biodiv';
+\q
+SELECT 
+    pg_terminate_backend(pid) 
+FROM 
+    pg_stat_activity 
+WHERE 
+    -- don't kill my own connection!
+    pid <> pg_backend_pid()
+    -- don't kill the connections to other databases
+    AND datname ='biodiv';
+\q
+\d
+\q
+select * from species_group;
+\q
+select * from species_group;
+\q
+\q
+\d
+\d userGroup
+\d usergroup
+\d  user_group
+\d  user_group 
+select webaddress from user_group
+\d  user_group
+select webaddress from user_group
+;
+select webaddress from user_group;
+\d taxonomy_definition
+select id from taxonomy_definition where rank=9;
+select id from taxonomy_definition where rank=9 and status=accepted;
+select id from taxonomy_definition where rank=9 and status='ACCEPTED';
+select id from taxonomy_definition where rank=8 and status='ACCEPTED';
+\d
+select id from taxonomy_definition;
+select * from taxonomy_definition where id=872;
+!
+select * from taxonomy_definition where id='872';
+!
+select * from taxonomy_definition where id=872;
+!
+select * from taxonomy_definition where id=872;
+select * from taxonomy_definition where id=872;
+select * from taxonomy_definition where id='872';
+\d taxonomy_registry
+select * from taxonomy_registry where id=874
+biodiv=# select * from taxonomy_registry where id=874
+select * from taxonomy_definition where id='872';
+select * from taxonomy_registry where id='872';
+select * from taxonomy_registry;
+select * from taxonomy_registry where id=387427;
+select * from taxonomy_registry where id=874;
+select * from taxonomy_definition where id=874;
+select * from taxonomy_definition where id=874;
+select * from taxonomy_definition where id=874;
+select default_hierarchy from taxonomy_definition where id=874;
+select path from taxonomy_definition
+select path fromtaxony_definition;
+select path from taxonomy_definition;
+select path from taxonomy_registry
+select path from taxonomy_registry;
+select path from taxonomy_registry;
+select path from taxonomy_registry where id=874;
+select path from taxonomy_registry where taxoid=874;
+select path from taxonomy_registry where id=874;
+select path from taxonomy_registry where id=872;
+\d taxonomy_registry
+select path from taxonomy_registry where id=872;
+select path from taxonomy_registry where id='872';
+select path from taxonomy_registry where id='2998';
+select path from taxonomy_registry where parent_taxon_id='2998';
+select id from taxonomy_registry where id='872';
+select * from taxonomy_registry where id='872';
+select * from taxonomy_registry;
+\d taxonomy_registry
+select id from taxonomy_registry
+select id from taxonomy_registry;
+select id from taxonomy_registry;
+select id from taxonomy_registry where id=874;
+select id from taxonomy_registry where id='874';
+select id from taxonomy_registry where id='874';
+select * from taxonomy_registry where id='874';
+select id from taxonomy_registry where classification_id='27798;
+select id from taxonomy_registry where classification_id ='2997'
+\d taxonomy_definition
+\d taxonomy_definition'
+cd
+\d taxonomy_definition;
+\d taxonomy_registry
+select path from taxonomy_registry where id='874';
+select path from taxonomy_registry where id='874';
+select path from taxonomy_registry where taxon_definition_id='874';
+select path from taxonomy_registry where taxon_definition_id='872';
+select path from taxonomy_registry where taxon_definition_id='447252';
+select path from taxonomy_registry where taxon_definition_id='298';
+select path from taxonomy_registry where taxon_definition_id='2998';
+select path from taxonomy_registry where parent_taxon_id='2998';
+select path from taxonomy_registry where parent_taxon_id='872';
+select path from taxonomy_registry where parent_taxon_definition_id='872';
+select path from taxonomy_registry where parent_taxon_definition_id='874';
+select path from taxonomy_registry where taxon_definition_id='';
+select path from taxonomy_registry where taxon_definition_id='872';
+select path from taxonomy_registry where taxon_definition_id='874';
+EXPLAIN ANALYSE select * from taxonomy_definition;
+EXPLAIN ANALYSE select * from classification ;
+EXPLAIN ANALYSE select * from classification ;
+EXPLAIN ANALYSE select * from classification;
+EXPLAIN ANALYSE select * from classification;
+EXPLAIN ANALYSE select * from classification;
+EXPLAIN ANALYSE select * from taxonomy_registry ad tr, clasification as c where tr.classification_id=c.id;
+EXPLAIN ANALYSE select * from taxonomy_registry as tr, clasification as c where tr.classification_id=c.id;
+EXPLAIN ANALYSE select * from taxonomy_registry as tr, classification as c where tr.classification_id=c.id;
+ select * from taxonomy_registry as tr, classification as c where tr.classification_id=c.id;
+ select tr.id,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id;
+ select tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id;
+ select tr.id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id;
+ select tr.id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id where tr.id='874';
+ select tr.id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id where tr.id='874';
+ select tr.id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id and tr.id='874';
+ select tr.id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id and tr.taxon_concept_id='874';
+ select tr.id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id and tr.taxon_definition_id='874';
+ select tr.taxon_definition_id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id and tr.taxon_definition_id='874';
+ select tr.taxon_definition_id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id and tr.taxon_definition_id='872';
+ select tr.taxon_definition_id, tr.path,tr.classification_id,c.id from taxonomy_registry as tr, classification as c where tr.classification_id=c.id and tr.taxon_definition_id='874';
+select t.path from taxonomy_registry as t where t.taxon_definitionid=874 
+;
+select t.path from taxonomy_registry as t where t.taxon_definition_id=874 
+;
+select t.path from taxonomy_registry as t where t.taxon_definition_id=874 and tR.classification_id=265799;
+select t.name,t.id from taxonomy_definition as t taxonomy_registry as tR where tR.taxon_definition_id=t.id and tR.classification_id=265799 and tR.path like '872_874';
+select t.name,t.id from taxonomy_definition as t ,taxonomy_registry as tR where tR.taxon_definition_id=t.id and tR.classification_id=265799 and tR.path like '872_874';
+select t.name,t.id from taxonomy_definition as t ,taxonomy_registry as tR where tR.taxon_definition_id=t.id and tR.classification_id=265799 and tR.path like '%872_874%';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ ^874_[0-9];
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ [^874]_[0-9];
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ ^874_[0-9];
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^874_[0-9]';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^[874]_[0-9]';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+\s
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+\du
+\list
+\l
+\dt
+\dt taxonomy_definition
+\dt taxonomy_definition;
+\d taxonomy_definition;
+\d+ taxonomy_definition;
+\d taxonomy_definition;
+\d+ taxonomy_definition;
+\d+
+\d+ taxonomy_definition;
+\d+ taxonomy_definition;
+\d+
+\s
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^874_[0-9]';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^874_[0-9]$';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^[874]_[0-9]$';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^[874]_[0-9]';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^[874]_[0-9]';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^[874]_[0-9]';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^872_[0-9]';
+/s
+\s
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '[874]_[0-9]' LIMIT 2;
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^872_[0-9]%';
+select t.id,t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^872_[0-9]';
+select count(t.id),t.name,tR.path from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^872_[0-9]';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^872_[0-9]';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^874_[0-9]';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.path ~ '^872_874_[0-9]';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 tR.path ~ '^872_874_[0-9]';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]_[0-9]';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874';
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' ;
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by s.path ;
+select count(t.id) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path ;
+select count(tR.path) from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path ;
+select count(tR.path) as c from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path where c>10 ;
+select count(tR.path) as c from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path where c > 10 ;
+select count(tR.path) as c from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path and c > 10 ;
+select count(tR.path) as c from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path having c > 10 ;
+select count(tR.path) as c from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path having c > 10 ;
+select count(tR.path) as C from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path having C > 10 ;
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path as C having C > 10 ;
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]' group by tR.path ;
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874___';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_8';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_...';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_...';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874' group by tR.path;
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874' group by tR.path;
+select count(tR.path) as A  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874' group by tR.path hav;
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874' group by tR.path;
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874' group by tR.path;
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]$';
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]+$';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_874_[0-9]+$';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_[0-9]+$';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_[0-9]+$';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_[0-9]+$' or tR.path ~'872_874_[0-9]+$';
+\timing
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_[0-9]+ ''872_874_[0-9]+$';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_[0-9]+$' or tR.path ~'872_874_[0-9]+$';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and tR.path ~ '872_874_[0-9]+$';
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$');
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$');
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$') group by tR.path;
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or tR.path is NULL) group by tR.path;
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or tR.path is NULL) group by tR.path;
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or tR.path is NULL);
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or tR.path is NULL);
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$');
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or t.rank=0);
+select count(tR.path)  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or t.rank=0);
+select tR.path  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or t.rank=0);
+select t.id  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or t.rank=0);
+\d+ taxonomy_definition
+\d+ taxonomy_registry
+create index on_path on table taxonomy_registry (path);
+create index on_path on taxonomy_registry (path);
+select t.id  from  taxonomy_registry as tR,taxonomy_definition as t where t.id=tR.taxon_definition_id and tR.classification_id=265799 and (tR.path ~ '^872_[0-9]+$' or tR.path ~ '872_874_[0-9]+$' or t.rank=0);
+\d+ taxonomy_registry
+\d+ taxonomy_registry
+\d+ taxonomy_definition
+\d+ observation
+\q
+\d+ accepted_synonym
+\d+ taxonomy_definition;
+\d+ taxonomy_registry;
+\d+ species_group
+select * from species_group;
+\d+ user_group_member_role
+\d+ user_group_member_role
+\d+ user_group_member_role
+select id from taxonomy_definition where name=Gymnopleurus;
+select id from taxonomy_definition where name='Gymnopleurus';
+pg_dump -t 'taxonomy_definition' --schema-only biodiv
+;
+COPY taxonomy_definition TO '/home/sunil/taxonomy_definition.csv' DELIMITER ',' CSV HEADER;
+\d+ observation;
+\d+ taxonomy_definition;
+select default_hierarchy from taxonomy_definition LIMIT 1;
+select default_hierarchy from taxonomy_definition LIMIT 10;
+select default_hierarchy from taxonomy_definition where default_hierarchy IS NOT NULL;
+select default_hierarchy from taxonomy_definition where default_hierarchy IS NOT NULL LIMIT 1;
+\d+ traits 
+\d+ trait
+select * from trait LIMIT 1;
+\x auto
+select * from trait LIMIT 1;
+\d+ traits 
+\d+ traits 
+\d+ trait
+\d+ taxonomy_definition;
+\d+ trait
+\d+ trait_taxonomy_definition ;
+\d+ trait_taxonomy_definition 
+select * from trait_taxonomy_definition LIMIT 2;
+select * from trait_taxonomy_definition where trait_taxon_id=840;
+select count(*) from trait_taxonomy_definition;
+\d+ trait
+\d+ trait
+\d+ trait_value
+select * from trait_value LIMIT 1;
+\d+ trait
+select * from fact LIMIT 1;
+select * from trait_value LIMIT 1;
+select * from trait LIMIT 1;
+\d+ trait
+\d+ trait_taxonomy_definition 
+\d+ trait_taxonomy_definition 
+\d+ species_group_mapping
+\d+ species_group_mapping
+select * from species_group_mapping;
+\d+ trait
+\d+ trait_taxonomy_definition 
+\d+ trait_taxonomy_definition 
+select trait_taxon_id from trait_taxonomy_definition where taxonomy_definition_id=874;
+select trait_taxon_id from trait_taxonomy_definition where taxonomy_definition_id='874';
+\d+ trait_taxonomy_definition 
+select trait_taxon_id from trait_taxonomy_definition where taxonomy_definition_id='872';
+select trait_taxon_id from trait_taxonomy_definition where taxonomy_definition_id='2998';
+\d+ trait_value;
+select * from trait_value where trait_id ='11';
+\d+ trait
+\d+ fact
+selct object_id from fact where object_id IS NOT NULL LIMIT 1;
+select object_id from fact where object_id IS NOT NULL LIMIT 1;
+select object_id from fact where object_id IS NOT NULL LIMIT 5;
+\d+ trait_value
+\d+ fact
+\d+ trait_value
+\x auto
+select * from fact LIMIT 2;
+select * from fact LIMIT 8;
+select * from fact where value is not null LIMIT 8 ;
+\d+ fact;
+select * from fact LIMIT 1;
+select * from fact where object_id=373359;
+\d+ fact;
+select page_taxon_id from fact LIMIT 2;
+select page_taxon_id from fact LIMIT 10;
+select page_taxon_id from fact where page_taxon_id IS NOT NULL;
+select count(page_taxon_id) from fact where page_taxon_id IS NOT NULL;
+select count(page_taxon_id) from fact where page_taxon_id IS NULL;
+select count(*) from fact where page_taxon_id IS NULL;
+select count(*) from fact where page_taxon_id IS NOT NULL;
+\d+ trait;
+\d+ fact
+\d+ trait;
+select distinct trait_type from trait;
+select distinct trait_types from trait;
+fact
+;
+\d+ fact
+\d+ trait
+\d+ trait_value
+\x auto
+select * from trait_value where trait_id=8;
+select *  from fact where count(objectId)>2; 
+select *  from fact where count(fact.objectId)>2; 
+select *  from fact where count(fact.objectId)>2; 
+select *  from fact where count(object_id)>2; 
+\d+ fact; 
+SELECT SalesID, COUNT(*)
+FROM AXDelNotesNoTracking
+GROUP BY SalesID
+;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 1;
+select *, count(*) from fact group by object_id having count(*)>2 LIMIT 1;
+select * from fact group by object_id having count(*)>2 LIMIT 1;
+select *, count(*) from fact group by object_id having count(*)>2 LIMIT 1;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 1;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 2;
+\d+ fact
+select object_id,page_taxon_id, count(*) from fact group by object_id having count(*)>2 LIMIT 2;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 2;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 10;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 100;
+select object_id, count(*) from fact group by object_id having count(*)=1 LIMIT 10;
+select * from fact where object_id=7336;
+select * from fact where object_id=175348;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 100;
+select * from fact where object_id=7455;
+select * from fact where object_id=7455;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 100;
+\d+ fact;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 100;
+select * from fact where object_type=;
+select object_id, count(*) from fact group by object_id having count(*)>2 LIMIT 100;
+select * from fact where object_id=7455;
+select * from fact where species_type=species.participation.Observation;
+select * from fact where object_type=species.participation.Observation;
+select * from fact where objectType=species.participation.Observation;
+\d+ fact
+select * from fact where object_type='species.participation.Observation';
+\d+ fact
+select * from fact ;
+select * from fact  where object_id='373359';
+select * from fact  where object_id='373359';
+users
+\d+ users
+\d+ suser
+select * from user LIMIT 2;
+select * from suser LIMIT 2;
+select * from suser LIMIT 2;
+select id from observation LIMIT 1;
+select id from suser where name='admin';
+select * from suser where name='admin';
+\s auto

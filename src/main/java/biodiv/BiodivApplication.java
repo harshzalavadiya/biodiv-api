@@ -38,17 +38,17 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 	public BiodivApplication() {
 
 		System.out.println("Starting Biodiv Api Application");
-		 Yaml yaml = new Yaml(); 
-		 try { 
-	    	 Map<String, Object> list = (HashMap<String, Object>) yaml.load(new FileReader("/home/abhinav/git/biodiv-api/conf/Config.yml")); 
-	    	 for (Map.Entry<String, Object> entry : list.entrySet()){
-	    	     System.out.println(entry.getKey() + "/" + entry.getValue());
-	    	 }	    	 
-	    }catch(Exception e){
-	    	e.printStackTrace();
-	    	System.out.println(e);
-	    }
-		 
+//		 Yaml yaml = new Yaml(); 
+//		 try { 
+//	    	 Map<String, Object> list = (HashMap<String, Object>) yaml.load(new FileReader("/home/abhinav/git/biodiv-api/conf/Config.yml")); 
+//	    	 for (Map.Entry<String, Object> entry : list.entrySet()){
+//	    	     System.out.println(entry.getKey() + "/" + entry.getValue());
+//	    	 }	    	 
+//	    }catch(Exception e){
+//	    	e.printStackTrace();
+//	    	System.out.println(e);
+//	    }
+//		 
 		// auto scanning of all classed for resources providers and features
 		packages("biodiv");
 		register(new AbstractBinder(){
@@ -57,6 +57,12 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 		    bind(MyInterceptionService.class)
             .to(org.glassfish.hk2.api.InterceptionService.class)
             .in(Singleton.class);
+//		    bind(ObservationService.class)
+//            .to(ObservationService.class)
+//            .in(Singleton.class);
+//		    bind(UserGroupService.class)
+//            .to(UserGroupService.class)
+//            .in(Singleton.class);
 		    bind(ObservationService.class)
             .to(ObservationService.class)
             .in(Singleton.class);

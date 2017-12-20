@@ -26,6 +26,7 @@ import biodiv.taxon.service.TaxonService;
 public class TaxonController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
+	
 	private static final String IBP = "IBP Taxonomy Hierarchy";
 	TaxonService taxonService = new TaxonService();
 

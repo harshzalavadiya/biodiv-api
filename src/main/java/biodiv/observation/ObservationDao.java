@@ -50,18 +50,6 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 
 	
 	
-/*	public List<Observation> findAll(int limit, int offset) {
-=======
-	/*
-	public List<Observation> findAll(int limit, int offset) {
->>>>>>> b6040d04d637ec2831c0238a185df4c0d4f14f9f
-		List<Observation> obvs = (List<Observation>) getCurrentSession().createQuery("from Observation")
-				.setFirstResult(offset)
-				.setMaxResults(limit)
-				.list();
-		
-		return obvs;
-	}
-*/
+
 
 }

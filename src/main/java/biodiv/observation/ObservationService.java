@@ -36,17 +36,14 @@ public class ObservationService extends AbstractService<Observation> {
 	@Intercept
 	public List<UserGroup> obvUserGroups(long id) {
 		try{
-			//observationDao.openCurrentSession();
 			List<UserGroup> usrGrps = observationDao.obvUserGroups(id);
 			return usrGrps;
 		} catch(Exception e) {
 			throw e;
 		} finally{
-			//observationDao.closeCurrentSession();
 		}
 
 	
 	}
-	
-	    
+
 }

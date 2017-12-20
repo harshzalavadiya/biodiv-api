@@ -1,32 +1,142 @@
 package biodiv.traits;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.jax.rs.annotations.Pac4JProfile;
+import org.pac4j.jax.rs.annotations.Pac4JSecurity;
+
 
 import biodiv.Intercept;
-import biodiv.common.SpeciesGroup;
+import biodiv.taxon.service.TaxonService;
 
 @Path("/trait")
 
 public class TraitController {
-	
-	TraitService traitService=new TraitService();
-	
-	
-	
+
+	private static final String IBP = "IBP Taxonomy Hierarchy";
+
+	TraitService traitService = new TraitService();
+	TaxonService taxonService = new TaxonService();
+
+	/**
+	 * 
+	 * @param sGroup
+	 * @param classificationId
+	 * @param isNotObservationTrait
+	 * @param showInObservation
+	 * @param objectType
+	 * @param objectId
+	 * @return
+	 */
+
 	@GET
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
-	public List<Object[]> list(){
-		List<Object[]> traitList=traitService.list();
+	public List<TraitFactUi> list(@QueryParam("sGroup") Long sGroup,
+			@QueryParam("classification") Long classificationId,
+			@DefaultValue("false") @QueryParam("isNotObservationTrait") Boolean isNotObservationTrait,
+			@DefaultValue("true") @QueryParam("showInObservation") Boolean showInObservation,
+			@QueryParam("objectType") String objectType, @QueryParam("objectId") Long objectId) {
+		if (classificationId == null) {
+			classificationId = taxonService.classificationIdByName(IBP);
+		}
+		List<TraitFactUi> traitList = traitService.list(objectId, objectType, sGroup, classificationId,
+				isNotObservationTrait, showInObservation);
 		return traitList;
 	}
+
+	/**
+	 * 
+	 * @param id
+	 * @param objectType
+	 * @return
+	 */
+	@GET
+	@Path("/observation/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	public List<Fact> slist(@PathParam("id") Long id,
+			@DefaultValue("species.participation.Observation") @QueryParam("objectType") String objectType) {
+
+		List<Fact> traitList = traitService.slist(id, objectType);
+		return traitList;
+	}
+
+	/**
+	 * 
+	 * @param traits
+	 * @param traitId
+	 * @param objectId
+	 * @param objectType
+	 * @return
+	 */
+	@POST
+	@Path("/fact/update")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	@Pac4JSecurity(clients = "headerClient", authorizers = "isAuthenticated")
+	public Serializable list(@QueryParam("traits") String trait, @QueryParam("traitId") Long traitId,
+			@QueryParam("objectId") Long objectId, @QueryParam("objectType") String objectType,
+			@Pac4JProfile CommonProfile profile) {
+
+		String[] arr = trait.trim().split(",");
+
+		Set<Long> traits = null;
+
+		if (trait != null) {
+			traits = new HashSet<Long>();
+			for (String data : arr) {
+				traits.add(Long.parseLong(data));
+			}
+		}
+
+		Serializable response = traitService.updateFact(traits, traitId, objectId, objectType, profile);
+		return response;
+	}
+
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+
+	@GET
+	@Path("{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	public Trait list(@PathParam("id") Long id) {
+		Trait result = traitService.list(id);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Path("fact/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	public Fact listFact(@PathParam("id") Long id) {
+		Fact result = traitService.listFact(id);
+		return result;
+
+	}
+
 }

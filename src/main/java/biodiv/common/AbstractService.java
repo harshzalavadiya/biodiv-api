@@ -4,18 +4,24 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.lang.reflect.ParameterizedType;
 
 import biodiv.Intercept;
 import biodiv.util.HibernateUtil;
 
-public abstract class AbstractService<T> {
+public abstract class  AbstractService<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractService.class);
-
+	public Class<T> entityClass;
 	//protected AbstractDao<T, Long> dao;
+	
 	
 	public abstract AbstractDao<T, Long> getDao();
 	
+	public AbstractService() {
+		
+		entityClass = ((Class) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+	}
 	
 
 	/*public void setDao(AbstractDao<T,Long> dao) {
@@ -71,6 +77,7 @@ public abstract class AbstractService<T> {
 			//getDao().openCurrentSession();
 			T entity = (T) getDao().findById(id);
 			//getDao().closeCurrentSession();
+			
 			return entity;
 		} catch (RuntimeException re) {
 			log.error("findById failed", re);
