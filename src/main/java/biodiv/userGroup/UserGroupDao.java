@@ -33,6 +33,7 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("userId", userId );
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^");
+	
 		System.out.println(userId);
 		System.out.println(query);
 		List<UserGroup> listResult = query.getResultList();
@@ -60,7 +61,7 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		return listResult;
 	}
 
-	public Set<UserGroup> posttoGroups(String objectType,Object object,Set<UserGroup> allowed,Set<UserGroup> obvUsrGrps,String pullType,String submitType,String userGroups,String filterUrl) throws Exception {
+	public Set<UserGroup> posttoGroups(String objectType,Object object,Set<UserGroup> allowed,Set<UserGroup> userGroupsContainingObv,Set<UserGroup> obvUsrGrps,String pullType,String submitType,String userGroups,String filterUrl) throws Exception {
 	
 		long[] userGroup = Arrays.asList(userGroups.split(",")).stream().map(String::trim).mapToLong(Long::parseLong).toArray();
 		UserGroupService userGroupService = new UserGroupService();
@@ -86,8 +87,6 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 	   
 	    if(submitType.equalsIgnoreCase("post"))
 	    {
-	    	Set<UserGroup> userGroupsWithFilterRule = userGroupService.findAllByFilterRuleIsNotNull();
-		    Set<UserGroup> userGroupsContainingObv = UserGroup.findAllContainingObj(objectType,object,userGroupsWithFilterRule);
 		    
 		    Set<UserGroup> union = new HashSet<>(obvUsrGrps);
 		    union.addAll(intersect);

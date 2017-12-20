@@ -87,25 +87,6 @@ public class UserGroupController {
 		return msg;
 	}
 	
-//	@POST
-//	@Path("/bulkPost")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
-//	@Intercept
-//	public Set<UserGroup> bulkPost(@QueryParam("pullType") String pullType,@QueryParam("selectionType") String selectionType,@QueryParam("objectType") String objectType,@QueryParam("objectIds") String objectIds,@QueryParam("submitType") String submitType,@QueryParam("userGroups") String userGroups,@QueryParam("filterUrl") String filterUrl,@Pac4JProfile CommonProfile profile) throws NumberFormatException, Exception{
-//	
-//		long[] objectId = Arrays.asList(objectIds.split(",")).stream().map(String::trim).mapToLong(Long::parseLong).toArray();
-////		Class<?> clazz = Class.forName("biodiv.observation.Observation");
-////	    Object obv = ((DataObject<?>) clazz.newInstance()).get(objectId[0]);
-//		//Set<UserGroup> newi = ((UserGroupModel) obv).getUserGroups();
-////		Observation obv = observationService.findById(objectId[0]);
-////		List<UserGroup> allowedUsrGrps =  userGroupService.userUserGroups(Long.parseLong(profile.getId()));
-////	    Set<UserGroup>  allowed = new HashSet<UserGroup>(allowedUsrGrps);
-//		//Set<UserGroup> abc =  obv.getUserGroups();
-//		Set<UserGroup> allowed = userGroupService.testmethod(objectId[0]);
-//		return allowed;
-//	}
-	
 	
 	@Path("/{groupName}/{x}")
 	@Produces(MediaType.APPLICATION_JSON)

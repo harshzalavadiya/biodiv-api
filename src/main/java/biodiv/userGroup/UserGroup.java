@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,6 +48,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
+import biodiv.common.DataObject;
 import biodiv.common.Language;
 import biodiv.observation.Observation;
 import net.minidev.json.parser.JSONParser;
@@ -602,19 +604,36 @@ private static Geometry convertToGeometry(String ruleValue) throws ParseExceptio
 	return boundary;
 }
 
-//public static boolean obvIsWithinUserGroupBoundary(Geometry topology, Geometry boundary) {
-//	boolean belongs = false;
-//	try{
-//		belongs = boundary.covers(topology);
-//		System.out.println("belongs or not " + belongs);
-//	}
-//	catch(Exception e){
-//		e.printStackTrace();
-//		throw e;
-//	}
-//	
-//	return belongs;
-//}
+public static <T> List<List<T>> collate( List<T> list, int size, int step ) {
+    return Stream.iterate( 0, i -> i + step )
+                    .limit( ( list.size() / step ) + 1 )
+                    .map( i -> list.stream()
+                                   .skip( i )
+                                   .limit( size )
+                                   .collect( Collectors.toList() ) )
+                    .filter( i -> !i.isEmpty() )
+                    .collect( Collectors.toList() ) ;
+}
+
+public static byte[][] splitBytes(final byte[] data, final int chunkSize)
+{
+  final int length = data.length;
+  final byte[][] dest = new byte[(length + chunkSize - 1)/chunkSize][];
+  int destIndex = 0;
+  int stopIndex = 0;
+
+  for (int startIndex = 0; startIndex + chunkSize <= length; startIndex += chunkSize)
+  {
+    stopIndex += chunkSize;
+    dest[destIndex++] = Arrays.copyOfRange(data, startIndex, stopIndex);
+  }
+
+  if (stopIndex < length)
+    dest[destIndex] = Arrays.copyOfRange(data, stopIndex, length);
+
+  return dest;
+}
+
 
 //public Map<String, List<String>> splitQuery(URL url) {
 //    if (Strings.isNullOrEmpty(url.getQuery())) {
@@ -636,6 +655,29 @@ public static Map<String, String> filterUrlParser(String uri){
 	String query =  uri.split("\\?")[1];
 	Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(query);
 	return map;
+}
+
+public static String getActivityObjectType(Object obj,String submitType,String rootHolderType,Long count) {
+	
+	String type = obj.getClass().getSimpleName();
+	String result = "";
+	
+	switch(type){
+
+	case "Observation":
+		if(rootHolderType.equalsIgnoreCase("UserGroup")){		
+			result = submitType.equalsIgnoreCase("post")?("Posted "+ count + " observation(s) to group"):("Removed "+ count +" observation(s) from group");
+			
+		}else{
+			result = submitType.equalsIgnoreCase("post")?"Posted observation to group":"Removed observation from group";
+		}
+		break;
+	
+	default:
+		//
+	}
+	return result;
+
 }
 
 }

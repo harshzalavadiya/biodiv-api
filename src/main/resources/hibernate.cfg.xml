@@ -43,6 +43,7 @@
 
 		<property name="hibernate.transaction.coordinator_class">jdbc</property>
 		<property name="hibernate.current_session_context_class">thread</property>
+		<property name ="hibernate.jdbc.batch_size">50</property>
 		<!-- Mappings -->
 		<!-- mapping package="biodiv"/ -->
 		<mapping class="biodiv.common.ExternalLinks" />
@@ -73,6 +74,8 @@
 		<mapping class="biodiv.traits.Trait" />
 		<mapping class="biodiv.traits.Fact" />
 		<mapping class="biodiv.traits.TraitValue" />
+		<mapping class="biodiv.activityFeed.ActivityFeed" />
+		<mapping class="biodiv.follow.Follow" />
 	</session-factory>
 
 </hibernate-configuration>
