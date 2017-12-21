@@ -1,5 +1,8 @@
 package biodiv.observation;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +13,13 @@ import javax.persistence.Query;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +56,28 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		System.out.println(listResult);
 		return listResult;
+	}
+
+	public List<Map<String, Object>> list() {
+		System.out.println("dao mai  aaye");
+		// TODO Auto-generated method stub
+		Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
+		TransportClient client = new PreBuiltTransportClient(settings);
+		try {
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		SearchResponse result = client.prepareSearch("ob").setTypes("data")
+				.execute().actionGet();
+		List<Map<String, Object>> esData = new ArrayList<Map<String, Object>>();
+		for (SearchHit hit : result.getHits()) {
+			esData.add(hit.getSource());
+		}
+		client.close();
+		
+		return esData;
 	}
 
 	

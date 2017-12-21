@@ -35,12 +35,16 @@ public class TokenService extends AbstractService<Token> {
 	}
 
 	/**
-	 * Builds a response for authentication. On success it returns a access
+	 *  Builds a response for authentication. On success it returns a access
 	 * token and optionally a refresh token
-	 * 
 	 * @param profile
+	 * dummy
+	 * @param user
+	 * dummy
 	 * @param getNewRefreshToken
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public Map<String, Object> buildTokenResponse(CommonProfile profile, User user, boolean getNewRefreshToken) {
 		try {
@@ -87,7 +91,9 @@ public class TokenService extends AbstractService<Token> {
 	 * for the profile.
 	 * 
 	 * @param profile
-	 * @return TODO : use bcrypt encryption for token
+	 * dummy
+	 * @return 
+	 * TODO : use bcrypt encryption for token
 	 */
 	public String generateAccessToken(CommonProfile profile) {
 		log.debug("generateAccessToken .... ");
@@ -101,6 +107,7 @@ public class TokenService extends AbstractService<Token> {
 	 * Generates a refresh token which is a plain string used to identify user.
 	 * 
 	 * @return
+	 * dummy
 	 */
 	public String generateRefreshToken() {
 		// Random random = new SecureRandom();
@@ -119,8 +126,11 @@ public class TokenService extends AbstractService<Token> {
 	/**
 	 * 
 	 * @param refreshToken
+	 * dummy
 	 * @param userId
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public boolean isValidRefreshToken(String refreshToken, Long userId) {
 		if (refreshToken == null || userId == null)
@@ -147,7 +157,8 @@ public class TokenService extends AbstractService<Token> {
 
 	/**
 	 * 
-	 * @param user
+	 * @param refreshToken
+	 * dummy
 	 */
     public void removeRefreshToken(String refreshToken) {
 		if (refreshToken== null)

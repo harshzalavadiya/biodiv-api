@@ -1,6 +1,7 @@
 package biodiv.observation;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -22,16 +23,13 @@ public class ObservationController {
 	@GET
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Observation> list(@PathParam("groupName") String grpName) {
-		List<Observation> obvs;
-		System.out.println("aaaaaaaaaaaa");
-		System.out.println(grpName);
-		if (grpName == null) {
-			obvs = observationService.findAll(3, 0);
-		} else {
-			obvs = observationService.findAllByGroup(3, 0);
-		}
-
+	@Intercept
+	public List<Map<String, Object>> list() {
+		
+		System.out.println("controller mai aaye");
+		 List<Map<String, Object>> obvs=null;
+		 obvs = observationService.list();
+	
 		return obvs;
 	}
 
@@ -43,8 +41,6 @@ public class ObservationController {
 	public Observation show(@PathParam("id") long id) {
 		DataObject obv = null;
 		try {
-			System.out.println("+++++++++++++++++++++++++++++");
-			System.out.println("+++++++++++++++++++++++++++++");
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

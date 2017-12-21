@@ -385,7 +385,7 @@ public class User extends CommonMethod implements Principal {
 		this.longitude = longitude;
 	}
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "suser_role", schema = "public", joinColumns = {
 			@JoinColumn(name = "s_user_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "role_id", nullable = false, updatable = false) })

@@ -27,6 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.common.ResponseModel;
 
+/**
+ * 
+ * @author sunil
+ * 		dummy
+ *
+ */
 @Path("/logout")
 public class LogoutController {
 

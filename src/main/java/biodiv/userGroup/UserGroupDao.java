@@ -33,6 +33,7 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("userId", userId );
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^");
+	
 		System.out.println(userId);
 		System.out.println(query);
 		List<UserGroup> listResult = query.getResultList();
@@ -60,7 +61,7 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		return listResult;
 	}
 
-	public Set<UserGroup> posttoGroups(String objectType,Object object,Set<UserGroup> allowed,Set<UserGroup> obvUsrGrps,String pullType,String submitType,String userGroups,String filterUrl) throws Exception {
+	public Set<UserGroup> posttoGroups(String objectType,Object object,Set<UserGroup> allowed,Set<UserGroup> userGroupsContainingObv,Set<UserGroup> obvUsrGrps,String pullType,String submitType,String userGroups,String filterUrl) throws Exception {
 	
 		long[] userGroup = Arrays.asList(userGroups.split(",")).stream().map(String::trim).mapToLong(Long::parseLong).toArray();
 		UserGroupService userGroupService = new UserGroupService();
@@ -86,8 +87,6 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 	   
 	    if(submitType.equalsIgnoreCase("post"))
 	    {
-	    	Set<UserGroup> userGroupsWithFilterRule = userGroupService.findAllByFilterRuleIsNotNull();
-		    Set<UserGroup> userGroupsContainingObv = UserGroup.findAllContainingObj(objectType,object,userGroupsWithFilterRule);
 		    
 		    Set<UserGroup> union = new HashSet<>(obvUsrGrps);
 		    union.addAll(intersect);
@@ -111,6 +110,23 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		long[] abc = {1,2,3};
 		
 		return abc;
+	}
+
+	public UserGroup findByName(String name) {
+		// TODO Auto-generated method stub
+		Query q;
+		UserGroup results=null;
+		q=getCurrentSession().createQuery("from UserGroup where webaddress=:name").setParameter("name",name);
+		try{
+			 results=(UserGroup) q.getResultList().get(0);
+		}
+		catch (IndexOutOfBoundsException e) {
+			// TODO: handle exception
+			System.out.println("array index out of bound"+ " result not found");
+		}
+		
+		
+		return results;
 	}
 
 	

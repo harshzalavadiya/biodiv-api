@@ -36,22 +36,29 @@ public class RandomString {
     }
 
     /**
-     * Create an alphanumeric string generator.
-     **/
+     * 
+     * @param length
+	 * dummy
+     * @param random
+	 * dummy
+     */
     public RandomString(int length, Random random) {
         this(length, random, alphanum);
     }
 
     /**
-     * Create an alphanumeric strings from a secure generator.
-     **/
+     * 
+     * @param length
+	 * dummy
+     */
     public RandomString(int length) {
         this(length, new SecureRandom());
     }
 
-    /**
-     * Create session identifiers.
-     **/
+   /**
+    * 
+	 * dummy
+    */
     public RandomString() {
         this(21);
     }
