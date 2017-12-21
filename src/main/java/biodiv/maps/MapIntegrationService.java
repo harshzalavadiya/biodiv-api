@@ -2,6 +2,8 @@ package biodiv.maps;
 
 import java.io.IOException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.ParseException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -13,13 +15,14 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * This is used for communication with the map module 
+ * This is used for communication with the map module
  *
  */
 public class MapIntegrationService {
@@ -64,7 +67,7 @@ public class MapIntegrationService {
 	 * @param uri
 	 * @param data
 	 */
-	public void postRequest(String uri, Object data) {
+	public MapHttpResponse postRequest(String uri, Object data) {
 		CloseableHttpResponse response = null;
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -78,6 +81,7 @@ public class MapIntegrationService {
 
 			try {
 				response = httpclient.execute(post, context);
+				return getMapHttpResponse(response);
 			} catch (IOException e) {
 				logger.error("Error while trying to send request at URL {}", uri);
 			} finally {
@@ -88,5 +92,22 @@ public class MapIntegrationService {
 			e.printStackTrace();
 			logger.error("Error while trying to send request at URL {}", uri);
 		}
+		
+		return null;
 	}
+
+	private MapHttpResponse getMapHttpResponse(CloseableHttpResponse response) throws ParseException, IOException {
+
+		String message = null;
+
+		if (response != null) {
+			HttpEntity httpEntity = response.getEntity();
+			if (httpEntity != null) {
+				message = EntityUtils.toString(httpEntity);
+			}
+		}
+
+		return new MapHttpResponse(response.getStatusLine().getStatusCode(), message);
+	}
+
 }
