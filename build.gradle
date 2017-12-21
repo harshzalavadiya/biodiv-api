@@ -116,7 +116,9 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: 'r05'
     
 	
-	
+	compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.8'
+
+
 }
 
 
