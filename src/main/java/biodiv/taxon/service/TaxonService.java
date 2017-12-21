@@ -45,17 +45,26 @@ public class TaxonService extends AbstractService<Taxon> {
 	
 
 	/**
-	 * get children
+	 * 
+	 * @param parent
+	 * dummy
+	 * @param classificationId
+	 * dummy
+	 * @return
+	 * dummy
 	 */
 	public List<TaxonRelation> list(Long parent, Long classificationId) {
 		return list(parent, classificationId, null, true);
 	}
 
 	/**
-	 * get tree expanded for all taxonids
 	 * 
 	 * @param taxonIds
+	 * dummy
+	 * @param classificationId
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public List<TaxonRelation> list(Set<String> taxonIds, Long classificationId) {
 		return list(null, classificationId, taxonIds, true);
@@ -69,10 +78,15 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param parent
+	 * dummy
 	 * @param classificationId
+	 * dummy
 	 * @param taxonIds
+	 * dummy
 	 * @param expand_taxon
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	private List<TaxonRelation> list(Long parent, Long classificationId, Set<String> taxonIds, Boolean expand_taxon) {
 
@@ -133,7 +147,9 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param items
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	private List<TaxonRelation> buildHierarchy(List<TaxonRelation> items) {
 		List<TaxonRelation> result = new ArrayList<TaxonRelation>();
@@ -154,7 +170,9 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param items
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	private Map<Long, TaxonRelation> prepareIdItemMap(List<TaxonRelation> items) {
 		HashMap<Long, TaxonRelation> result = new HashMap<>();
@@ -169,7 +187,9 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param res
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	private List<TaxonRelation> createInputItems(List<Map<String, Object>> res) {
 		List<TaxonRelation> result = new ArrayList<>();
@@ -183,9 +203,10 @@ public class TaxonService extends AbstractService<Taxon> {
 
 	/**
 	 * 
-	 * @param classification
 	 * @param term
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public List<Map<String, Object>> search(String term) {
 		
@@ -225,8 +246,13 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param classification
+	 * dummy
 	 * @param term
+	 * dummy
+	 * @param taxonids
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public Set<String> specificSearch(Long classification, String term,Long taxonids) {
 		//TODO:NULL check , FINALLY close connection, string constant
@@ -256,20 +282,38 @@ public class TaxonService extends AbstractService<Taxon> {
 		return taxonIds;
 		
 	}
-
+	/**
+	 * 
+	 * @return
+	 * dummy
+	 */
 	public List<Classification> classification() {
 		// TODO Auto-ge
 		taxonDao.openCurrentSession();
 		List<Classification> results=taxonDao.classification();
 		return results;
 	}
-
+	/**
+	 * 
+	 * @param name
+	 * dummy
+	 * @return
+	 * dummy
+	 */
 	public Long classificationIdByName(String name) {
 		List<Classification> results=taxonDao.classificationIdByName(name);
 		Long id=results.get(0).getId();
 		return id;
 	}
-
+	/**
+	 * 
+	 * @param offset
+	 * dummy
+	 * @param limit
+	 * dummy
+	 * @return
+	 * dummy
+	 */
 
 	public List<Object[]> getTaxonData(Integer offset, Integer limit) {
 		// TODO Auto-generated method stub

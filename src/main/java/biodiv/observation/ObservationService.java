@@ -1,6 +1,7 @@
 package biodiv.observation;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
@@ -44,6 +45,13 @@ public class ObservationService extends AbstractService<Observation> {
 		}
 
 	
+	}
+
+
+	public List<Map<String, Object>> list() {
+			System.out.println("service mai  aaye");
+			List<Map<String, Object>> results = observationDao.list();
+		return results;
 	}
 
 }

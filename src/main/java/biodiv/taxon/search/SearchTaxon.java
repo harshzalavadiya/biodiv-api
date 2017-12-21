@@ -65,6 +65,7 @@ public class SearchTaxon {
 	public List<Map<String, Object>> search(String data) {
 		
 		Boolean call=false;
+		
 		Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
 		TransportClient client = new PreBuiltTransportClient(settings);
 		try {
@@ -73,6 +74,10 @@ public class SearchTaxon {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		
+		
 		if(call){
 			publishSearchIndex(client);
 		}

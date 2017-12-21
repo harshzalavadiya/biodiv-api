@@ -46,9 +46,6 @@ public class UserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
 	public List<UserGroup> currentUserUserGroups(@Pac4JProfile CommonProfile profile){
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@");
-		System.out.println(profile.getId());
-		System.out.println("###################");
 		UserGroupService userGroupService = new UserGroupService();
 		List<UserGroup>  usrGrps = userGroupService.userUserGroups(Long.parseLong(profile.getId()));
 		return usrGrps;

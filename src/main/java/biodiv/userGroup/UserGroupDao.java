@@ -112,6 +112,23 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		return abc;
 	}
 
+	public UserGroup findByName(String name) {
+		// TODO Auto-generated method stub
+		Query q;
+		UserGroup results=null;
+		q=getCurrentSession().createQuery("from UserGroup where webaddress=:name").setParameter("name",name);
+		try{
+			 results=(UserGroup) q.getResultList().get(0);
+		}
+		catch (IndexOutOfBoundsException e) {
+			// TODO: handle exception
+			System.out.println("array index out of bound"+ " result not found");
+		}
+		
+		
+		return results;
+	}
+
 	
 	
 }

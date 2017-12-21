@@ -20,7 +20,7 @@ public abstract class  AbstractService<T> {
 	
 	public AbstractService() {
 		
-		entityClass = ((Class) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+		//entityClass = ((Class) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
 	}
 	
 

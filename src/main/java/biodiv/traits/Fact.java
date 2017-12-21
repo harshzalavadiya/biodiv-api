@@ -131,7 +131,7 @@ public class Fact extends CommonMethod implements java.io.Serializable {
 	public void setTrait(Trait trait) {
 		this.trait = trait;
 	}
-
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "trait_value_id", nullable = true)
 	public TraitValue getTraitValue() {

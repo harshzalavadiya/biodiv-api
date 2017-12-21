@@ -65,6 +65,14 @@ public class UserGroupController {
 		UserGroup usrGrp = userGroupService.findById(Long.valueOf(id));
 		return usrGrp;
 	}
+	@GET
+	@Path("/find/{name}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	public UserGroup show(@PathParam("name") String name){
+		UserGroup usrGrp = userGroupService.findByName(name);
+		return usrGrp;
+	}
 	
 	@GET
 	@Path("/{groupId}/users/{roleId}")

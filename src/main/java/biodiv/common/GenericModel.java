@@ -10,53 +10,54 @@ import biodiv.userGroup.UserGroup;
 
 /**
  * 
- * @author abhinav
+ * @author 
+ * dummy
  *
  * @param <T>
+ * dummy
  */
 public interface GenericModel<T> {
 
 	/**
 	 * 
 	 * @param obvId
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public T get(long obvId);
 		
 	/**
 	 * 
 	 * @param obvId
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public T read(long obvId);
 	
 	/**
 	 * 
 	 * @param obvId
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public T load(long obvId);
 	
 	/**
 	 * 
-	 * @param flush
-	 * @return
 	 */
-
-
 	public void save();
 	/**
 	 * 
 	 * @param flush
-	 * @return
+	 * dummy
 	 */
 	public void update(boolean flush);
 
-	/**
-	 * 
-	 * @param obvId
-	 * @return
-	 */
+	
+	
 	public void delete();
 
 

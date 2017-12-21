@@ -40,8 +40,11 @@ public class LoginController {
 	/**
 	 * 
 	 * @param username
+	 * 		user name
 	 * @param password
+	 * 		password
 	 * @return
+	 * 		returns something
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
@@ -79,9 +82,13 @@ public class LoginController {
 	/**
 	 * 
 	 * @param username
+	 * 			username
 	 * @param password
+	 * 			password
 	 * @return
+	 * 		is valid or not
 	 * @throws Exception
+	 * 			Possible error
 	 */
 	private CommonProfile authenticate(String username, String password) throws Exception {
 		SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator = new SimpleUsernamePasswordAuthenticator();
@@ -94,7 +101,9 @@ public class LoginController {
 	/**
 	 * 
 	 * @param profile
+	 * 		profile
 	 * @return
+	 * 		profile
 	 */
 	@Path("/callback")
 	@GET
@@ -143,8 +152,11 @@ public class LoginController {
 	/**
 	 * 
 	 * @param grantType
+	 * 			dummy
 	 * @param refreshToken
+	 * 			dummy
 	 * @return
+	 * 			dummy
 	 */
 	@Path("/token")
 	@POST
