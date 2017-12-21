@@ -18,11 +18,20 @@ public class ObservationList implements MapService {
 
 	@Override
 	public MapResponse create(String index, String type, String documentId, String document) {
+		System.out.println(index);
+		System.out.println(type);
+		System.out.println(documentId);
+		System.out.println(document);
+		
 		// TODO Auto-generated method stub
 		String url="http://localhost:8080/naksha/services/"+index+"/"+type+"/"+documentId;
+		
 		MapIntegrationService mapIntegrationService =new MapIntegrationService();
 		
+		
+		
 		MapHttpResponse res = mapIntegrationService.postRequest(url, document);
+		System.out.println(url);
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			return mapper.readValue(res.getMessage(), MapResponse.class);
@@ -34,9 +43,9 @@ public class ObservationList implements MapService {
 
 	@Override
 	public String fetch(String index, String type, String documentId) {
-		// TODO Auto-generated method stub
-		MapIntegrationService mapIntegrationService =new MapIntegrationService();
-		MapHttpResponse res = mapIntegrationService.fetch(index,type,documentId);
+//		// TODO Auto-generated method stub
+//		MapIntegrationService mapIntegrationService =new MapIntegrationService();
+//		MapHttpResponse res = mapIntegrationService.fetch(index,type,documentId);
 		return null;
 	}
 

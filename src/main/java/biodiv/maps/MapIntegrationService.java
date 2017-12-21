@@ -2,7 +2,6 @@ package biodiv.maps;
 
 import java.io.IOException;
 
-
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.CookieStore;
@@ -68,9 +67,7 @@ public class MapIntegrationService {
 	 * @param uri
 	 * @param data
 	 */
-
 	public MapHttpResponse postRequest(String uri, Object data) {
-
 		CloseableHttpResponse response = null;
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -95,8 +92,6 @@ public class MapIntegrationService {
 			e.printStackTrace();
 			logger.error("Error while trying to send request at URL {}", uri);
 		}
-
-
 		
 		return null;
 	}
