@@ -21,7 +21,7 @@ public class ActivityFeedController {
 	@Path("/feeds")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
-	public List<List<Map<String, Object>>> getFeeds(@QueryParam("rootHolderId") long rhId ,@QueryParam("rootHolderType") String rootHolderType,@QueryParam("activityHolderId") long ahId ,@QueryParam("activityHolderType") String activityHolderType,
+	public Map<String,Object>   getFeeds(@QueryParam("rootHolderId") long rhId ,@QueryParam("rootHolderType") String rootHolderType,@QueryParam("activityHolderId") long ahId ,@QueryParam("activityHolderType") String activityHolderType,
 			@QueryParam("activityType") String activityType,@QueryParam("feedType") String feedType ,@QueryParam("feedCategory") String feedCategory,@QueryParam("feedClass") String feedClass ,@QueryParam("feedPermission") String feedPermission,
 			@QueryParam("feedOrder") String feedOrder ,@QueryParam("subRootHolderId") long srhId ,@QueryParam("subRootHolderType") String subRootHolderType ,@QueryParam("feedHomeObjectId") long fhoId,
 			@QueryParam("feedHomeObjectType") String feedHomeObjectType ,@QueryParam("webaddress") String webaddress,@QueryParam("userGroupFromUserProfile") String ugfromUserProfile ,@QueryParam("refreshType") String refreshType,
@@ -29,7 +29,7 @@ public class ActivityFeedController {
 			
 		
 		System.out.println("inside controller");
-		List<List<Map<String, Object>>> af = activityFeedService.getFeeds( rhId, rootHolderType,activityType,feedType,feedCategory,feedClass,feedPermission,feedOrder,fhoId, feedHomeObjectType,
+		Map<String,Object>  af = activityFeedService.getFeeds( rhId, rootHolderType,activityType,feedType,feedCategory,feedClass,feedPermission,feedOrder,fhoId, feedHomeObjectType,
 				 refreshType, timeLine, refTym,isShowable,max);
 		return af;
 	}

@@ -34,105 +34,22 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 	}
 	
 	
-	public List<List<Map<String, Object>>> getFeeds(long rhId,String rootHolderType,String activityType,String feedType,String feedCategory,String feedClass,String feedPermission,
+	public Map<String,Object>  getFeeds(long rhId,String rootHolderType,String activityType,String feedType,String feedCategory,String feedClass,String feedPermission,
 			String feedOrder,long fhoId,String feedHomeObjectType,String refreshtype,String timeLine,long refTym ,boolean isShowable,int max){
 		
-		System.out.println("inside service");
+
+		Date newerTimeRef = null;
+		Date olderTimeRef = null;
+		Map<String, Object> queryAndObject = ActivityFeed.getQuery(rhId,rootHolderType,activityType,feedType,feedCategory,feedClass,feedPermission,
+				feedOrder,fhoId,feedHomeObjectType,refreshtype,timeLine,refTym ,isShowable,max,false,olderTimeRef);
 		
-		ActivityFeed _af = new ActivityFeed();
+		String hql = (String) queryAndObject.get("query");
+		ActivityFeed _af = (ActivityFeed) queryAndObject.get("afObject");
 		
-		String selectClause = "select usr.id,usr.name,usr.icon,af.id,af.version,af.activityHolderId,af.activityHolderType"
-				+ ",af.activityDescrption,af.activityRootType,af.activityType,af.dateCreated,af.lastUpdated,af.rootHolderId"
-				+ ",af.rootHolderType,af.subRootHolderId,af.subRootHolderType,af.isShowable";	
-		String fromClause = "from ActivityFeed af inner join User usr on af.user.id = usr.id";	
-		String whereClause = "where";	
-		String orderClause = "order by af.lastUpdated desc";
-		
-		if(isShowable){
-			if(whereClause == "where"){
-				whereClause += " af.isShowable =:isShowable";
-			}else{
-				whereClause += " and af.isShowable =:isShowable";
-			}	
-			_af.setIsShowable(isShowable);
+		if(max>100){
+			max=100;
 		}
 		
-		if(feedCategory !=null && (feedCategory != "all")){
-			if(whereClause == "where"){
-				whereClause += " af.rootHolderType =:rootHolderType";
-			}else{
-				whereClause += " and af.rootHolderType =:rootHolderType";
-			}
-			_af.setRootHolderType(rootHolderType);
-		}
-		
-		if(feedClass !=null){
-			if(whereClause == "where"){
-				whereClause += " af.activityType = :activitytype";
-			}else{
-				whereClause += " and af.activityType = :activitytype";
-			}
-			_af.setActivityType(activityType);
-		}
-		
-		if(timeLine.equalsIgnoreCase("older")){
-			
-			if(whereClause == "where"){
-				whereClause += " af.lastUpdated < :lastUpdated";
-			}else{
-				whereClause += " and af.lastUpdated < :lastUpdated";
-			}
-			Timestamp refTime = new java.sql.Timestamp(refTym);
-			_af.setLastUpdated(refTime);
-		}else{
-			System.out.println("olderrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-			if(whereClause == "where"){
-				whereClause += " af.lastUpdated > :lastUpdated";
-			}else{
-				whereClause += " and af.lastUpdated > :lastUpdated";
-			}
-			Timestamp refTime = new java.sql.Timestamp(refTym);
-			_af.setLastUpdated(refTime);
-		}
-		
-		switch(feedType){
-		
-		case "generic":
-			if(whereClause == "where"){
-				whereClause += " af.rootHolderType = :rootHolderType";
-			}else{
-				whereClause += " and af.rootHolderType = :rootHolderType";
-			}
-			_af.setRootHolderType(rootHolderType);
-			break;
-			
-		case "specific":
-			if(whereClause == "where"){
-				whereClause += " af.rootHolderType = :rootHolderType";
-				whereClause += " and af.rootHolderId = :rootHolderId";
-			}else{
-				whereClause += " and af.rootHolderType = :rootHolderType";
-				whereClause += " and af.rootHolderId = :rootHolderId";
-			}		
-			_af.setRootHolderType(rootHolderType);
-			_af.setRootHolderId(rhId);
-			break;
-			
-		case "user":
-		case "groupSpecific":
-		case "myFeeds":
-			if(feedType == "user"){
-				
-			}
-			break;
-			
-		default:
-			break;
-			
-		}
-		
-		
-		String hql =selectClause+" "+fromClause+" " + whereClause+" "+ orderClause;	
 		List<Object[]> af = getDao().getFeeds(_af,hql,rhId,rootHolderType,feedType,feedPermission,feedOrder, fhoId, feedHomeObjectType,
 				 refreshtype,timeLine, refTym ,max);
 		
@@ -140,16 +57,14 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 			Collections.reverse(af);
 		}
 		 
-		List<List<Map<String, Object>>> results = new ArrayList<List<Map<String, Object>>>();
 		List<Map<String, Object>> feeds = new ArrayList<Map<String, Object>>();
-		
 		for(Object[] obj : af){
 			Map<String, Object> res = new HashMap<String, Object>();
-			Map<String,Object> user = new HashMap<String,Object>();	
-			user.put("id",(Long) obj[0]);
-			user.put("name",(String)obj[1]);
-			user.put("icon",(String) obj[2]); 
-		    res.put("user", user);
+			Map<String,Object> author = new HashMap<String,Object>();	
+			author.put("id",(Long) obj[0]);
+			author.put("name",(String)obj[1]);
+			author.put("icon",(String) obj[2]); 
+		    res.put("author", author);
 		    res.put("id", (Long) obj[3]);
 		    res.put("version", (Long) obj[4]);
 		    res.put("activityHolderId", (Long) obj[5]);
@@ -166,22 +81,30 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 		    res.put("isShowable", (boolean) obj[16]);
 			feeds.add(res);
 		}
+		Map<String,Object>  model = new HashMap<String, Object>();
+		model.put("feeds", feeds);
+		
+		int feedSize = feeds.size();
+		newerTimeRef = feedOrder.equalsIgnoreCase("latestFirst")? (Date)( feeds.get(0).get("lastUpdated")):(Date)(feeds.get(feedSize-1).get("lastUpdated"));
+		olderTimeRef = feedOrder.equalsIgnoreCase("latestFirst")? (Date) (feeds.get(feedSize-1).get("lastUpdated")):(Date)(feeds.get(0).get("lastUpdated"));
+		Date currentDate = new java.util.Date();
+
+		
+		queryAndObject = ActivityFeed.getQuery(rhId,rootHolderType,activityType,feedType,feedCategory,feedClass,feedPermission,
+				feedOrder,fhoId,feedHomeObjectType,refreshtype,timeLine,refTym ,isShowable,max,true,olderTimeRef);
+		ActivityFeed acf = (ActivityFeed) queryAndObject.get("afObject");
+		hql = (String) queryAndObject.get("query");
+		long count = getDao().getFeedCount(acf,hql);
+		long remainingFeedCount = count ;
 		
 		
-		selectClause = "select count(*)";
-		hql = selectClause+" "+fromClause+" " + whereClause;
-		long count = getDao().getFeedCount(_af,hql);
-		long countMinusMax = count-max<0?0:(count-max);
-		count = max==0?0:countMinusMax;
-		
-		List<Map<String, Object>> meta = new ArrayList<Map<String, Object>>();
-		Map<String,Object> extra = new HashMap<String, Object>();
-	    extra.put("remainingFeedCount", (Long) count);
-	    meta.add(extra);
-	    
-	    results.add(feeds);
-		results.add(meta);
-		return results;
+		Map<String,Object>  afResult = new HashMap<String, Object>();
+	    afResult.put("model", model);
+	    afResult.put("remainingFeedCount", remainingFeedCount);
+	    afResult.put("olderTimeRef", olderTimeRef);
+	    afResult.put("newerTimeRef", newerTimeRef);
+	    afResult.put("currentTime", currentDate.getTime());
+		return afResult;
 	}
 	
 	@Intercept

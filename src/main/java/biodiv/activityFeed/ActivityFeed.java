@@ -1,5 +1,6 @@
 package biodiv.activityFeed;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -412,6 +413,122 @@ public class ActivityFeed implements java.io.Serializable {
 			//
 		}
 		return type;
+	}
+
+	public static Map<String,Object> getQuery(long rhId, String rootHolderType, String activityType, String feedType,
+			String feedCategory, String feedClass, String feedPermission, String feedOrder, long fhoId,
+			String feedHomeObjectType, String refreshtype, String timeLine, long refTime, boolean isShowable, int max,
+			boolean countQuery,Date olderTimeRef) {
+		
+		ActivityFeed _af = new ActivityFeed();
+		String hql;
+		System.out.println("lastUpdatedfffffffffffffffffffffffffff "+olderTimeRef);
+		Timestamp refTym = new java.sql.Timestamp(refTime);
+		System.out.println("reftym "+refTym);
+		if(countQuery){
+			refTym = (Timestamp) olderTimeRef;
+		}
+		
+		String selectClause;
+		String fromClause = "from ActivityFeed af inner join User usr on af.user.id = usr.id";	
+		String whereClause = "where";	
+		String orderClause = "order by af.lastUpdated desc";
+		if(isShowable){
+			if(whereClause == "where"){
+				whereClause += " af.isShowable =:isShowable";
+			}else{
+				whereClause += " and af.isShowable =:isShowable";
+			}	
+			_af.setIsShowable(isShowable);
+		}
+		
+		if(feedCategory !=null && (feedCategory != "all")){
+			if(whereClause == "where"){
+				whereClause += " af.rootHolderType =:rootHolderType";
+			}else{
+				whereClause += " and af.rootHolderType =:rootHolderType";
+			}
+			_af.setRootHolderType(rootHolderType);
+		}
+		
+		if(feedClass !=null){
+			if(whereClause == "where"){
+				whereClause += " af.activityType = :activitytype";
+			}else{
+				whereClause += " and af.activityType = :activitytype";
+			}
+			_af.setActivityType(activityType);
+		}
+		
+		if(timeLine.equalsIgnoreCase("older")){
+			
+			if(whereClause == "where"){
+				whereClause += " af.lastUpdated < :lastUpdated";
+			}else{
+				whereClause += " and af.lastUpdated < :lastUpdated";
+			}
+			//Timestamp refTime = new java.sql.Timestamp(refTym);
+			_af.setLastUpdated(refTym);
+		}else{
+			System.out.println("olderrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+			if(whereClause == "where"){
+				whereClause += " af.lastUpdated > :lastUpdated";
+			}else{
+				whereClause += " and af.lastUpdated > :lastUpdated";
+			}
+			//Timestamp refTime = new java.sql.Timestamp(refTym);
+			_af.setLastUpdated(refTym);
+		}
+		
+		switch(feedType){
+		
+		case "generic":
+			if(whereClause == "where"){
+				whereClause += " af.rootHolderType = :rootHolderType";
+			}else{
+				whereClause += " and af.rootHolderType = :rootHolderType";
+			}
+			_af.setRootHolderType(rootHolderType);
+			break;
+			
+		case "specific":
+			if(whereClause == "where"){
+				whereClause += " af.rootHolderType = :rootHolderType";
+				whereClause += " and af.rootHolderId = :rootHolderId";
+			}else{
+				whereClause += " and af.rootHolderType = :rootHolderType";
+				whereClause += " and af.rootHolderId = :rootHolderId";
+			}		
+			_af.setRootHolderType(rootHolderType);
+			_af.setRootHolderId(rhId);
+			break;
+			
+		case "user":
+		case "groupSpecific":
+		case "myFeeds":
+			if(feedType == "user"){
+				
+			}
+			break;
+			
+		default:
+			break;
+			
+		}
+		
+		if(!countQuery){
+		  selectClause = "select usr.id,usr.name,usr.icon,af.id,af.version,af.activityHolderId,af.activityHolderType"
+					+ ",af.activityDescrption,af.activityRootType,af.activityType,af.dateCreated,af.lastUpdated,af.rootHolderId"
+					+ ",af.rootHolderType,af.subRootHolderId,af.subRootHolderType,af.isShowable";
+		  hql = selectClause+" "+fromClause+" " + whereClause+" "+ orderClause;
+		}else{
+			selectClause = "select count(*)";
+			hql = selectClause+" "+fromClause+" " + whereClause;
+		}
+		Map<String, Object> queryAndAfObject = new HashMap<String, Object>();
+		queryAndAfObject.put("query", hql);
+		queryAndAfObject.put("afObject", _af);
+		return queryAndAfObject;
 	}
 
 }
