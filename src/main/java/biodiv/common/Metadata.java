@@ -70,6 +70,7 @@ public abstract class Metadata implements GenericModel {
 	//XXX to be removed after locationScale migration
 	private String locationAccuracy;
 	private LocationScale locationScale;
+	
 	@JsonIgnore
 	private Geometry topology;
      

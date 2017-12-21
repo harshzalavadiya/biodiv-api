@@ -31,9 +31,13 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	/**
 	 * 
 	 * @param traitIds
+	 * dummy
 	 * @param isNotObservationTrait
+	 * dummy
 	 * @param showInObservation
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public List<TraitObject> list(Set<Long> traitIds, Boolean isNotObservationTrait, Boolean showInObservation) {
 		// TODO Auto-generated method stub
@@ -89,10 +93,14 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	/**
 	 * 
 	 * @param sGroup
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public List<Long> getTaxonIds(Long sGroup) {
+		
 		// TODO Auto-generated method stub
+		
 		List<Long> taxonIds = new ArrayList<Long>();
 		Query q;
 		q = getCurrentSession().createQuery("select taxonId from SpeciesGroupMapping where speciesId=:sGroup");
@@ -104,8 +112,11 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	/**
 	 * 
 	 * @param taxonIds
+	 * dummy
 	 * @param classificationId
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public Set<Long> getPathToRoot(List<Long> taxonIds, Long classificationId) {
 		Query q;
@@ -140,7 +151,9 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	/**
 	 * 
 	 * @param allTaxonIds
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public Set<Long> getTraitId(Set<Long> allTaxonIds) {
 		// TODO Auto-generated method stub
@@ -160,13 +173,15 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 		return traitIds;
 	}
 
-	/**
-	 * 
-	 * @param id
-	 * @param objectType
-	 * @return
-	 */
-
+/**
+ * 
+ * @param id
+	 * dummy
+ * @param objectType
+	 * dummy
+ * @return
+	 * dummy
+ */
 	public List<Fact> getFact(Long id, String objectType) {
 		List<Fact> results = new ArrayList<Fact>();
 		Query q;
@@ -178,21 +193,14 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 
 	/**
 	 * 
-	 * @param id
-	 * @return
-	 */
-	public Trait list(Long id) {
-		// TODO Auto-generated method stub
-		Trait trait = getCurrentSession().get(Trait.class, id);
-		return trait;
-	}
-
-	/**
-	 * 
 	 * @param objectId
+	 * dummy
 	 * @param objectType
+	 * dummy
 	 * @param traitId
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public List<Fact> getFact(Long objectId, String objectType, Long traitId) {
 		Query q;
@@ -208,9 +216,13 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	/**
 	 * 
 	 * @param objectId
+	 * dummy
 	 * @param objectType
+	 * dummy
 	 * @param trait
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 
 	public int deleteFact(Long objectId, String objectType, Long trait) {
@@ -224,28 +236,47 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 
 	}
 
-	/**
-	 * 
-	 * @param traitValues
-	 * @param traitId
-	 * @param objectId
-	 * @param objectType
-	 * @return
-	 */
-	
-	
-
-	public TraitValue getTraitValue(Long id) {
+	public TraitValue getTraitValue(Long traitId, Long value) {
 		// TODO Auto-generated method stub
-		TraitValue traitValue = getCurrentSession().get(TraitValue.class, id);
-		return traitValue;
-	}
-
-	public Serializable updateFact(Fact newupdated) {
+		Query q;
+		q=getCurrentSession().createQuery("from TraitValue where id=:value and traitId=:traitId");
+		q.setParameter("value", value).setParameter("traitId", traitId);
+		TraitValue results = null;
+		try{
+			 results=(TraitValue) q.getResultList().get(0);
+		}
+		catch (IndexOutOfBoundsException e) {
+			System.out.println("array index out of bound or no element present");
+		}
 		
-		Serializable result = getCurrentSession().save(newupdated);
-
-		return result;
+		return results;
 	}
+
+	public List<Trait> listObservationTrait() {
+		// TODO Auto-generated method stub
+		Query q;
+		q=getCurrentSession().createQuery("From Trait where showInObservation=true");
+		List<Trait> results=null;
+		
+			results=q.getResultList();
+		
+
+		return results;
+	}
+
+
+	
+
+	public List<TraitValue> getTraitValueWithTraitId(Long id) {
+		// TODO Auto-generated method stub
+		Query q;
+		q=getCurrentSession().createQuery("from TraitValue where traitId=:id");
+		q.setParameter("id", id);
+		List<TraitValue> results=q.getResultList();
+		return results;
+	
+	}
+
+
 
 }

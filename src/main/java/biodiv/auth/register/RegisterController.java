@@ -38,7 +38,12 @@ public class RegisterController {
 
 	/**
 	 * 
+	 * @param registerCommand
+	 * dummy
+	 * @param request
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
@@ -106,7 +111,15 @@ public class RegisterController {
 			return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
 		}
 	}
-
+	/**
+	 * 
+	 * @param registerCommand
+	 * dummy
+	 * @param userLanguage
+	 * dummy
+	 * @return
+	 * dummy
+	 */
 	private User create(RegisterCommand registerCommand, Language userLanguage) {
 		User user = new User();
 		try {

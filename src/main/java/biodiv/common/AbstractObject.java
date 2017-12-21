@@ -9,6 +9,7 @@ public class AbstractObject {
 	/**
 	 * returns generated id. It can be long or string in serializable format 
 	 * @return
+	 * dummy
 	 */
 	public Serializable save() {
 		try {

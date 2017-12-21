@@ -43,12 +43,19 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param objectId
+	 * dummy
 	 * @param objectType
+	 * dummy
 	 * @param sGroup
+	 * dummy
 	 * @param classificationId
+	 * dummy
 	 * @param isNotObservationTrait
+	 * dummy
 	 * @param showInObservation
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public List<TraitFactUi> list(Long objectId, String objectType, Long sGroup, Long classificationId,
 			Boolean isNotObservationTrait, Boolean showInObservation) {
@@ -85,8 +92,11 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param id
+	 * dummy
 	 * @param objectType
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 
 	public List<Fact> slist(Long id, String objectType) {
@@ -98,11 +108,17 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param traitValues
+	 * dummy
 	 * @param traitId
+	 * dummy
 	 * @param objectId
+	 * dummy
 	 * @param objectType
+	 * dummy
 	 * @param profile
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public Serializable updateFact(Set<Long> traitValues, Long traitId, Long objectId, String objectType,CommonProfile profile) {
 		Serializable result = null;
@@ -151,23 +167,29 @@ public class TraitService extends AbstractService<Trait> {
 				Optional<Long> firstString = traitValues.stream().findFirst();
 				if (firstString.isPresent()) {
 					Long value = firstString.get();
-					TraitValue traitValue = traitDao.getTraitValue(value);
+					
+					//TraitValue traitValue=(TraitValue) new TraitValue().get(value);
+					TraitValue traitValue=traitDao.getTraitValue(traitId,value);
+					
 					if (traitValue != null) {
 						newupdated.setTraitValue(traitValue);
+					}
+					else{
+						return null;
 					}
 
 				}
 				/**
 				 * Getting user corresponding to given id
 				 */
-				UserService userService = new UserService();
-				User s = userService.findById(Long.parseLong(profile.getId()));
+				User user=new User();
+				User s =  (User) user.get(Long.parseLong(profile.getId()));
 				newupdated.setUser(s);
 				newupdated.setVersion(0L);
 				/**
 				 * Updating fact Table
 				 */
-				traitDao.updateFact(newupdated);
+				newupdated.save();
 
 			} else {
 
@@ -191,18 +213,23 @@ public class TraitService extends AbstractService<Trait> {
 					Optional<Long> firstString = traitValues.stream().findFirst();
 					if (firstString.isPresent()) {
 						Long value = firstString.get();
-						TraitValue traitValue = traitDao.getTraitValue(value);
+						
+						TraitValue traitValue=traitDao.getTraitValue(traitId,value);
+						
 						if (traitValue != null) {
 							newupdated.setTraitValue(traitValue);
 						}
+						else{
+							return null;
+						}
 					}
-					UserService userService = new UserService();
-					User s = userService.findById(Long.parseLong(profile.getId()));
+					User user=new User();
+					User s =  (User) user.get(Long.parseLong(profile.getId()));
 					newupdated.setUser(s);
 					newupdated.setVersion(fact.getVersion() + 1L);
 
 				}
-				traitDao.updateFact(newupdated);
+				newupdated.save();
 			}
 
 		} else if (trait.getTraitTypes().equalsIgnoreCase(multiple_category)) {
@@ -230,14 +257,23 @@ public class TraitService extends AbstractService<Trait> {
 				newupdated.setToDate(new Date());
 				newupdated.setToValue(null);
 				newupdated.setTrait(trait);
-				TraitValue traitValue1 = traitDao.getTraitValue(traitValue);
+				
+				//TraitValue traitValue1=(TraitValue) new TraitValue().get(traitValue);
+						
+				//TraitValue traitValue1 = traitDao.getTraitValue(traitValue);
+				
+				TraitValue traitValue1=traitDao.getTraitValue(traitId,traitValue);
 				if (traitValue1 != null) {
 					newupdated.setTraitValue(traitValue1);
 				}
+				else{
+					return null;
+				}
+				
 				newupdated.setUser(s);
 				newupdated.setVersion(0L);
 
-				result = traitDao.updateFact(newupdated);
+				newupdated.save();
 
 			}
 
@@ -256,23 +292,12 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param id
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public Trait list(Long id) {
-		Class<?> css = null;
-		try {
-			css = Class.forName("biodiv.traits.Trait");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Trait result = null;
-		try {
-			result = (Trait) ((CommonMethod) css.newInstance()).get(id);
-		} catch (InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Trait result=(Trait) new Trait().get(id);
 		return result;
 
 	}
@@ -280,25 +305,26 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param id
+	 * dummy
 	 * @return
+	 * dummy
 	 */
 	public Fact listFact(Long id) {
-		Class<?> css = null;
-		;
-		try {
-			css = Class.forName("biodiv.traits.Fact");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Fact result = null;
-		try {
-			result = (Fact) ((CommonMethod) css.newInstance()).get(id);
-		} catch (InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		Fact result=(Fact) new Fact().get(id);
 		return result;
+	}
+
+	public List<Trait> listObservationTrait() {
+		// TODO Auto-generated method stub
+		List<Trait> results=traitDao.listObservationTrait();
+		return results;
+	}
+
+	public List<TraitValue> getTraitValue(Long id) {
+		// TODO Auto-generated method stub
+		List<TraitValue> results=traitDao.getTraitValueWithTraitId(id);
+		return results;
 	}
 
 }

@@ -148,4 +148,11 @@ public class UserGroupService extends AbstractService<UserGroup> {
 			
 		}
 	}
+
+	public UserGroup findByName(String name) {
+		// TODO Auto-generated method stub
+		name=name.trim();
+		UserGroup userGroup=userGroupDao.findByName(name);
+		return userGroup;
+	}
 }
