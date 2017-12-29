@@ -44,6 +44,8 @@
 		<property name="hibernate.transaction.coordinator_class">jdbc</property>
 		<property name="hibernate.current_session_context_class">thread</property>
 		<property name ="hibernate.jdbc.batch_size">50</property>
+		
+		<property name="hibernate.dialect">biodiv.common.MyPostgreSQL95Dialect</property>
 		<!-- Mappings -->
 		<!-- mapping package="biodiv"/ -->
 		<mapping class="biodiv.common.ExternalLinks" />
@@ -77,7 +79,7 @@
 		<mapping class="biodiv.follow.Follow" />
 		<mapping class="biodiv.traits.SpeciesGroupMapping" />
 		<mapping class="biodiv.traits.TraitTaxonomyDefinition" />
-
+		<mapping class="biodiv.comment.Comment" />
 	</session-factory>
 
 </hibernate-configuration>
