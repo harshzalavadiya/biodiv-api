@@ -1,13 +1,9 @@
 package biodiv.observation;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,16 +25,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-
-
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.vividsolutions.jts.geom.Geometry;
 
 import biodiv.common.DataObject;
-import biodiv.common.GenericModel;
 import biodiv.resource.Resource;
 import biodiv.userGroup.UserGroup;
-import biodiv.userGroup.UserGroupModel;
 
 @Entity
 @Table(name = "observation", uniqueConstraints = { @UniqueConstraint(columnNames = "id"), })

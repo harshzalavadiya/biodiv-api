@@ -15,12 +15,14 @@ import biodiv.userGroup.UserGroup;
 public class ObservationService extends AbstractService<Observation> {
 
 
-	private static final Logger log = LoggerFactory.getLogger(ObservationService.class);
+	
 
 	private ObservationDao observationDao;
 	
 	public ObservationService() {
+		System.out.println("ObservationService constructor");
 		this.observationDao = new ObservationDao();
+		System.out.println("ObservationService constructor end");
 	}
 	
 	

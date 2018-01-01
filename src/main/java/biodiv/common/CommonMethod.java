@@ -1,6 +1,9 @@
 package biodiv.common;
 
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +12,8 @@ import biodiv.util.HibernateUtil;
 
 public class CommonMethod<T> implements GenericModel {
 	
-	private static final Logger log = LoggerFactory.getLogger(DataObject.class);
+	private static final Logger log = LoggerFactory.getLogger(CommonMethod.class);
+	
 	@Override
 	public T get(long Id) {
 		// TODO Auto-generated method stub
@@ -74,6 +78,15 @@ public class CommonMethod<T> implements GenericModel {
 			log.error("save  failed", re);
 			throw re;
 		}
+		
+	}
+	public Set<String> cSTSOT(String str){
+		if(str == null|| str== "" || str.isEmpty())
+			return new HashSet<String>();
+		
+		String [] y = str.split(",");
+		Set<String> strSet1 = Arrays.stream(y).collect(Collectors.toSet());
+		return strSet1;
 		
 	}
 

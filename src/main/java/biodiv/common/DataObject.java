@@ -1,20 +1,11 @@
 package biodiv.common;
 
-import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.Intercept;
-import biodiv.userGroup.UserGroup;
 import biodiv.userGroup.UserGroupModel;
 import biodiv.util.HibernateUtil;
 

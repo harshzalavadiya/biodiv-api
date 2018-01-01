@@ -1,6 +1,5 @@
 package biodiv.license;
 
-import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
 import biodiv.common.License;
 

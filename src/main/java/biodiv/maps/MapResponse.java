@@ -1,35 +1,34 @@
 package biodiv.maps;
 
+import org.apache.http.StatusLine;
+
 /**
  * 
  * The response from map module
  */
 public class MapResponse {
 
-	private MapQueryStatus result;
+	private StatusLine result;
+	private Object document;
 	
-	private String message;
-
-	public MapResponse (MapQueryStatus result, String message) {
+	public MapResponse(StatusLine result, Object document) {
 		super();
 		this.result = result;
-		this.message = message;
+		this.document = document;
 	}
-
-	public MapQueryStatus getResult() {
+	public StatusLine getResult() {
 		return result;
 	}
-
-	public void setResult(MapQueryStatus result) {
+	public void setResult(StatusLine result) {
 		this.result = result;
 	}
-
-	public String getMessage() {
-		return message;
+	public Object getDocument() {
+		return document;
+	}
+	public void setDocument(Object document) {
+		this.document = document;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
 	
+
 }

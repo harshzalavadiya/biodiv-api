@@ -1,13 +1,11 @@
 package biodiv.observation;
 
+import java.lang.reflect.ParameterizedType;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.Query;
 import javax.ws.rs.container.ResourceContext;
@@ -17,18 +15,14 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 import biodiv.userGroup.UserGroup;
-import biodiv.userGroup.UserGroupService;
 
 class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterface<Observation, Long> {
 	
@@ -37,7 +31,9 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 	@Context
     private ResourceContext resourceContext;
 	
-	
+	protected ObservationDao() {
+		System.out.println("ObservationDao constructor");
+	}
 	
 	@Override
 	public Observation findById(Long id) {
@@ -59,7 +55,6 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 	}
 
 	public List<Map<String, Object>> list() {
-		System.out.println("dao mai  aaye");
 		// TODO Auto-generated method stub
 		Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
 		TransportClient client = new PreBuiltTransportClient(settings);

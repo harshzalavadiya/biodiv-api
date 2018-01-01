@@ -10,7 +10,6 @@ import javax.ws.rs.NotFoundException;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
-import biodiv.observation.Observation;
 
 
 class UserDao extends AbstractDao<User, Long> implements DaoInterface<User, Long>{

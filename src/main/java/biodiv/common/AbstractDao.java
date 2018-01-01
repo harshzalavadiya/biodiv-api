@@ -26,6 +26,8 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	protected Class<? extends T> daoType;
 
 	protected AbstractDao() {
+		System.out.println("AbstractDao constructor");
+
 		daoType = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 

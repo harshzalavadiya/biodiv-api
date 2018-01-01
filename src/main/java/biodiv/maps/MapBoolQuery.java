@@ -1,14 +1,14 @@
 package biodiv.maps;
 
-import java.util.List;
+import java.util.Set;
 
 public class MapBoolQuery {
 
 	private String key;
-	
-	private List<Object> values;
 
-	public MapBoolQuery(String key, List<Object> values) {
+	private Set<String> values;
+
+	public MapBoolQuery(String key, Set<String> values) {
 		super();
 		this.key = key;
 		this.values = values;
@@ -22,11 +22,12 @@ public class MapBoolQuery {
 		this.key = key;
 	}
 
-	public List<Object> getValues() {
+	public Set<String> getValues() {
 		return values;
 	}
 
-	public void setValues(List<Object> values) {
+	public void setValues(Set<String> values) {
 		this.values = values;
 	}
+
 }

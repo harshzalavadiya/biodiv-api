@@ -4,10 +4,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.lang.reflect.ParameterizedType;
-
-import biodiv.Intercept;
-import biodiv.util.HibernateUtil;
 
 public abstract class  AbstractService<T> {
 
@@ -19,6 +15,7 @@ public abstract class  AbstractService<T> {
 	public abstract AbstractDao<T, Long> getDao();
 	
 	public AbstractService() {
+		System.out.println("AbstractService constructor");
 		
 		//entityClass = ((Class) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
 	}

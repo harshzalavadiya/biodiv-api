@@ -8,11 +8,8 @@ import java.util.Set;
 
 import javax.persistence.Query;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
-import biodiv.observation.Observation;
 import biodiv.user.User;
 
 public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoInterface<UserGroup, Long>{

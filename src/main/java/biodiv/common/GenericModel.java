@@ -1,13 +1,5 @@
 package biodiv.common;
 
-
-import java.io.Serializable;
-
-import java.util.Set;
-
-import biodiv.userGroup.UserGroup;
-
-
 /**
  * 
  * @author 

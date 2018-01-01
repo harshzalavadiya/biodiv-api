@@ -1,11 +1,7 @@
 package biodiv.userGroup;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -22,8 +18,6 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Intercept;
-import biodiv.common.DataObject;
-import biodiv.observation.Observation;
 import biodiv.observation.ObservationService;
 import biodiv.user.User;
 

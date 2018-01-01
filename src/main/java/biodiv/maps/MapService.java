@@ -10,7 +10,7 @@ public interface MapService {
 
 	public MapResponse create(String index, String type, String documentId, String document);
 
-	public String fetch(String index, String type, String documentId);
+	public MapHttpResponse fetch(String index, String type, String documentId);
 
 	public MapResponse delete(String index, String type, String documentId);
 
@@ -18,7 +18,9 @@ public interface MapService {
 
 	public List<MapResponse> bulkUpload(String index, String type, String jsonArray);
 
-	public List<String> termSearch(String index, String type, String key, String value, Integer from, Integer limit);
+	public MapHttpResponse termSearch(String index, String type, String key, String value, Integer from, Integer limit);
+	
+	public MapHttpResponse search(String index, String type, List<MapBoolQuery> query ,Integer from, Integer limit);
 
 	public List<String> searchBool(String index, String type, List<MapBoolQuery> queries, Integer from, Integer limit);
 
