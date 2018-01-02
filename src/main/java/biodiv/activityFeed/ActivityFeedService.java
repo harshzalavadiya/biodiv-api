@@ -140,7 +140,8 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 				ActivityFeed af = new ActivityFeed(user,(String)afNew.get("activityDescrption"),(Long)afNew.get("activityHolderId"),
 						(String)afNew.get("activityHolderType"),(String)afNew.get("activityType") ,(Date)afNew.get("dateCreated"),
 						(Date)afNew.get("lastUpdated"),(Long)afNew.get("rootHolderId"), (String)afNew.get("rootHolderType"),
-						(Long)afNew.get("subRootHolderId"),(String)afNew.get("subRootHolderType"),(Boolean)afNew.get("isShowable"));
+						(Long)afNew.get("subRootHolderId"),(String)afNew.get("subRootHolderType"),(MyJson) afNew.get("descriptionJson"),
+						(Boolean)afNew.get("isShowable"));
 				
 				save(af);		
 			

@@ -8,11 +8,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import biodiv.user.User;
 
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-public abstract class ParticipationMetadata extends Metadata {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class ParticipationMetadata extends Metadata implements java.io.Serializable{
 	
 	User author;// or uploader from sourcedata
 	String originalAuthor;

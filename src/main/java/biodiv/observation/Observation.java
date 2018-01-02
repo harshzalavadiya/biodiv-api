@@ -29,8 +29,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -45,8 +44,8 @@ import biodiv.userGroup.UserGroupModel;
 @NamedQuery(name = Observation.QUERY_SELECT_BY_ID, query = "SELECT obv FROM Observation obv WHERE obv.id = :"
 		+ Observation.PARAM_ID)
 
-
-public class Observation extends DataObject {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Observation extends DataObject implements java.io.Serializable{
 	
 //	@Inject
 //	ObservationService observationService;

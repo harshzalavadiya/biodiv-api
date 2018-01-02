@@ -183,7 +183,7 @@ public class ActivityFeed implements java.io.Serializable {
 
 	public ActivityFeed(User user, String activityDescrption, Long activityHolderId,
 			String activityHolderType, String activityType, Date dateCreated, Date lastUpdated,
-			Long rootHolderId, String rootHolderType, Long subRootHolderId, String subRootHolderType,
+			Long rootHolderId, String rootHolderType, Long subRootHolderId, String subRootHolderType,MyJson descriptionJson,
 			Boolean isShowable) {
 		this.user = user;
 		this.activityDescrption = activityDescrption;
@@ -196,6 +196,7 @@ public class ActivityFeed implements java.io.Serializable {
 		this.rootHolderType = rootHolderType;
 		this.subRootHolderId = subRootHolderId;
 		this.subRootHolderType = subRootHolderType;
+		this.descriptionJson = descriptionJson;
 		this.isShowable = isShowable;
 	}
 
@@ -362,7 +363,7 @@ public class ActivityFeed implements java.io.Serializable {
 	
 	
 	public static Map<String, Object> createMapforAf(String rootType,Long rhId,Object rootHolder,String activityHolderType,Long activityHolderId,
-			String activityType,String activityDescrption ,Boolean isShowable) {
+			String activityType,String activityDescrption ,String name,String ro_type,Boolean isShowable) {
 		
 		//String activityDescrption;
 	    //Long activityHolderId ;  
@@ -383,7 +384,17 @@ public class ActivityFeed implements java.io.Serializable {
 		 String rootHolderType ;
 		 Long subRootHolderId ;
 		 String subRootHolderType;
-		
+		 
+		    MyJson myJson = new MyJson();
+	    	//myJson.setAid((Long) obj[3]);
+	    	myJson.setName(name);
+	    	myJson.setRo_id(activityHolderId);
+	    	myJson.setRo_type(ro_type);
+	    	//myJson.setDescription(body);
+	    	myJson.setIs_migrated("true");
+	    	myJson.setActivity_performed(activityDescrption);
+	    	//myJson.setIs_scientific_name(null);
+	    	
 		if(rootType.equalsIgnoreCase("UserGroup")){
 			rootHolderId = rhId;
 			rootHolderType = "species.groups.UserGroup";
@@ -417,6 +428,7 @@ public class ActivityFeed implements java.io.Serializable {
 		 afNew.put("subRootHolderId",subRootHolderId);
 		 afNew.put("subRootHolderType",subRootHolderType);
 		 afNew.put("isShowable",isShowable);
+		 afNew.put("descriptionJson", myJson);
 		 
 		return afNew;
 	}
