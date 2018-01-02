@@ -1,30 +1,21 @@
 package biodiv.userGroup;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.hibernate.StatelessSession;
-import org.hibernate.Transaction;
 import org.jvnet.hk2.annotations.Service;
-
-import com.google.common.collect.Lists;
-import com.vividsolutions.jts.geom.Geometry;
 
 import biodiv.Intercept;
 import biodiv.activityFeed.ActivityFeed;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.DataObject;
-import biodiv.observation.Observation;
 import biodiv.observation.ObservationService;
 import biodiv.user.User;
 import biodiv.user.UserService;

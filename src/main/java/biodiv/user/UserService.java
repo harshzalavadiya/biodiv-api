@@ -3,9 +3,7 @@ package biodiv.user;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.activityFeed.ActivityFeedDao;
 import biodiv.auth.register.RegistrationCode;
-import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
 
 public class UserService extends AbstractService<User> {

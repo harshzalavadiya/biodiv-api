@@ -1,8 +1,9 @@
 package biodiv;
 
-import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.inject.Singleton;
 import javax.ws.rs.ApplicationPath;
@@ -11,10 +12,6 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-//import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +28,7 @@ import biodiv.userGroup.UserGroupService;
 public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Application
 														// {
 
-	private final Logger log = LoggerFactory.getLogger(BiodivApplication.class);
+	//private final Logger log = LoggerFactory.getLogger(BiodivApplication.class);
 	private Map<String,Object> getConfig= new HashMap<String,Object>();
 	
 	
@@ -85,8 +82,9 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 //		});
 		register(RolesAllowedDynamicFeature.class);
 		register(org.glassfish.jersey.server.filter.UriConnegFilter.class);
-		register(org.glassfish.jersey.logging.LoggingFeature.class);
-        property(LoggingFeature.LOGGING_FEATURE_VERBOSITY_CLIENT, LoggingFeature.Verbosity.PAYLOAD_TEXT);
+		register(new LoggingFeature(Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), Level.ALL, LoggingFeature.Verbosity.PAYLOAD_ANY, Integer.MAX_VALUE));
+		//register(org.glassfish.jersey.logging.LoggingFeature.class);
+        //property(LoggingFeature.LOGGING_FEATURE_VERBOSITY_CLIENT, LoggingFeature.Verbosity.PAYLOAD_TEXT);
 		// register(org.glassfish.jersey.server.validation.ValidationFeature.class);
 		// register(org.glassfish.jersey.server.spring.SpringComponentProvider.class);
 

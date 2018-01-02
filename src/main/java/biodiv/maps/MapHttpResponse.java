@@ -1,35 +1,39 @@
 package biodiv.maps;
 
+import org.apache.http.StatusLine;
+
 /**
  * 
  * Http response code and message received.
  */
 public class MapHttpResponse {
 
-	private int statusCode;
-	
-	private String message;
-	
-	public MapHttpResponse(int statusCode, String message) {
+	private StatusLine statusCode;
+
+	private Object document;
+
+	public MapHttpResponse(StatusLine statusCode, Object document) {
 		super();
 		this.statusCode = statusCode;
-		this.message = message;
+		this.document = document;
 	}
 
-	public int getStatusCode() {
+	public StatusLine getStatusCode() {
 		return statusCode;
 	}
 
-	public void setStatusCode(int statusCode) {
+	public void setStatusCode(StatusLine statusCode) {
 		this.statusCode = statusCode;
 	}
 
-	public String getMessage() {
-		return message;
+	public Object getDocument() {
+		return document;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setDocument(Object document) {
+		this.document = document;
 	}
+
 	
+
 }

@@ -3,10 +3,8 @@ package biodiv.traits;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,11 +14,9 @@ import org.pac4j.core.profile.CommonProfile;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
-import biodiv.common.CommonMethod;
 import biodiv.common.License;
 import biodiv.license.LicenseService;
 import biodiv.user.User;
-import biodiv.user.UserService;
 
 public class TraitService extends AbstractService<Trait> {
 

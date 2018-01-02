@@ -1,13 +1,9 @@
 package biodiv.follow;
 
-import java.util.List;
-
 import javax.persistence.Query;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
-import biodiv.user.User;
-import biodiv.userGroup.UserGroup;
 
 
 public class FollowDao extends AbstractDao<Follow, Long> implements DaoInterface<Follow, Long>{

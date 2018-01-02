@@ -1,13 +1,11 @@
 package biodiv.activityFeed;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import biodiv.Intercept;
 import biodiv.comment.CommentService;
@@ -16,9 +14,6 @@ import biodiv.common.AbstractService;
 import biodiv.common.MyJson;
 import biodiv.follow.FollowService;
 import biodiv.user.User;
-import biodiv.user.UserService;
-import biodiv.userGroup.UserGroup;
-import biodiv.userGroup.UserGroupDao;
 
 public class ActivityFeedService extends AbstractService<ActivityFeed>{
 	

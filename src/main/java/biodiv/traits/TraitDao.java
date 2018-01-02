@@ -1,6 +1,5 @@
 package biodiv.traits;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,12 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-
-import org.bouncycastle.crypto.tls.SecurityParameters;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;

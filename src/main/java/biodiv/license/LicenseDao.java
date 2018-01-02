@@ -8,7 +8,6 @@ import javax.ws.rs.NotFoundException;
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 import biodiv.common.License;
-import biodiv.user.User;
 
 public class LicenseDao extends AbstractDao<License, Long> implements DaoInterface<License, Long>{
 

@@ -25,15 +25,16 @@ public class ObservationController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
 	public List<Map<String, Object>> list() {
-		
-		System.out.println("controller mai aaye");
-		 List<Map<String, Object>> obvs=null;
-		 obvs = observationService.list();
-	
+		List<Map<String, Object>> obvs = null;
+
+		try {
+			obvs = observationService.list();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return obvs;
 	}
 
-	@SuppressWarnings("unchecked")
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -41,9 +42,7 @@ public class ObservationController {
 	public Observation show(@PathParam("id") long id) {
 		DataObject obv = null;
 		try {
-			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return (Observation) obv;

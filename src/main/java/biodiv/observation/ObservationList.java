@@ -3,8 +3,6 @@ package biodiv.observation;
 import java.io.IOException;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biodiv.maps.MapBoolQuery;
@@ -16,37 +14,53 @@ import biodiv.maps.MapService;
 
 public class ObservationList implements MapService {
 
+	private static final String URL = "http://localhost:8080/naksha/services/data/";
+
 	@Override
 	public MapResponse create(String index, String type, String documentId, String document) {
-		System.out.println(index);
-		System.out.println(type);
-		System.out.println(documentId);
-		System.out.println(document);
-		
+
 		// TODO Auto-generated method stub
-		String url="http://localhost:8080/naksha/services/"+index+"/"+type+"/"+documentId;
-		
-		MapIntegrationService mapIntegrationService =new MapIntegrationService();
-		
-		
-		
-		MapHttpResponse res = mapIntegrationService.postRequest(url, document);
-		System.out.println(url);
+
+		String newurl = URL + index + "/" + type + "/" + documentId;
+
+		/**
+		 * Map integration service have required method to make respective calls
+		 */
+
+		MapIntegrationService mapIntegrationService = new MapIntegrationService();
+		/**
+		 * Wrapper class for observation
+		 */
+		ObservationListObject object = new ObservationListObject();
+		object.setDocument(document);
+
+		/**
+		 * MapResponse is generic class to handle all the responses
+		 */
+
+		MapHttpResponse res = mapIntegrationService.postRequest(newurl, object);
+		/**
+		 * ObjectMapper provided by the jackson for serializing and
+		 * deserializing the java object to JSON.
+		 */
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			return mapper.readValue(res.getMessage(), MapResponse.class);
-		} catch(IOException e) {
+//			return mapper.readValue(res.getDocument(), MapResponse.class);
 			
+			
+		} catch (Exception e) {
+
 		}
 		return null;
 	}
 
 	@Override
-	public String fetch(String index, String type, String documentId) {
-//		// TODO Auto-generated method stub
-//		MapIntegrationService mapIntegrationService =new MapIntegrationService();
-//		MapHttpResponse res = mapIntegrationService.fetch(index,type,documentId);
-		return null;
+	public MapHttpResponse fetch(String index, String type, String documentId) {
+		// // TODO Auto-generated method stub
+		MapIntegrationService mapIntegrationService = new MapIntegrationService();
+		String newurl = URL + index + "/" + type + "/" + documentId;
+		MapHttpResponse content = mapIntegrationService.getRequest(newurl);
+		return content;
 	}
 
 	@Override
@@ -68,9 +82,12 @@ public class ObservationList implements MapService {
 	}
 
 	@Override
-	public List<String> termSearch(String index, String type, String key, String value, Integer from, Integer limit) {
+	public MapHttpResponse termSearch(String index, String type, String key, String value, Integer from, Integer limit) {
 		// TODO Auto-generated method stub
-		return null;
+		String newurl = "http://localhost:8080/naksha/services/term-search/" + index + "/" + type+"?"+"key="+key+"&value="+value;
+		MapIntegrationService mapIntegrationService = new MapIntegrationService();
+		MapHttpResponse mapHttpResponse= mapIntegrationService.getSingleSearch(newurl);	
+		return mapHttpResponse;
 	}
 
 	@Override
@@ -84,6 +101,23 @@ public class ObservationList implements MapService {
 			Integer limit) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public MapHttpResponse search(String index, String type, List<MapBoolQuery> querys, Integer max, Integer offset) {
+		// TODO Auto-generated method stub
+		String newurl = "http://localhost:8080/naksha/services/terms-search/" + index + "/" + type+"?from="+offset+"&limit="+max;
+		MapIntegrationService mapIntegrationService = new MapIntegrationService();
+		MapHttpResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);
+		return mapHttpResponse;
+	}
+
+	public void uploadSettingsAndMappings(String index, String settingsAndMappings) {
+		// TODO Auto-generated method stub
+		String newurl="htpp://localhost:8080/naksha/services/mapping/"+index;
+		MapIntegrationService mapIntegrationService = new MapIntegrationService();
+		MapHttpResponse mapHttpResponse= mapIntegrationService.uploadSettingAndMappings(newurl,settingsAndMappings);
+		
 	}
 
 }

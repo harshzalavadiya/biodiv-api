@@ -1,7 +1,6 @@
 package biodiv.traits;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +17,6 @@ import javax.ws.rs.core.MediaType;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
-
 
 import biodiv.Intercept;
 import biodiv.taxon.service.TaxonService;
