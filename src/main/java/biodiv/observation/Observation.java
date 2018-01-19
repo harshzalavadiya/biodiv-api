@@ -25,6 +25,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -37,10 +39,13 @@ import biodiv.userGroup.UserGroup;
 @NamedQuery(name = Observation.QUERY_SELECT_BY_ID, query = "SELECT obv FROM Observation obv WHERE obv.id = :"
 		+ Observation.PARAM_ID)
 
-public class Observation extends DataObject {
 
-	// @Inject
-	// ObservationService observationService;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Observation extends DataObject implements java.io.Serializable{
+	
+//	@Inject
+//	ObservationService observationService;
 	public static final String QUERY_SELECT_BY_ID = "Observation.findById";
 	public static final String PARAM_ID = "id";
 

@@ -5,13 +5,16 @@ import javax.persistence.MappedSuperclass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import biodiv.Intercept;
 import biodiv.userGroup.UserGroupModel;
 import biodiv.util.HibernateUtil;
 
 @MappedSuperclass
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class DataObject<T>  extends ParticipationMetadata 
-	implements UserGroupModel {
+	implements UserGroupModel , java.io.Serializable{
 	
 	public Class<T> entityClass;
 	
@@ -21,6 +24,7 @@ public abstract class DataObject<T>  extends ParticipationMetadata
 
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	@Intercept
 	public DataObject get(long Id) {

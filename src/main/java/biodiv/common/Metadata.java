@@ -14,15 +14,20 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.vividsolutions.jts.geom.Geometry;
 
 import biodiv.dataset.Dataset;
 
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-public abstract class Metadata implements GenericModel {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class Metadata implements GenericModel,java.io.Serializable {
 
+	
 	public enum LocationScale {
 		APPROXIMATE ("Approximate"),
 		ACCURATE ("Accurate"),

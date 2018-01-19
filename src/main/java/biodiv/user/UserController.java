@@ -14,6 +14,7 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Intercept;
 import biodiv.userGroup.UserGroup;
 import biodiv.userGroup.UserGroupService;
 
@@ -45,6 +46,7 @@ public class UserController {
 	@Path("/currentUserUserGroups")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
+	@Intercept
 	public List<UserGroup> currentUserUserGroups(@Pac4JProfile CommonProfile profile){
 		UserGroupService userGroupService = new UserGroupService();
 		List<UserGroup>  usrGrps = userGroupService.userUserGroups(Long.parseLong(profile.getId()));

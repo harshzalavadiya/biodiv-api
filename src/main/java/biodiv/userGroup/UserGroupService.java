@@ -129,8 +129,9 @@ public class UserGroupService extends AbstractService<UserGroup> {
 					
 					Class<?> clazz = Class.forName(objectType);
 					DataObject _obj = (DataObject) clazz.newInstance();
-					
+					System.out.println("bbbbnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
 					DataObject dataObj = _obj.get(object);
+					System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 					typeOfObject = dataObj;
 					Set<UserGroup> obvUsrGrps = dataObj.getUserGroups();
 					
@@ -155,7 +156,8 @@ public class UserGroupService extends AbstractService<UserGroup> {
 						
 						for(UserGroup ug : newAddedUsrGrpsByUsr){
 							 long ugId = ug.getId();
-							 Map<String, Object> afNew = ActivityFeed.createMapforAf("Object",object,dataObj,"species.groups.UserGroup",ugId,"Posted resource",activityDescription,true);	 
+							 String name = ug.getName();
+							 Map<String, Object> afNew = ActivityFeed.createMapforAf("Object",object,dataObj,"species.groups.UserGroup",ugId,"Posted resource",activityDescription,name,"UserGroup",true);	 
 							 activityFeedService.addActivityFeed(user,afNew,dataObj);
 							 if(pullType.equalsIgnoreCase("bulk")){
 								 groupFeed_ByUser.merge(ugId, (long) 1, Long::sum);
@@ -165,7 +167,8 @@ public class UserGroupService extends AbstractService<UserGroup> {
 						
 						for(UserGroup ug : newAddedUsrGrpsByAdmin){						
 							long ugId = ug.getId();
-							Map<String, Object> afNew = ActivityFeed.createMapforAf("Object",object,dataObj,"species.groups.UserGroup",ugId,"Posted resource",activityDescription,true);	 
+							String name = ug.getName();
+							Map<String, Object> afNew = ActivityFeed.createMapforAf("Object",object,dataObj,"species.groups.UserGroup",ugId,"Posted resource",activityDescription,name,"UserGroup",true);	 
 							activityFeedService.addActivityFeed(admin,afNew,dataObj);
 							if(pullType.equalsIgnoreCase("bulk")){
 								groupFeed_ByAdmin.merge(ugId, (long) 1, Long::sum);
@@ -176,7 +179,8 @@ public class UserGroupService extends AbstractService<UserGroup> {
 						previousUsrGrps.removeAll(newAddedOrRemovedUsrGrps);
 						for(UserGroup ug : previousUsrGrps){
 							long ugId = ug.getId();
-							Map<String, Object> afNew = ActivityFeed.createMapforAf("Object",object,dataObj,"species.groups.UserGroup",ugId,"Removed resoruce",activityDescription,true);
+							String name = ug.getName();
+							Map<String, Object> afNew = ActivityFeed.createMapforAf("Object",object,dataObj,"species.groups.UserGroup",ugId,"Removed resoruce",activityDescription,name,"UserGroup",true);
 							activityFeedService.addActivityFeed(user,afNew,dataObj);
 							if(pullType.equalsIgnoreCase("bulk")){
 								groupFeed_ByUser.merge(ugId, (long) 1, Long::sum);
@@ -198,25 +202,28 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				if(submitType.equalsIgnoreCase("post")){
 					for(Long ugId : groupFeed_ByUser.keySet()){
 						UserGroup ug = findById(ugId);
+						String name = ug.getName();
 						long countOfObjs = groupFeed_ByUser.get(ugId);
 						String description = UserGroup.getActivityObjectType((Object)typeOfObject,submitType,"UserGroup",countOfObjs);
-						Map<String, Object> afNew = ActivityFeed.createMapforAf("UserGroup",ugId,typeOfObject,"species.groups.UserGroup",ugId,"Posted resource",description,true);
+						Map<String, Object> afNew = ActivityFeed.createMapforAf("UserGroup",ugId,typeOfObject,"species.groups.UserGroup",ugId,"Posted resource",description,name,"UserGroup",true);
 						activityFeedService.addActivityFeed(user, afNew, ug);
 					}
 					
 					for(Long ugId : groupFeed_ByAdmin.keySet()){
 						UserGroup ug = findById(ugId);
+						String name = ug.getName();
 						long countOfObjs = groupFeed_ByAdmin.get(ugId);
 						String description = UserGroup.getActivityObjectType((Object)typeOfObject,submitType,"UserGroup",countOfObjs);
-						Map<String, Object> afNew = ActivityFeed.createMapforAf("UserGroup",ugId,typeOfObject,"species.groups.UserGroup",ugId,"Posted resource",description,true);
+						Map<String, Object> afNew = ActivityFeed.createMapforAf("UserGroup",ugId,typeOfObject,"species.groups.UserGroup",ugId,"Posted resource",description,name,"UserGroup",true);
 						activityFeedService.addActivityFeed(admin, afNew, ug);
 					}
 				}else{
 					for(Long ugId : groupFeed_ByUser.keySet()){
 						UserGroup ug = findById(ugId);
+						String name = ug.getName();
 						long countOfObjs = groupFeed_ByUser.get(ugId);
 						String description = UserGroup.getActivityObjectType((Object)typeOfObject,submitType,"UserGroup",countOfObjs);
-						Map<String, Object> afNew = ActivityFeed.createMapforAf("UserGroup",ugId,typeOfObject,"species.groups.UserGroup",ugId,"Removed resoruce",description,true);
+						Map<String, Object> afNew = ActivityFeed.createMapforAf("UserGroup",ugId,typeOfObject,"species.groups.UserGroup",ugId,"Removed resoruce",description,name,"UserGroup",true);
 						activityFeedService.addActivityFeed(user, afNew, ug);
 					}
 					
