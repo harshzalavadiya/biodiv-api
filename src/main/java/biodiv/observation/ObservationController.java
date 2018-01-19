@@ -55,5 +55,13 @@ public class ObservationController {
 		List<UserGroup> usrGrps = observationService.obvUserGroups(id);
 		return usrGrps;
 	}
+	@GET
+	@Path("/resource/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	public List<ObservationResource> getResource(@PathParam("id") long id) {
+		List<ObservationResource> observationResources = observationService.getResouce(id);
+		return observationResources;
+	}
 
 }

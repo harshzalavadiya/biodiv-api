@@ -2,13 +2,13 @@ package biodiv.maps;
 
 import java.util.Set;
 
-public class MapBoolQuery {
+public class MapAndBoolQuery {
 
 	private String key;
 
 	private Set<String> values;
 
-	public MapBoolQuery(String key, Set<String> values) {
+	public MapAndBoolQuery(String key, Set<String> values) {
 		super();
 		this.key = key;
 		this.values = values;

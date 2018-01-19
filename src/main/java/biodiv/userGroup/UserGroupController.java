@@ -82,8 +82,6 @@ public class UserGroupController {
 	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
 	@Intercept
 	public String bulkPost(@QueryParam("pullType") String pullType,@QueryParam("selectionType") String selectionType,@QueryParam("objectType") String objectType,@QueryParam("objectIds") String objectIds,@QueryParam("submitType") String submitType,@QueryParam("userGroups") String userGroups,@QueryParam("filterUrl") String filterUrl,@Pac4JProfile CommonProfile profile) throws NumberFormatException, Exception{
-		System.out.println("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-		System.out.println(observationService);
 		String msg = userGroupService.posttoGroups(objectType,pullType,submitType,objectIds,userGroups, Long.parseLong(profile.getId()),filterUrl);
 		//observationService.update(obv);
 		return msg;
@@ -93,9 +91,6 @@ public class UserGroupController {
 	@Path("/{groupName}/{x}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object mapfunc(@PathParam("x") String x){	
-		//String x = "abhinav";
-		System.out.println("ggggggggggggggg");
-		//return new ObservationController();
 		Mapping m = new Mapping(x);
 	
 		return m.getObject();

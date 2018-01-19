@@ -59,6 +59,8 @@
 		<mapping class="biodiv.dataset.Datasource" />
 		<mapping class="biodiv.observation.Annotation" />
 		<mapping class="biodiv.observation.Observation" />
+		<mapping class="biodiv.observation.ObservationResource" />
+		
 		<mapping class="biodiv.observation.Recommendation" />
 		<mapping class="biodiv.observation.RecommendationVote" />
 		<mapping class="biodiv.resource.Resource" />

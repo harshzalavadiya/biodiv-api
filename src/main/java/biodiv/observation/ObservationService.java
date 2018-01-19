@@ -56,4 +56,11 @@ public class ObservationService extends AbstractService<Observation> {
 		return results;
 	}
 
+
+	public List<ObservationResource> getResouce(long id) {
+		// TODO Auto-generated method stub
+		List<ObservationResource> observationResources=observationDao.getResource(id);
+		return observationResources;
+	}
+
 }

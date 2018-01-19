@@ -1,15 +1,16 @@
 package biodiv.observation;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import biodiv.maps.MapBoolQuery;
+import biodiv.maps.MapBiodivResponse;
+import biodiv.maps.MapAndBoolQuery;
 import biodiv.maps.MapHttpResponse;
 import biodiv.maps.MapIntegrationService;
-import biodiv.maps.MapRangeQuery;
+import biodiv.maps.MapAndRangeQuery;
 import biodiv.maps.MapResponse;
+import biodiv.maps.MapSearchQuery;
 import biodiv.maps.MapService;
 
 public class ObservationList implements MapService {
@@ -71,7 +72,11 @@ public class ObservationList implements MapService {
 
 	@Override
 	public MapResponse update(String index, String type, String documentId, String document) {
+		String newurl = URL+index + "/" + type+"/"+documentId;
+		MapIntegrationService mapIntegrationService = new MapIntegrationService();
+			MapResponse mapResponse=mapIntegrationService.updateSingleDocument(newurl,document);
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -80,7 +85,9 @@ public class ObservationList implements MapService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+/**
+ * For single id observation object search
+ */
 	@Override
 	public MapHttpResponse termSearch(String index, String type, String key, String value, Integer from, Integer limit) {
 		// TODO Auto-generated method stub
@@ -91,27 +98,32 @@ public class ObservationList implements MapService {
 	}
 
 	@Override
-	public List<String> searchBool(String index, String type, List<MapBoolQuery> queries, Integer from, Integer limit) {
+	public List<String> searchBool(String index, String type, List<MapAndBoolQuery> queries, Integer from, Integer limit) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<String> searchRange(String index, String type, List<MapRangeQuery> queries, Integer from,
+	public List<String> searchRange(String index, String type, List<MapAndRangeQuery> queries, Integer from,
 			Integer limit) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
 
 	@Override
-	public MapHttpResponse search(String index, String type, List<MapBoolQuery> querys, Integer max, Integer offset) {
+	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision) {
 		// TODO Auto-generated method stub
-		String newurl = "http://localhost:8080/naksha/services/terms-search/" + index + "/" + type+"?from="+offset+"&limit="+max;
+		String newurl = "http://localhost:8080/naksha/services/search/" + index + "/" + type+"?from="+offset+"&limit="+max
+				+"&geoAggregationField="+geoAggregationField + "&geoAggegationPrecision="+geoAggegationPrecision;
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
-		MapHttpResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);
+		MapBiodivResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);
+		
 		return mapHttpResponse;
 	}
 
+	
+	
 	public void uploadSettingsAndMappings(String index, String settingsAndMappings) {
 		// TODO Auto-generated method stub
 		String newurl="htpp://localhost:8080/naksha/services/mapping/"+index;

@@ -45,13 +45,7 @@ public class Resource implements java.io.Serializable {
 	public Resource() {
 	}
 
-	public Resource(long id, Language language, License license, String fileName, String type) {
-		this.id = id;
-		this.language = language;
-		this.license = license;
-		this.fileName = fileName;
-		this.type = type;
-	}
+	
 
 	public Resource(long id, Language language, License license, User user, String description, String fileName,
 			String mimeType, String type, String url, Integer rating, Date uploadTime, String context,
@@ -84,7 +78,7 @@ public class Resource implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@Version
+
 	@Column(name = "version", nullable = false)
 	public long getVersion() {
 		return this.version;
