@@ -15,7 +15,7 @@ import biodiv.maps.MapService;
 
 public class ObservationList implements MapService {
 
-	private static final String URL = "http://localhost:8081/naksha/services/data/";
+	private static final String URL = "http://localhost:8080/naksha/services/data/";
 
 	@Override
 	public MapResponse create(String index, String type, String documentId, String document) {
@@ -91,7 +91,7 @@ public class ObservationList implements MapService {
 	@Override
 	public MapHttpResponse termSearch(String index, String type, String key, String value, Integer from, Integer limit) {
 		// TODO Auto-generated method stub
-		String newurl = "http://localhost:8081/naksha/services/term-search/" + index + "/" + type+"?"+"key="+key+"&value="+value;
+		String newurl = "http://localhost:8080/naksha/services/term-search/" + index + "/" + type+"?"+"key="+key+"&value="+value;
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 		MapHttpResponse mapHttpResponse= mapIntegrationService.getSingleSearch(newurl);	
 		return mapHttpResponse;
@@ -114,7 +114,7 @@ public class ObservationList implements MapService {
 	@Override
 	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision) {
 		// TODO Auto-generated method stub
-		String newurl = "http://localhost:8081/naksha/services/search/" + index + "/" + type+"?from="+offset+"&limit="+max
+		String newurl = "http://localhost:8080/naksha/services/search/" + index + "/" + type+"?from="+offset+"&limit="+max
 				+"&geoAggregationField="+geoAggregationField + "&geoAggegationPrecision="+geoAggegationPrecision;
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 		MapBiodivResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);
@@ -126,7 +126,7 @@ public class ObservationList implements MapService {
 	
 	public void uploadSettingsAndMappings(String index, String settingsAndMappings) {
 		// TODO Auto-generated method stub
-		String newurl="htpp://localhost:8081/naksha/services/mapping/"+index;
+		String newurl="htpp://localhost:8080/naksha/services/mapping/"+index;
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 		MapHttpResponse mapHttpResponse= mapIntegrationService.uploadSettingAndMappings(newurl,settingsAndMappings);
 		
