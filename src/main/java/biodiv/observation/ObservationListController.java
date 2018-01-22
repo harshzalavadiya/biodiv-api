@@ -350,6 +350,7 @@ public class ObservationListController {
 
 		/**
 		 * combine all the queries
+		 * 
 		 */
 		
 		MapSearchQuery mapSearchQuery=new MapSearchQuery(boolAndLists,boolOrLists,rangeAndLists,rangeOrLists,andMapExistQueries);
