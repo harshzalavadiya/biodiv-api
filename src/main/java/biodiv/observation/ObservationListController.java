@@ -139,7 +139,6 @@ public class ObservationListController {
 
 		Set<String> groupId = commonMethod.cSTSOT(sGroup);
 		if(!groupId.isEmpty()){
-			System.out.println(groupId.size());
 			boolAndLists.add(new MapAndBoolQuery("speciesgroupid", groupId));
 		}
 		
@@ -152,7 +151,6 @@ public class ObservationListController {
 		Set<String> authorId = commonMethod.cSTSOT(user);
 		
 		if(!authorId.isEmpty()){
-			System.out.println(authorId.size());
 			boolAndLists.add(new MapAndBoolQuery("authorid", authorId));
 		}
 		
