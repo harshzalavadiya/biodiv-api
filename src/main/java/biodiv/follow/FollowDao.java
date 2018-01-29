@@ -16,7 +16,7 @@ public class FollowDao extends AbstractDao<Follow, Long> implements DaoInterface
 
 	public Boolean isFollowing(String objectToFollowType, Long objectToFollowId, long userId) {
 		
-		String hql = "select count(*) from Follow fo where fo.objectType =:objectType and fo.id =:id and fo.user.id =:userId";
+		String hql = "select count(*) from Follow fo where fo.objectType =:objectType and fo.objectId =:id and fo.user.id =:userId";
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("objectType", objectToFollowType );
 		query.setParameter("id", objectToFollowId );

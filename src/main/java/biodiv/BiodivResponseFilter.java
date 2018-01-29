@@ -22,7 +22,7 @@ public class BiodivResponseFilter implements ContainerResponseFilter {
 		MultivaluedMap<String,Object> headers = responseContext.getHeaders();
         headers.add("X-Powered-By", "Biodiv App");
         headers.add("Access-Control-Allow-Origin", "*");
-        headers.add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, X-Requested-With, X-AUTH-TOKEN, X-AppKey");
+        headers.add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, X-Requested-With, X-Auth-Token, X-AppKey");
         headers.add("Access-Control-Allow-Credentials", "true");
         headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
         headers.add("Access-Control-Max-Age", "1209600");

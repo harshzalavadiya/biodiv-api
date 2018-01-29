@@ -52,11 +52,11 @@ public abstract class  AbstractService<T> {
 
 	}
 
-	public void delete(String id) {
+	public void delete(Long id) {
 		log.debug("deleting " + id);
 		try {
 			//getDao().openCurrentSessionWithTransaction();
-			T entity = (T) getDao().findById(Long.parseLong(id));
+			T entity = (T) getDao().findById(id);
 			getDao().delete(entity);
 			//getDao().closeCurrentSessionWithTransaction();
 			log.debug("delete successful");

@@ -359,8 +359,8 @@ public class ActivityFeed implements java.io.Serializable {
 	
 	
 	
-	public static Map<String, Object> createMapforAf(String rootType,Long rhId,Object rootHolder,String activityHolderType,Long activityHolderId,
-			String activityType,String activityDescrption ,String name,String ro_type,Boolean isShowable) {
+	public static Map<String, Object> createMapforAf(String rootType,Long rhId,Object rootHolder,String rootHolderTyp,String activityHolderType,Long activityHolderId,
+			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isShowable) {
 		
 		//String activityDescrption;
 	    //Long activityHolderId ;  
@@ -384,13 +384,24 @@ public class ActivityFeed implements java.io.Serializable {
 		 
 		    MyJson myJson = new MyJson();
 	    	//myJson.setAid((Long) obj[3]);
-	    	myJson.setName(name);
-	    	myJson.setRo_id(activityHolderId);
-	    	myJson.setRo_type(ro_type);
-	    	//myJson.setDescription(body);
-	    	myJson.setIs_migrated("true");
-	    	myJson.setActivity_performed(activityDescrption);
-	    	//myJson.setIs_scientific_name(null);
+		    
+		    //need to check on next activity written in backend
+		    if(!activityType.equalsIgnoreCase("Added a comment")){
+		    	if(ro_type != null){
+			    	myJson.setName(name);
+			    	myJson.setRo_id(activityHolderId);
+			    	myJson.setRo_type(ro_type);
+			    }
+		    	
+		    	if(description !=null){
+		    		myJson.setDescription(description);
+		    	}
+		    	myJson.setIs_migrated("true");
+		    	
+		    	myJson.setActivity_performed(activityPerformed);
+		    	//myJson.setIs_scientific_name(null);
+		    }
+		    
 	    	
 		if(rootType.equalsIgnoreCase("UserGroup")){
 			rootHolderId = rhId;
@@ -400,9 +411,18 @@ public class ActivityFeed implements java.io.Serializable {
 		}else{
 			
 			rootHolderId = rhId;
-			 rootHolderType = getType(rootHolder);
-			 subRootHolderId = rhId;
-			 subRootHolderType = getType(rootHolder);
+			subRootHolderId = rhId;
+			if(rootHolderTyp == null){
+				rootHolderType = getType(rootHolder);
+			}else{
+				rootHolderType = rootHolderTyp;
+			}
+			 
+			if(rootHolderTyp == null){
+				subRootHolderType = getType(rootHolder);
+			}else{
+				subRootHolderType = rootHolderTyp;
+			}
 			 isShowable = true;
 			 
 			 if(activityHolderType.equalsIgnoreCase("species.participation.Comment")){		 

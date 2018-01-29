@@ -20,13 +20,22 @@ public class FollowService extends AbstractService<Follow>{
 	}
 	
 	@Intercept
-	public void addFollower(Object objectToFollow,Long objectToFollowId,User user){
+	public void addFollower(Object objectToFollow,String objectTyp,Long objectToFollowId,User user){
 		
 		//String objectType = objectToFollow.getClass().getCanonicalName();
 		try{
-			String objectType = Follow.getType(objectToFollow);
+			
+			String objectType;
+			if(objectTyp != null){
+				objectType = objectTyp;
+			}else{
+				objectType = Follow.getType(objectToFollow);
+			}
 			long userId = user.getId();
 			Date createdOn = new java.util.Date();
+			System.out.println("objectTypeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee "+objectType);
+			System.out.println("oibjectToFollowIdddddddddddddddddddddddddddddddddddddddddd "+objectToFollowId);
+			System.out.println("authoridddddddddddddddddddddddddddddddd "+user.getId());
 			if(!isFollowing(objectType,objectToFollowId,userId)){
 				System.out.println("is zFollowing is false");
 				Follow follow = new Follow(user,objectToFollowId,objectType,createdOn);

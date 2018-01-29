@@ -476,7 +476,6 @@ public class Observation extends DataObject implements java.io.Serializable{
 			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "user_group_id", nullable = false, updatable = false) })
 	public Set<UserGroup> getUserGroups() {
-		System.out.println("aaaaye");
 		return this.userGroups;
 	}
 	

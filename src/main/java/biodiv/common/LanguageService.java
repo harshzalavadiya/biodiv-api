@@ -5,6 +5,8 @@ import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 
+import biodiv.Intercept;
+
 public class LanguageService extends AbstractService<Language> {
 
 	private static final Random NUMBER_GENERATOR = new Random();
@@ -86,6 +88,19 @@ public class LanguageService extends AbstractService<Language> {
 		}
 		// println "Invalid ThreeLetterCode. please give unique code"
 		return null;
+	}
+
+	@Intercept
+	public Language findByTwoLetterCode(String code) {
+		Language lang ;
+		try{
+			lang = languageDao.findByTwoLetterCode(code);
+			return lang;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			
+		}
 	}
 
 
