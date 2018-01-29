@@ -45,11 +45,7 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 		String hql = "select obv.userGroups from Observation obv where obv.id =:id";
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("id", id );
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^");
-		System.out.println(id);
-		System.out.println(query);
 		List<UserGroup> listResult = query.getResultList();
-		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		System.out.println(listResult);
 		return listResult;
 	}
@@ -73,6 +69,14 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 		client.close();
 		
 		return esData;
+	}
+
+	public List<ObservationResource> getResource(long id) {
+		// TODO Auto-generated method stub
+		Query q;
+		q=getCurrentSession().createQuery("select obvr.resourceId from ObservationResource  as obvr where obvr.observationId.id=:id").setParameter("id",id);
+		List<ObservationResource> observationResources=q.getResultList();
+		return observationResources;
 	}
 
 	

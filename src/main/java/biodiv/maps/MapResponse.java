@@ -1,34 +1,76 @@
 package biodiv.maps;
 
-import org.apache.http.StatusLine;
+import java.util.List;
 
 /**
  * 
  * The response from map module
  */
 public class MapResponse {
-
-	private StatusLine result;
-	private Object document;
 	
-	public MapResponse(StatusLine result, Object document) {
+	 /**
+     * List of {@link MapDocument} to be sent as response
+     * to the request
+     */
+    private List<MapDocument> documents;
+    
+    /**
+     * Total number of documents which satisfied the request condition.
+     * This number may be different than the size of list if limit/offset
+     * were specified in the request.
+     */
+    private long totalDocuments;
+    
+    /**
+     * Geographic aggregation of the result based on geohash.
+     * 
+     */
+    private String geohashAggregation;
+
+    
+    
+	public MapResponse() {
 		super();
-		this.result = result;
-		this.document = document;
-	}
-	public StatusLine getResult() {
-		return result;
-	}
-	public void setResult(StatusLine result) {
-		this.result = result;
-	}
-	public Object getDocument() {
-		return document;
-	}
-	public void setDocument(Object document) {
-		this.document = document;
 	}
 
+
+
+	public MapResponse( List<MapDocument> documents, long totalDocuments,
+			String geohashAggregation) {
+		super();
+		this.documents = documents;
+		this.totalDocuments = totalDocuments;
+		this.geohashAggregation = geohashAggregation;
+	}
+
+	
+
+	public List<MapDocument> getDocuments() {
+		return documents;
+	}
+
+	public void setDocuments(List<MapDocument> documents) {
+		this.documents = documents;
+	}
+
+	public long getTotalDocuments() {
+		return totalDocuments;
+	}
+
+	public void setTotalDocuments(long totalDocuments) {
+		this.totalDocuments = totalDocuments;
+	}
+
+	public String getGeohashAggregation() {
+		return geohashAggregation;
+	}
+
+	public void setGeohashAggregation(String geohashAggregation) {
+		this.geohashAggregation = geohashAggregation;
+	}
+    
+    
+	
 	
 
 }

@@ -61,6 +61,7 @@ public class ObservationController {
 		List<UserGroup> usrGrps = observationService.obvUserGroups(id);
 		return usrGrps;
 	}
+
 	
 	@GET
 	@Path("/customFields")
@@ -83,6 +84,15 @@ public class ObservationController {
 		
 		String msg = observationService.updateInlineCf(fieldValue,cfId,obvId,Long.parseLong(profile.getId()));
 		return msg;
+	}
+	
+	@GET
+	@Path("/resource/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	public List<ObservationResource> getResource(@PathParam("id") long id) {
+		List<ObservationResource> observationResources = observationService.getResouce(id);
+		return observationResources;
 	}
 
 }

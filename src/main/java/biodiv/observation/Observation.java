@@ -39,6 +39,8 @@ import biodiv.userGroup.UserGroup;
 @NamedQuery(name = Observation.QUERY_SELECT_BY_ID, query = "SELECT obv FROM Observation obv WHERE obv.id = :"
 		+ Observation.PARAM_ID)
 
+
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Observation extends DataObject implements java.io.Serializable{
 	
@@ -46,9 +48,9 @@ public class Observation extends DataObject implements java.io.Serializable{
 //	ObservationService observationService;
 	public static final String QUERY_SELECT_BY_ID = "Observation.findById";
 	public static final String PARAM_ID = "id";
-	
-//	@Inject
-//	ObservationService observationService;
+
+	// @Inject
+	// ObservationService observationService;
 
 	public enum OccurrenceStatus {
 		ABSENT("Absent"), // http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -66,7 +68,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 		OccurrenceStatus(String value) {
 			this.value = value;
 		}
-		
+
 		@JsonValue
 		String value() {
 			return this.value;
@@ -74,21 +76,17 @@ public class Observation extends DataObject implements java.io.Serializable{
 	}
 
 	public enum BasisOfRecord {
-		PRESERVED_SPECIMEN("Preserved Specimen"), 
-		FOSSIL_SPECIMEN("Fossil Specimen"), 
-		LIVING_SPECIMEN("Living Specimen"), 
-		HUMAN_OBSERVATION("Human Observation"), 
-		MACHINE_OBSERVATION("Machine Observation"), 
-		MATERIAL_SAMPLE("Material Sample"), 
-		OBSERVATION("Observation"), 
-		UNKNOWN("Unknown");
+		PRESERVED_SPECIMEN("Preserved Specimen"), FOSSIL_SPECIMEN("Fossil Specimen"), LIVING_SPECIMEN(
+				"Living Specimen"), HUMAN_OBSERVATION("Human Observation"), MACHINE_OBSERVATION(
+						"Machine Observation"), MATERIAL_SAMPLE(
+								"Material Sample"), OBSERVATION("Observation"), UNKNOWN("Unknown");
 
 		private String value;
 
 		BasisOfRecord(String value) {
 			this.value = value;
 		}
-		
+
 		@JsonValue
 		String value() {
 			return this.value;
@@ -200,22 +198,26 @@ public class Observation extends DataObject implements java.io.Serializable{
 
 	private Set resources = new HashSet(0);
 	private Set recommendationVotes = new HashSet(0);
-	
-//	@SuppressWarnings("unchecked")
-//	@Access(value = AccessType.FIELD)
-//	@ManyToMany(fetch = FetchType.LAZY)
-//	@JoinTable(name = "user_group_observations", schema = "public", joinColumns = {
-//			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
-//					@JoinColumn(name = "user_group_id", nullable = false, updatable = false) })
+
+	// @SuppressWarnings("unchecked")
+	// @Access(value = AccessType.FIELD)
+	// @ManyToMany(fetch = FetchType.LAZY)
+	// @JoinTable(name = "user_group_observations", schema = "public",
+	// joinColumns = {
+	// @JoinColumn(name = "observation_id", nullable = false, updatable = false)
+	// }, inverseJoinColumns = {
+	// @JoinColumn(name = "user_group_id", nullable = false, updatable = false)
+	// })
 	private Set userGroups = new HashSet(0);
 	private Set annotations = new HashSet(0);
-	
-//	static hasMany=[userGroups:UserGroup,resource:Resource,recommendationVote:RecommendationVote,annotations:Annotation];
-//	static belongsTo=[SUser,UserGroup,Checklists,Dataset]
+
+	// static
+	// hasMany=[userGroups:UserGroup,resource:Resource,recommendationVote:RecommendationVote,annotations:Annotation];
+	// static belongsTo=[SUser,UserGroup,Checklists,Dataset]
 
 	private Long id;
-	
-	public String lis(){
+
+	public String lis() {
 		System.out.println("hhhhhhhhhh");
 		String x = "abc";
 		return x;
@@ -223,14 +225,13 @@ public class Observation extends DataObject implements java.io.Serializable{
 
 	public Observation() {
 		// this form is used by hibernate
-		//super(Observation.class);
+		// super(Observation.class);
 	}
 
 	public Observation(Map properties) {
 		// map properties of observation using reflection to the keys of the map
-		//super(Observation.class);
+		// super(Observation.class);
 	}
-	
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "observation_generator")
@@ -244,7 +245,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 		this.id = id;
 	}
 
-	@Column(name = "notes", columnDefinition="text")
+	@Column(name = "notes", columnDefinition = "text")
 	public String getNotes() {
 		return notes;
 	}
@@ -253,7 +254,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 		this.notes = notes;
 	}
 
-	@Column(name = "search_text", columnDefinition="text")
+	@Column(name = "search_text", columnDefinition = "text")
 	public String getSearchText() {
 		return searchText;
 	}
@@ -266,8 +267,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 	public boolean isLocked() {
 		return isLocked;
 	}
-	
-	
+
 	public void setLocked(boolean isLocked) {
 		this.isLocked = isLocked;
 	}
@@ -299,7 +299,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 	public void setShowable(boolean isShowable) {
 		this.isShowable = isShowable;
 	}
-	
+
 	@Column(name = "is_checklist")
 	public boolean isChecklist() {
 		return isChecklist;
@@ -318,7 +318,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 		this.sourceId = sourceId;
 	}
 
-	@Column(name = "checklist_annotations", columnDefinition="text")
+	@Column(name = "checklist_annotations", columnDefinition = "text")
 	public String getChecklistAnnotations() {
 		return checklistAnnotations;
 	}
@@ -384,7 +384,6 @@ public class Observation extends DataObject implements java.io.Serializable{
 		this.publishingCountry = publishingCountry;
 	}
 
-	
 	@Column(name = "access_rights")
 	public String getAccessRights() {
 		return accessRights;
@@ -448,24 +447,24 @@ public class Observation extends DataObject implements java.io.Serializable{
 	public void setNoOfIdentifications(int noOfIdentifications) {
 		this.noOfIdentifications = noOfIdentifications;
 	}
-	
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "observation_resource", schema = "public", joinColumns = {
 			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "resource_id", nullable = false, updatable = false) })
 	public Set<Resource> getResources() {
-		return null;//this.resources;x
+		return null;// this.resources;x
 	}
-	
+
 	public void setResources(Set<Resource> resources) {
 		this.resources = resources;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "observation")
 	public Set<RecommendationVote> getRecommendationVotes() {
-		return null;//this.recommendationVotes;
+		return null;// this.recommendationVotes;
 	}
-	
+
 	public void setRecommendationVotes(Set<RecommendationVote> recommendationVotes) {
 		this.recommendationVotes = recommendationVotes;
 	}
@@ -478,53 +477,50 @@ public class Observation extends DataObject implements java.io.Serializable{
 	public Set<UserGroup> getUserGroups() {
 		return this.userGroups;
 	}
-	
+
 	public void setUserGroups(Set<UserGroup> userGroups) {
 		this.userGroups = userGroups;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "observation")
 	public Set<Annotation> getAnnotations() {
-		return null;//this.annotations;
+		return null;// this.annotations;
 	}
-	
+
 	public void setAnnotations(Set<Annotation> annotations) {
 		this.annotations = annotations;
 	}
-	
-	public Observation get(long obvId,ObservationService observationService){
-		System.out.println("testing injection in observation "+ observationService);
+
+	public Observation get(long obvId, ObservationService observationService) {
+		System.out.println("testing injection in observation " + observationService);
 		Observation obv = observationService.findById(obvId);
 		return obv;
 	}
-	
+
 	public static boolean obvIsWithinUserGroupBoundary(Geometry topology, Geometry boundary) {
 		boolean belongs = false;
-		try{
+		try {
 			belongs = boundary.covers(topology);
 			System.out.println("belongs or not " + belongs);
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
-		
+
 		return belongs;
 	}
 
-	
 	public String toString() {
 		return "Observation [id=" + id + "]";
 	}
 
-//	@Override
-//	public Observation get(long obvId) {
-//		// TODO Auto-generated method stub
-//		System.out.println("pfday");
-//		ObservationService observationService =new ObservationService();
-//		Observation result=observationService.findById(obvId);
-//		return result;
-//	}
-	
+	// @Override
+	// public Observation get(long obvId) {
+	// // TODO Auto-generated method stub
+	// System.out.println("pfday");
+	// ObservationService observationService =new ObservationService();
+	// Observation result=observationService.findById(obvId);
+	// return result;
+	// }
 
 }

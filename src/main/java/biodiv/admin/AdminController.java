@@ -25,7 +25,7 @@ public class AdminController {
 	 * The this going to allow admin to upload setting and mapping 
 	 */
 	@POST
-	@Path("{index}/uploadmapping")
+	@Path("/{index}/uploadmapping")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "headerClient", authorizers = "isAuthenticated")
 	public void uploadMapping(@PathParam("index") String index,String settingsAndMappings){

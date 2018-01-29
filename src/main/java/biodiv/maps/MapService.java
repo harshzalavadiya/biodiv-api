@@ -2,6 +2,8 @@ package biodiv.maps;
 
 import java.util.List;
 
+import biodiv.observation.ObservationListMapper;
+
 /**
  * 
  * The services available from map module
@@ -20,10 +22,10 @@ public interface MapService {
 
 	public MapHttpResponse termSearch(String index, String type, String key, String value, Integer from, Integer limit);
 	
-	public MapHttpResponse search(String index, String type, List<MapBoolQuery> query ,Integer from, Integer limit);
+	public MapBiodivResponse search(String index, String type, MapSearchQuery query ,Integer from, Integer limit,String sortOn, String geoAggregationField, Integer geoAggegationPrecision);
 
-	public List<String> searchBool(String index, String type, List<MapBoolQuery> queries, Integer from, Integer limit);
+	public List<String> searchBool(String index, String type, List<MapAndBoolQuery> queries, Integer from, Integer limit);
 
-	public List<String> searchRange(String index, String type, List<MapRangeQuery> queries, Integer from,
+	public List<String> searchRange(String index, String type, List<MapAndRangeQuery> queries, Integer from,
 			Integer limit);
 }

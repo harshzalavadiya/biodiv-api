@@ -2,7 +2,6 @@ package biodiv.maps;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -12,6 +11,7 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.entity.ContentType;
@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biodiv.observation.ObservationListMapper;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 /**
  * This is used for communication with the map module
@@ -68,6 +66,7 @@ public class MapIntegrationService {
 		CookieStore cookieStore = new BasicCookieStore();
 		context = HttpClientContext.create();
 		context.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
+
 	}
 
 	/**
@@ -76,7 +75,7 @@ public class MapIntegrationService {
 	 * @param uri
 	 * @param data
 	 */
-	
+
 	public MapHttpResponse postRequest(String uri, Object data) {
 		CloseableHttpResponse response = null;
 		try {
@@ -116,14 +115,15 @@ public class MapIntegrationService {
 		try {
 			response1 = httpClient.execute(httpGet);
 			HttpEntity entity1 = response1.getEntity();
-
 			String content = EntityUtils.toString(entity1);
-			
-			System.out.println(content);
+
 			ObjectMapper mapper = new ObjectMapper();
-			Object rootAsClass = mapper.readValue(content, ObservationListMapper.class);
-			
-			return new MapHttpResponse(response1.getStatusLine(), rootAsClass);
+			MapDocument mapDocument = mapper.readValue(content, MapDocument.class);
+
+			ObservationListMapper result = mapper.readValue(String.valueOf(mapDocument.getDocument()),
+					ObservationListMapper.class);
+
+			return new MapHttpResponse(response1.getStatusLine(), result);
 
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -152,46 +152,50 @@ public class MapIntegrationService {
 		}
 
 	}
-	public MapHttpResponse postSearch(String url, List<MapBoolQuery> querys) {
+
+	/**
+	 * For observation serach on the basis of the given parameter url consisst
+	 * of parmas and path parms List<MapBoolQuer> contain result
+	 * 
+	 * @param url
+	 *            for post request
+	 * @param querys
+	 *            List
+	 * @return the list of document along with there count
+	 */
+	public MapBiodivResponse postSearch(String url, MapSearchQuery querys) {
 		// TODO Auto-generated method stub
 		CloseableHttpResponse response = null;
-		try{
-			
+		try {
+
 			HttpPost post = new HttpPost(url);
-			
+
 			String jsonData = objectMapper.writeValueAsString(querys);
-	
 
 			StringEntity entity = new StringEntity(jsonData, ContentType.APPLICATION_JSON);
-			
-			
+
 			post.setEntity(entity);
-			
+
 			try {
 				CloseableHttpClient httpclient = HttpClients.createDefault();
 
 				response = httpclient.execute(post, context);
-				
+
 				HttpEntity entity1 = response.getEntity();
-				
+
 				String responseString = EntityUtils.toString(entity1);
-			
-				
 				ObjectMapper mapper = new ObjectMapper();
-				
-				List<Object> myObjects = mapper.readValue(responseString, mapper.getTypeFactory().constructCollectionType(List.class, Object.class));
-				
+
+				MapResponse myObject = mapper.readValue(responseString, MapResponse.class);
+
 				List<ObservationListMapper> result = new ArrayList<>();
-				for(Object o : myObjects) {
-					result.add(mapper.readValue(String.valueOf(o), ObservationListMapper.class));
+
+				for (MapDocument o : myObject.getDocuments()) {
+					result.add(mapper.readValue(String.valueOf(o.getDocument()), ObservationListMapper.class));
 				}
-				
-//				List<ObservationListMapper> myObjects = Arrays.asList(mapper.readValue(responseString, ObservationListMapper[].class));
-				
-//				Object[] rootAsMap = mapper.readValue(responseString, ObservationListMapper[].class);
-				
-				return new MapHttpResponse(response.getStatusLine(), result);
-				
+
+				return new MapBiodivResponse(result, myObject.getTotalDocuments(), myObject.getGeohashAggregation());
+
 			} catch (IOException e) {
 				e.printStackTrace();
 				logger.error("Error while trying to send request at URL {}", url);
@@ -200,11 +204,11 @@ public class MapIntegrationService {
 					HttpClientUtils.closeQuietly(response);
 			}
 
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
-		
+
 	}
 
 	private MapHttpResponse getMapHttpResponse(CloseableHttpResponse response) throws ParseException, IOException {
@@ -213,16 +217,24 @@ public class MapIntegrationService {
 
 		if (response != null) {
 			HttpEntity httpEntity = response.getEntity();
-			
+
 			if (httpEntity != null) {
-				return new MapHttpResponse(response.getStatusLine(),httpEntity);
+				return new MapHttpResponse(response.getStatusLine(), httpEntity);
 			}
-			//TODO:return new MapHttpResponse(response.,null);
+			// TODO:return new MapHttpResponse(response.,null);
 		}
-		//TODO:return new MapHttpResponse(StatusLine,null);
-		return null;		
+		// TODO:return new MapHttpResponse(StatusLine,null);
+		return null;
 	}
 
+	/**
+	 * 
+	 * Get single observation object on the basis of object id
+	 * 
+	 * @param url
+	 *            url from where you want to fecth data
+	 * @return return the single observation object
+	 */
 	public MapHttpResponse getSingleSearch(String url) {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet(url);
@@ -235,7 +247,7 @@ public class MapIntegrationService {
 			String content = EntityUtils.toString(entity1);
 			ObjectMapper mapper = new ObjectMapper();
 			Object rootAsClass = mapper.readValue(content, ObservationListMapper.class);
-			
+
 			return new MapHttpResponse(response1.getStatusLine(), rootAsClass);
 
 		} catch (ClientProtocolException e) {
@@ -266,6 +278,13 @@ public class MapIntegrationService {
 
 	}
 
+	/**
+	 * Method to upload seeting
+	 * 
+	 * @param url
+	 * @param settingsAndMappings
+	 * @return MapHTTPRespose, which include result
+	 */
 	public MapHttpResponse uploadSettingAndMappings(String url, String settingsAndMappings) {
 		// TODO Auto-generated method stub
 		CloseableHttpResponse response = null;
@@ -297,6 +316,42 @@ public class MapIntegrationService {
 		return null;
 	}
 
-	
+	/**
+	 * TO update single document All you need to provide is just document id and
+	 * key need to be updated
+	 * 
+	 * @param newurl
+	 * @param document
+	 * @return
+	 */
+
+	public MapResponse updateSingleDocument(String url, String document) {
+		// TODO Auto-generated method stub
+		CloseableHttpResponse response = null;
+		try {
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+
+			HttpPut put = new HttpPut(url);			
+			StringEntity entity = new StringEntity(document, ContentType.APPLICATION_JSON);
+			
+			
+			put.setEntity(entity);
+
+			try {
+				response = httpclient.execute(put, context);
+				System.out.println(response);
+			} catch (IOException e) {
+				logger.error("Error while trying to send request at URL {}", url);
+			} finally {
+				if (response != null)
+					HttpClientUtils.closeQuietly(response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Error while trying to send request at URL {}", url);
+		}
+
+		return null;
+	}
 
 }
