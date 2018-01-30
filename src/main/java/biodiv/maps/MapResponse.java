@@ -33,6 +33,9 @@ public class MapResponse {
 	 */
 	private String viewFilteredGeohashAggregation;
 
+	// empty constructor for json serialization/de-serialization
+	public MapResponse() {}
+	
 	public MapResponse(List<MapDocument> documents, long totalDocuments, String geohashAggregation) {
 		this(documents, totalDocuments, geohashAggregation, null);
 	}
