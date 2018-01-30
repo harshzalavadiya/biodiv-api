@@ -20,7 +20,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 	private ActivityFeedDao activityFeedDao;
 	
 	FollowService followService =  new FollowService();
-	CommentService commentService = new CommentService();
+	CommentService commentService;
 	
 	public ActivityFeedService(){
 		this.activityFeedDao = new ActivityFeedDao();
@@ -80,6 +80,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 			    res.put("subRootHolderType", (String) obj[15]);
 			    res.put("isShowable", (boolean) obj[16]);
 			    if(activityTyp.equalsIgnoreCase("Added a comment")){
+			    	commentService = new CommentService();
 			    	MyJson myJson = new MyJson();
 			    	myJson.setAid((Long) obj[3]);
 			    	myJson.setName(null);
@@ -129,7 +130,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 	}
 	
 	@Intercept
-	public void addActivityFeed(User user,Map<String, Object> afNew,Object objectToFollow){
+	public void addActivityFeed(User user,Map<String, Object> afNew,Object objectToFollow,String objectToFollowType){
 		
 		try{			
 				ActivityFeed af = new ActivityFeed(user,(String)afNew.get("activityDescrption"),(Long)afNew.get("activityHolderId"),
@@ -141,7 +142,11 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 				save(af);		
 			
 				//Follow
-				followService.addFollower(objectToFollow,(Long)afNew.get("rootHolderId"),user);
+				if(objectToFollow != null || objectToFollowType != null){
+					String objectTyp = objectToFollowType;
+					followService.addFollower(objectToFollow,objectTyp,(Long)afNew.get("rootHolderId"),user);
+				}
+				
 				
 		}catch(Exception e){
 			throw e;

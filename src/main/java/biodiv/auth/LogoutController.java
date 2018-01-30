@@ -25,6 +25,7 @@ import org.pac4j.jax.rs.pac4j.JaxRsContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Intercept;
 import biodiv.common.ResponseModel;
 
 /**
@@ -60,6 +61,7 @@ public class LogoutController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
+	@Intercept
 	public Response logout(@Pac4JProfile Optional<CommonProfile> profile,
 			@Context final ContainerRequestContext requestContext, @Context SessionStore<WebContext> sessionStore) {
 

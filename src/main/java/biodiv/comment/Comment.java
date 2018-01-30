@@ -223,6 +223,7 @@ public class Comment implements java.io.Serializable {
 		this.subject = subject;
 	}
 
+
 //	@OneToMany(fetch = FetchType.LAZY, mappedBy = "comment")
 //	public Set getCommentResources() {
 //		return this.commentResources;
@@ -241,4 +242,19 @@ public class Comment implements java.io.Serializable {
 //		this.commentUsers = commentUsers;
 //	}
 
+	public static String getClassType(Object parentComment) {
+		
+		String result = null;
+		String name = parentComment.getClass().getSimpleName();
+		
+		switch(name){
+		
+		 case "Comment":
+			 result = "species.participation.Comment";
+			 break;
+		default:
+			
+		}
+		return result;
+	}
 }

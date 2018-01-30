@@ -76,7 +76,6 @@ public abstract class Metadata implements GenericModel,java.io.Serializable {
 	private String locationAccuracy;
 	private LocationScale locationScale;
 	
-	@JsonIgnore
 	private Geometry topology;
      
 	private double latitude;
@@ -158,6 +157,7 @@ public abstract class Metadata implements GenericModel,java.io.Serializable {
 		this.locationScale = locationScale;
 	}
 
+	@JsonIgnore
 	@Column(name = "topology", nullable = false)
 	public Geometry getTopology() {
 		return topology;

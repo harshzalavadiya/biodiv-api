@@ -80,9 +80,9 @@
 		<mapping class="biodiv.traits.SpeciesGroupMapping" />
 		<mapping class="biodiv.traits.TraitTaxonomyDefinition" />
 		<mapping class="biodiv.comment.Comment" />
-	
-		
-	
+		<mapping class="biodiv.customField.CustomField"/>
+		<mapping class="biodiv.customField.CustomFieldsGroup18"/>
+
 	</session-factory>
 
 </hibernate-configuration>
