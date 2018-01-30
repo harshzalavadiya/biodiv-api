@@ -46,12 +46,16 @@ public class ObservationController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
 	public Observation show(@PathParam("id") long id) {
-		DataObject obv = null;
+		
 		try {
+		Observation observation= observationService.show(id);
+		return observation;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
+			
 		}
-		return (Observation) obv;
+		
 	}
 
 	@GET
@@ -93,6 +97,16 @@ public class ObservationController {
 	public List<ObservationResource> getResource(@PathParam("id") long id) {
 		List<ObservationResource> observationResources = observationService.getResouce(id);
 		return observationResources;
+	}
+	@POST
+	@Path("/updategroup")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	@Pac4JSecurity(clients = "headerClient", authorizers = "isAuthenticated")
+	public Observation updateGroup(@QueryParam("objectid") Long objectid,@QueryParam("groupid") Long groupid){
+		
+		Observation observation=observationService.updateGroup(objectid,groupid);
+		return observation;
 	}
 
 }

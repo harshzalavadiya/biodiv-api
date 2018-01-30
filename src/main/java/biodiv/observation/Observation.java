@@ -1,5 +1,6 @@
 package biodiv.observation;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -198,6 +199,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 
 	private Set resources = new HashSet(0);
 	private Set recommendationVotes = new HashSet(0);
+
 
 	// @SuppressWarnings("unchecked")
 	// @Access(value = AccessType.FIELD)
@@ -513,7 +515,11 @@ public class Observation extends DataObject implements java.io.Serializable{
 	public String toString() {
 		return "Observation [id=" + id + "]";
 	}
+	
+	
 
+	
+	
 	// @Override
 	// public Observation get(long obvId) {
 	// // TODO Auto-generated method stub
