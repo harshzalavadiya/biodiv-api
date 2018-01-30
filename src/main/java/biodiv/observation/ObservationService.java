@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.Intercept;
 import biodiv.common.AbstractService;
+import biodiv.common.SpeciesGroup;
+import biodiv.speciesGroup.SpeciesGroupService;
 import biodiv.userGroup.UserGroup;
 
 @Service
@@ -18,11 +20,11 @@ public class ObservationService extends AbstractService<Observation> {
 	
 
 	private ObservationDao observationDao;
+	private SpeciesGroupService speciesGroupService;
 	
 	public ObservationService() {
-		System.out.println("ObservationService constructor");
 		this.observationDao = new ObservationDao();
-		System.out.println("ObservationService constructor end");
+		this.speciesGroupService=new SpeciesGroupService();
 	}
 	
 	
@@ -51,7 +53,6 @@ public class ObservationService extends AbstractService<Observation> {
 
 
 	public List<Map<String, Object>> list() {
-			System.out.println("service mai  aaye");
 			List<Map<String, Object>> results = observationDao.list();
 		return results;
 	}
@@ -61,6 +62,21 @@ public class ObservationService extends AbstractService<Observation> {
 		// TODO Auto-generated method stub
 		List<ObservationResource> observationResources=observationDao.getResource(id);
 		return observationResources;
+	}
+
+
+	public Observation updateGroup(Long objectid, Long groupid) {
+		// TODO Auto-generated method stub
+			
+		SpeciesGroup speciesGroup =  speciesGroupService.findById(groupid);
+		Observation obseravtion=show(objectid);
+		return observationDao.updateGroup(obseravtion,speciesGroup);
+	}
+
+
+	public Observation show(long id) {
+		Observation obseravtion=observationDao.findById(id);
+		return obseravtion;
 	}
 
 }

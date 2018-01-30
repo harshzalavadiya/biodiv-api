@@ -5,10 +5,14 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Intercept;
 import biodiv.common.DataObject;
@@ -40,12 +44,16 @@ public class ObservationController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
 	public Observation show(@PathParam("id") long id) {
-		DataObject obv = null;
+		
 		try {
+		Observation observation= observationService.show(id);
+		return observation;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
+			
 		}
-		return (Observation) obv;
+		
 	}
 
 	@GET
@@ -62,6 +70,16 @@ public class ObservationController {
 	public List<ObservationResource> getResource(@PathParam("id") long id) {
 		List<ObservationResource> observationResources = observationService.getResouce(id);
 		return observationResources;
+	}
+	@POST
+	@Path("/updategroup")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	@Pac4JSecurity(clients = "headerClient", authorizers = "isAuthenticated")
+	public Observation updateGroup(@QueryParam("objectid") Long objectid,@QueryParam("groupid") Long groupid){
+		
+		Observation observation=observationService.updateGroup(objectid,groupid);
+		return observation;
 	}
 
 }

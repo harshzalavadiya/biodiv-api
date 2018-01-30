@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import biodiv.common.SpeciesGroup;
 import biodiv.userGroup.UserGroup;
+import net.minidev.json.JSONObject;
 
 class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterface<Observation, Long> {
 	
@@ -77,6 +79,17 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 		q=getCurrentSession().createQuery("select obvr.resourceId from ObservationResource  as obvr where obvr.observationId.id=:id").setParameter("id",id);
 		List<ObservationResource> observationResources=q.getResultList();
 		return observationResources;
+	}
+
+	public Observation updateGroup(Observation observation, SpeciesGroup speciesGroup) {
+		
+		observation.setGroup(speciesGroup);
+		ObservationList observationList=new ObservationList();
+		JSONObject obj = new JSONObject();
+		obj.put("speciesgroupid", observation.getGroup().getId());
+		observationList.update("observation", "observations", observation.getId().toString(),obj.toString());
+		return observation;
+		
 	}
 
 	

@@ -16,7 +16,8 @@
 		<!--property name="connection.pool_size">1</property-->
 
 		<!-- SQL dialect -->
-	    <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property> 
+		<property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+		<property name="hibernate.dialect">biodiv.common.MyPostgreSQL93Dialect</property>
 		<property name="hibernate.dialect"> org.hibernate.spatial.dialect.postgis.PostgisDialect</property>
 		
 		<!-- Disable the second-level cache -->
@@ -44,7 +45,6 @@
 		<property name="hibernate.transaction.coordinator_class">jdbc</property>
 		<property name="hibernate.current_session_context_class">thread</property>
 		<property name ="hibernate.jdbc.batch_size">50</property>
-		<property name="hibernate.dialect">biodiv.common.MyPostgreSQL95Dialect</property>
 		
 		<!-- Mappings -->
 		<!-- mapping package="biodiv"/ -->
@@ -59,8 +59,6 @@
 		<mapping class="biodiv.dataset.Datasource" />
 		<mapping class="biodiv.observation.Annotation" />
 		<mapping class="biodiv.observation.Observation" />
-		<mapping class="biodiv.observation.ObservationResource" />
-		
 		<mapping class="biodiv.observation.Recommendation" />
 		<mapping class="biodiv.observation.RecommendationVote" />
 		<mapping class="biodiv.resource.Resource" />
@@ -82,6 +80,9 @@
 		<mapping class="biodiv.traits.SpeciesGroupMapping" />
 		<mapping class="biodiv.traits.TraitTaxonomyDefinition" />
 		<mapping class="biodiv.comment.Comment" />
+	
+		
+	
 	</session-factory>
 
 </hibernate-configuration>

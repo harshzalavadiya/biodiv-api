@@ -8,6 +8,7 @@ import javax.persistence.Query;
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 import biodiv.common.SpeciesGroup;
+import biodiv.userGroup.UserGroup;
 
 
 public class SpeciesGroupDao extends  AbstractDao<SpeciesGroup, Long> implements DaoInterface<SpeciesGroup, Long>  {
@@ -24,7 +25,7 @@ public class SpeciesGroupDao extends  AbstractDao<SpeciesGroup, Long> implements
 	}
 	@Override
 	public SpeciesGroup findById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		SpeciesGroup speciesGroup=   getCurrentSession().get(SpeciesGroup.class, id);
+		return speciesGroup;
 	}
 }

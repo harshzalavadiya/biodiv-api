@@ -17,24 +17,18 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 	@Override
 	public UserGroup findById(Long id) {
 		UserGroup entity = (UserGroup) getCurrentSession().get(UserGroup.class, id);
-		System.out.println("7&&&&&&&&&&&&&&&&");
+	
 		return entity;
 	}
 	
 	public List<UserGroup> userUserGroups(long userId){
 	//	String hql = "select userGroup.id from UserGroupMemberRole where suser.id =:Id";
-		System.out.println("inside Usergroup Dao");
 		String hql = " select ug from UserGroup ug inner join UserGroupMemberRole ugmr on ug = ugmr.userGroup where ugmr.user.id =:userId";
 		
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^");
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("userId", userId );
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^");
-	
-		System.out.println(userId);
-		System.out.println(query);
+
 		List<UserGroup> listResult = query.getResultList();
-		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		return listResult;
 	}
 	
@@ -43,9 +37,6 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("groupId", groupId);
 		query.setParameter("roleId", roleId);
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^");
-		System.out.println(roleId);
-		System.out.println(query);
 		List<User> listResult = query.getResultList();
 		return listResult;
 	}
@@ -63,13 +54,6 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		long[] userGroup = Arrays.asList(userGroups.split(",")).stream().map(String::trim).mapToLong(Long::parseLong).toArray();
 		UserGroupService userGroupService = new UserGroupService();
 		
-		System.out.println("inside Dao");
-	
-		//Map<String, String> filterUrlMap = UserGroup.filterUrlParser(filterUrl);
-		//System.out.println(filterUrlMap);
-		//System.out.println(filterUrlMap.get("abc"));
-		//long[] objectId1 = userGroupService.findObjectIdsByFilterUrl(filterUrlMap);
-	   
         Set<UserGroup> newUsrGrps = new HashSet<UserGroup>();
         Set<UserGroup> updated = new HashSet<UserGroup>();
         
