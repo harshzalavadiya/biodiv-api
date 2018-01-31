@@ -76,11 +76,7 @@ public class ObservationList implements MapService {
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 			MapResponse mapResponse=mapIntegrationService.updateSingleDocument(newurl,document);
 			
-			
-			System.out.println("************************************");
-			System.out.println(mapResponse);
-			System.out.println("(((((((((((((((((((((");
-		// TODO Auto-generated method stub
+
 		
 		return null;
 	}
@@ -120,7 +116,7 @@ public class ObservationList implements MapService {
 	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision) {
 		// TODO Auto-generated method stub
 		String newurl = URL+"naksha/services/search/" + index + "/" + type+"?from="+offset+"&limit="+max
-				+"&geoAggregationField="+geoAggregationField + "&sortOn="+sortOn+"&sortType=DESC"+"&geoAggegationPrecision="+geoAggegationPrecision;
+				+"&geoAggregationField="+geoAggregationField +"&geoAggegationPrecision="+geoAggegationPrecision;
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 		MapBiodivResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);
 		
