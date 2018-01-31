@@ -81,14 +81,15 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 		return observationResources;
 	}
 
-	public Observation updateGroup(Observation observation, SpeciesGroup speciesGroup) {
-		
-		observation.setGroup(speciesGroup);
+	public Object updateGroup(Observation observation, SpeciesGroup speciesGroup) {
 		ObservationList observationList=new ObservationList();
+		observation.setGroup(speciesGroup);
 		JSONObject obj = new JSONObject();
 		obj.put("speciesgroupid", observation.getGroup().getId());
+		obj.put("speciesgroupname", observation.getGroup().getName());
 		observationList.update("observation", "observations", observation.getId().toString(),obj.toString());
-		return observation;
+		Object data=observationList.fetch("observation", "observations",observation.getId().toString());
+		return data;
 		
 	}
 

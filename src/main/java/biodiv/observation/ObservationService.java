@@ -100,9 +100,8 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 
-	public Observation updateGroup(Long objectid, Long groupid) {
+	public Object updateGroup(Long objectid, Long groupid) {
 		// TODO Auto-generated method stub
-			
 		SpeciesGroup speciesGroup =  speciesGroupService.findById(groupid);
 		Observation obseravtion=show(objectid);
 		return observationDao.updateGroup(obseravtion,speciesGroup);

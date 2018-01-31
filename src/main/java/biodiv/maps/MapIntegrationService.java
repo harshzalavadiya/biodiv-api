@@ -116,7 +116,7 @@ public class MapIntegrationService {
 			response1 = httpClient.execute(httpGet);
 			HttpEntity entity1 = response1.getEntity();
 			String content = EntityUtils.toString(entity1);
-
+			
 			ObjectMapper mapper = new ObjectMapper();
 			MapDocument mapDocument = mapper.readValue(content, MapDocument.class);
 
@@ -184,6 +184,7 @@ public class MapIntegrationService {
 				HttpEntity entity1 = response.getEntity();
 
 				String responseString = EntityUtils.toString(entity1);
+				
 				ObjectMapper mapper = new ObjectMapper();
 
 				MapResponse myObject = mapper.readValue(responseString, MapResponse.class);
@@ -194,7 +195,7 @@ public class MapIntegrationService {
 					result.add(mapper.readValue(String.valueOf(o.getDocument()), ObservationListMapper.class));
 				}
 
-				return new MapBiodivResponse(result, myObject.getTotalDocuments(), myObject.getGeohashAggregation());
+				return new MapBiodivResponse(result, myObject.getTotalDocuments(), myObject.getGeohashAggregation(), myObject.getViewFilteredGeohashAggregation());
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -339,7 +340,6 @@ public class MapIntegrationService {
 
 			try {
 				response = httpclient.execute(put, context);
-				System.out.println(response);
 			} catch (IOException e) {
 				logger.error("Error while trying to send request at URL {}", url);
 			} finally {
