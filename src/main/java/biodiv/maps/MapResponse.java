@@ -3,47 +3,47 @@ package biodiv.maps;
 import java.util.List;
 
 /**
- * 
- * The response from map module
+ * A response result to the request made to app.
+ * @author mukund
+ *
  */
 public class MapResponse {
+
+	/**
+	 * List of {@link MapDocument} to be sent as response
+	 * to the request
+	 */
+	private List<MapDocument> documents;
 	
-	 /**
-     * List of {@link MapDocument} to be sent as response
-     * to the request
-     */
-    private List<MapDocument> documents;
-    
-    /**
-     * Total number of documents which satisfied the request condition.
-     * This number may be different than the size of list if limit/offset
-     * were specified in the request.
-     */
-    private long totalDocuments;
-    
-    /**
-     * Geographic aggregation of the result based on geohash.
-     * 
-     */
-    private String geohashAggregation;
+	/**
+	 * Total number of documents which satisfied the request condition.
+	 * This number may be different than the size of list if limit/offset
+	 * were specified in the request.
+	 */
+	private long totalDocuments;
+	
+	/**
+	 * Geographic aggregation of the result based on geohash.
+	 * Maximum buckets are 10000.
+	 */
+	private String geohashAggregation;
+	
+	/**
+	 * Geohash aggregation filtered by bounds of user screen provided.
+	 */
+	private String viewFilteredGeohashAggregation;
 
-    
-    
-	public MapResponse() {
-		super();
-	}
-
-
-
-	public MapResponse( List<MapDocument> documents, long totalDocuments,
-			String geohashAggregation) {
+	// empty constructor for json serialization/de-serialization
+	public MapResponse() {}
+	
+	public MapResponse(List<MapDocument> documents, long totalDocuments, String geohashAggregation,
+			String viewFilteredGeohashAggregation) {
 		super();
 		this.documents = documents;
 		this.totalDocuments = totalDocuments;
 		this.geohashAggregation = geohashAggregation;
+		this.viewFilteredGeohashAggregation = viewFilteredGeohashAggregation;
 	}
-
-	
 
 	public List<MapDocument> getDocuments() {
 		return documents;
@@ -67,10 +67,13 @@ public class MapResponse {
 
 	public void setGeohashAggregation(String geohashAggregation) {
 		this.geohashAggregation = geohashAggregation;
+	} 
+	
+	public String getViewFilteredGeohashAggregation() {
+		return viewFilteredGeohashAggregation;
 	}
-    
-    
 	
-	
-
+	public void setViewFilteredGeohashAggregation(String viewFilteredGeohashAggregation) {
+		this.viewFilteredGeohashAggregation = viewFilteredGeohashAggregation;
+	}
 }
