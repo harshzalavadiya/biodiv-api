@@ -20,12 +20,15 @@ public class CommentService extends AbstractService<Comment>{
 
 	private CommentDao commentDao;
 	
-	LanguageService languageService = new LanguageService();
-	UserService userService = new UserService();
-	ActivityFeedService activityFeedService = new ActivityFeedService();
+	LanguageService languageService;
+	UserService userService;
+	ActivityFeedService activityFeedService ;
 	FollowService followService;
 	
 	public CommentService(){
+		languageService = new LanguageService();
+		userService = new UserService();
+		activityFeedService = new ActivityFeedService();
 		this.commentDao = new CommentDao();
 	}
 	
