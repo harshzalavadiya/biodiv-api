@@ -1,8 +1,12 @@
 package biodiv.activityFeed;
 
 import java.util.List;
+import java.util.Map;
+
+//import javax.persistence.Query;
 
 import org.hibernate.Query;
+
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
@@ -33,6 +37,15 @@ public class ActivityFeedDao extends AbstractDao<ActivityFeed, Long> implements 
         query.setProperties(_af);
 		long listResult = (long) query.getSingleResult();
 		return listResult;
+	}
+
+	public ActivityFeed findActivityFeed(String hql,Map<String,Object> params) {
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("activityType", (String) params.get("type"));
+		query.setParameter("objectId",(Long)params.get("id"));
+		ActivityFeed af = (ActivityFeed) query.getSingleResult();
+		
+		return af;
 	}
 	
 }
