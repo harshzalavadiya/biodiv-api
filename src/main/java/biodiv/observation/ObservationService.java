@@ -9,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.Intercept;
+import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 
 import biodiv.common.SpeciesGroup;
 import biodiv.speciesGroup.SpeciesGroupService;
-
+import biodiv.user.User;
+import biodiv.user.UserService;
 import biodiv.customField.CustomFieldService;
 
 import biodiv.userGroup.UserGroup;
@@ -25,10 +27,14 @@ public class ObservationService extends AbstractService<Observation> {
 	
 	private ObservationDao observationDao;
 	private SpeciesGroupService speciesGroupService;
+	ActivityFeedService activityFeedService ;
+	UserService userService;
 	
 	public ObservationService() {
 		this.observationDao = new ObservationDao();
 		this.speciesGroupService=new SpeciesGroupService();
+		activityFeedService = new ActivityFeedService();
+		userService = new UserService();
 	}
 	
 	
@@ -100,11 +106,24 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 
-	public Object updateGroup(Long objectid, Long groupid) {
+	public Object updateGroup(Long userId,Long objectid, Long newgroupid,Long oldGroupId) {
 		// TODO Auto-generated method stub
-		SpeciesGroup speciesGroup =  speciesGroupService.findById(groupid);
+		User user = userService.findById(userId);
+		Object obj;
+		SpeciesGroup speciesGroup =  speciesGroupService.findById(newgroupid);
+		String newSpeciesGroupName = speciesGroup.getName();
+		SpeciesGroup oldSpeciesGroup = speciesGroupService.findById(oldGroupId);
+		String oldSpeciesGroupName = oldSpeciesGroup.getName();
 		Observation obseravtion=show(objectid);
-		return observationDao.updateGroup(obseravtion,speciesGroup);
+		obj =  observationDao.updateGroup(obseravtion,speciesGroup);
+		//activityFeed
+		String activityDescription = oldSpeciesGroupName+" to "+newSpeciesGroupName;
+		Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectid,obseravtion,
+				"species.participation.Observation","species.participation.Observation",objectid,"Observation species group updated",
+				"Species group updated",activityDescription,activityDescription,null,null,true,null);
+		activityFeedService.addActivityFeed(user,afNew,obseravtion,(String)afNew.get("rootHolderType"));
+		//activityFeed
+		return obj;
 	}
 
 

@@ -103,9 +103,10 @@ public class ObservationController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
 	@Pac4JSecurity(clients = "headerClient", authorizers = "isAuthenticated")
-	public Object updateGroup(@QueryParam("objectid") Long objectid,@QueryParam("groupid") Long groupid){
+	public Object updateGroup(@QueryParam("objectid") Long objectid,@QueryParam("newGroupId") Long newGroupId,
+			@QueryParam("oldGroupId") Long oldGroupId,@Pac4JProfile CommonProfile profile){
 		
-		Object observation=observationService.updateGroup(objectid,groupid);
+		Object observation=observationService.updateGroup(objectid,newGroupId,oldGroupId,Long.parseLong(profile.getId()));
 		return observation;
 	}
 
