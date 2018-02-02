@@ -523,12 +523,12 @@ public class UserGroup implements java.io.Serializable {
 		Set<UserGroup> allGroupsContainingObv = new HashSet<UserGroup>();
 		for(UserGroup ug : userGroupsWithFilterRule)
 		{
-			if(ug.filterRule != null)
+			if(ug.getFilterRule() != null)
 			{		
 				try{
 						ObjectMapper mapper = new ObjectMapper();
-						
-						JsonNode rootNode = mapper.readValue(ug.filterRule, JsonNode.class);
+						//System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% "+ug.getFilterRule());
+						JsonNode rootNode = mapper.readValue(ug.getFilterRule(), JsonNode.class);
 						String field = "";
 						String rule = "";
 						JsonNode ruleValue = null;
