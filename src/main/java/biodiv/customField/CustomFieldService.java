@@ -63,9 +63,9 @@ public class CustomFieldService extends AbstractService<CustomField> {
 					if(oldValue != newValue){
 						String activityDescription = cf.getName()+" : "+ map.get("columnValue");
 						String description = activityDescription;
-						Map<String, Object> afNew = ActivityFeed.createMapforAf("Object",obvId,null,
+						Map<String, Object> afNew = activityFeedService.createMapforAf("Object",obvId,null,
 								"species.participation.Observation","species.participation.Observation",obvId,
-								"Custom field edited","Custom field edited",activityDescription,description,null,null,true);
+								"Custom field edited","Custom field edited",activityDescription,description,null,null,true,null);
 						
 						activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
 					}

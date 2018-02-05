@@ -20,12 +20,15 @@ public class CommentService extends AbstractService<Comment>{
 
 	private CommentDao commentDao;
 	
-	LanguageService languageService = new LanguageService();
-	UserService userService = new UserService();
-	ActivityFeedService activityFeedService = new ActivityFeedService();
+	LanguageService languageService;
+	UserService userService;
+	ActivityFeedService activityFeedService ;
 	FollowService followService;
 	
 	public CommentService(){
+		languageService = new LanguageService();
+		userService = new UserService();
+		activityFeedService = new ActivityFeedService();
 		this.commentDao = new CommentDao();
 	}
 	
@@ -63,6 +66,8 @@ public class CommentService extends AbstractService<Comment>{
 			//Timestamp refTym = new java.sql.Timestamp(newerTimeRef);
 			
 			if(parentId != null){
+				System.out.println("**************************************************************************");
+				System.out.println("insdie parenId not null");
 				Comment parentComment = findById(parentId);
 				mainParentId = (parentComment.getMainParentId() == null)?parentComment.getId():null;
 				commentHolderId = parentComment.getId();
@@ -72,6 +77,7 @@ public class CommentService extends AbstractService<Comment>{
 			}
 			
 			long[] tagUserIds = null;
+			System.out.println("taguserIds "+tagUserIds);
 			if(tagUserId != null){
 				tagUserIds =  Arrays.asList(tagUserId.split(",")).stream().map(String::trim).mapToLong(Long::parseLong).toArray();
 			}
@@ -95,21 +101,26 @@ public class CommentService extends AbstractService<Comment>{
 			 save(c);
 			
 			//activityFeed
-			 if(commentId != null){
-				 String activityDescription = "";
-					Long activityHolderId = c.getId();
-					System.out.println("comment id after save "+activityHolderId);
-					Map<String, Object> afNew = ActivityFeed.createMapforAf("Object",rootHolderId,null,
-							rootHolderType,"species.participation.Comment",activityHolderId,
-							"Added a comment","Added a Comment",activityDescription,null,null,null,true);
-					
-					activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
+			 if(commentId == null){
+				
+					 	String activityDescription = "";
+						Long activityHolderId = c.getId();
+						System.out.println("comment id after save "+activityHolderId);
+						Long subRootId = isMainThread(c)?activityHolderId:fetchMainThreadId(c);
+						Map<String, Object> afNew = activityFeedService.createMapforAf("Object",rootHolderId,null,
+									rootHolderType,"species.participation.Comment",activityHolderId,
+									"Added a comment","Added a comment",activityDescription,null,null,null,true,subRootId);
+							
+						activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
+	 
 			 }
 			// activityFeed end
-			 
-			 if(tagUserIds.length > 0){
-				 userTagNotify(rootHolderType,rootHolderId,tagUserIds);
+			 if(tagUserIds != null){
+				 if(tagUserIds.length > 0){
+					 userTagNotify(rootHolderType,rootHolderId,tagUserIds);
+				 }
 			 }
+			 
 			
 			return "success";
 		}catch(Exception e){
@@ -117,6 +128,10 @@ public class CommentService extends AbstractService<Comment>{
 		}finally{
 			
 		}
+	}
+
+	private Long fetchMainThreadId(Comment comment) {
+		return comment.getMainParentId();
 	}
 
 	private void userTagNotify(String objectType,Long objectToFollowId,long[] tagUserIds) {
@@ -139,8 +154,9 @@ public class CommentService extends AbstractService<Comment>{
 				if(author.getId() == userId){
 					
 					delete(commentId);
+					activityFeedService.deleteActivityFeed(commentId,"Added a comment","activityHolder");
 					if(isMainThread(comment)){
-						setParentToNull(commentId);
+						deleteChildren(commentId);
 					}
 					return true;
 				}
@@ -155,12 +171,15 @@ public class CommentService extends AbstractService<Comment>{
 		}
 	}
 
-	private void setParentToNull(Long commentId) {
+	private void deleteChildren(Long commentId) {
 		try{
 			List<Comment> childComments = findAllByParentId(commentId);
 			for(Comment c : childComments){
-				c.setParentId(null);
-				save(c);
+				//c.setParentId(null);
+				//save(c);
+				Long childId = c.getId();
+				delete(childId);
+				activityFeedService.deleteActivityFeed(childId,"Added a comment","activityHolder");
 			}
 		}catch(Exception e){
 			throw e;

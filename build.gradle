@@ -138,7 +138,7 @@ dependencies {
 
 
 tomcat {
-    httpPort = 8090
+    httpPort = 8080
     //httpsPort = 8099
     //enableSSL = true
     contextPath = 'biodiv-api'

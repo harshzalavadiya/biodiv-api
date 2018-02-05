@@ -43,7 +43,7 @@ public class CommentController {
 		
 	}
 	
-	@GET
+	@POST
 	@Path("/removeComment")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")

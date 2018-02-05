@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import biodiv.Intercept;
+import biodiv.comment.Comment;
 import biodiv.comment.CommentService;
-import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
 import biodiv.common.MyJson;
 import biodiv.follow.FollowService;
@@ -83,13 +83,27 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 			    	commentService = new CommentService();
 			    	MyJson myJson = new MyJson();
 			    	myJson.setAid((Long) obj[3]);
-			    	myJson.setName(null);
-			    	myJson.setRo_id(null);
-			    	myJson.setRo_type(null);
+			    	
+			    	Comment comment = commentService.findById((Long) res.get("activityHolderId"));
+			    	Long parentId = comment.getParentId();
+			    	if(parentId != null){
+			    		Comment parentComment = commentService.findById(parentId);
+			    		User parentCommentAuthor = parentComment.getUser();
+			    		myJson.setName(parentCommentAuthor.getName());
+			    		myJson.setRo_id(parentCommentAuthor.getId());
+			    		myJson.setRo_type("user");
+			    		myJson.setActivity_performed("In reply to");
+			    	}else{
+			    		myJson.setName(null);
+				    	myJson.setRo_id(null);
+				    	myJson.setRo_type(null);
+				    	myJson.setActivity_performed("Added a comment");
+			    	}
+			    	
 			    	String body = commentService.getCommentBody((Long) obj[5]);
 			    	myJson.setDescription(body);
 			    	myJson.setIs_migrated("true");
-			    	myJson.setActivity_performed("Added a comment");
+			    	
 			    	myJson.setIs_scientific_name(null);
 			    	res.put("descriptionJson", myJson);
 				}else{
@@ -154,6 +168,124 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 			
 		}
 			
+	}
+	
+	public  Map<String, Object> createMapforAf(String rootType,Long rhId,Object rootHolder,String rootHolderTyp,String activityHolderType,Long activityHolderId,
+			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isShowable,Long subRootId) {
+		
+		//String activityDescrption;
+	    //Long activityHolderId ;  
+		//String activityHolderType ;
+		//String activityType ;
+		Date dateCreated = new java.util.Date();
+		Date lastUpdated = new java.util.Date();
+		
+		
+
+		//Boolean isShowable;
+		
+		 //activityDescrption = "Posted observation to group";
+	     //activityHolderId = ahId;  
+		 //activityHolderType = "species.groups.UserGroup";
+		 //activityType = "Posted Resource";
+		 Long rootHolderId ;
+		 String rootHolderType ;
+		 Long subRootHolderId ;
+		 String subRootHolderType;
+		 
+		    MyJson myJson = new MyJson();
+	    	//myJson.setAid((Long) obj[3]);
+		    
+		    //need to check on next activity written in backend
+		    if(!activityType.equalsIgnoreCase("Added a comment")){
+		    	if(ro_type != null){
+			    	myJson.setName(name);
+			    	myJson.setRo_id(activityHolderId);
+			    	myJson.setRo_type(ro_type);
+			    }
+		    	
+		    	if(description !=null){
+		    		myJson.setDescription(description);
+		    	}
+		    	myJson.setIs_migrated("true");
+		    	
+		    	myJson.setActivity_performed(activityPerformed);
+		    	//myJson.setIs_scientific_name(null);
+		    }
+		    
+	    	
+		if(rootType.equalsIgnoreCase("UserGroup")){
+			rootHolderId = rhId;
+			rootHolderType = "species.groups.UserGroup";
+			subRootHolderId = rhId;
+			subRootHolderType = "species.groups.UserGroup";
+		}else{
+			
+			rootHolderId = rhId;
+			subRootHolderId = rhId;
+			if(rootHolderTyp == null){
+				rootHolderType = ActivityFeed.getType(rootHolder);
+			}else{
+				rootHolderType = rootHolderTyp;
+			}
+			 
+			if(rootHolderTyp == null){
+				subRootHolderType = ActivityFeed.getType(rootHolder);
+			}else{
+				subRootHolderType = rootHolderTyp;
+			}
+			 isShowable = true;
+			 
+			 if(activityHolderType.equalsIgnoreCase("species.participation.Comment")){	
+				 
+				 subRootHolderType = activityHolderType;
+				 subRootHolderId = subRootId;
+			 }
+		}
+		 
+		 
+		  
+		 Map<String,Object> afNew =  new HashMap<String, Object>();
+		 afNew.put("activityDescrption",activityDescrption);
+		 afNew.put("activityHolderId",activityHolderId);
+		 afNew.put("activityHolderType",activityHolderType);
+		 afNew.put("activityType",activityType);
+		 afNew.put("dateCreated",dateCreated);
+		 afNew.put("lastUpdated",lastUpdated);
+		 afNew.put("rootHolderId",rootHolderId);
+		 afNew.put("rootHolderType",rootHolderType);
+		 afNew.put("subRootHolderId",subRootHolderId);
+		 afNew.put("subRootHolderType",subRootHolderType);
+		 afNew.put("isShowable",isShowable);
+		 afNew.put("descriptionJson", myJson);
+		 
+		return afNew;
+	}
+
+	private boolean isMainThread(Comment comment) {
+		return comment.getParentId() ==  null;
+	}
+
+	public void deleteActivityFeed(Long objectId, String activityType, String position) {
+		
+		String query = "";
+		Map<String,Object> params =  new HashMap<String, Object>();
+		params.put("type", activityType);
+		params.put("id", objectId);
+		switch(position){
+		
+			case "activityHolder":
+				query = "from ActivityFeed where activityType =:activityType"+" and activityHolderId =:objectId";
+				
+				break;
+			case "rootHolder":
+				query = "from ActivityFeed where activityType =:activityType"+" and rootHolderId =:objectId";
+				break;
+			default:
+				//
+		}
+		ActivityFeed af = getDao().findActivityFeed(query,params);
+		delete(af.getId());
 	}
 
 }

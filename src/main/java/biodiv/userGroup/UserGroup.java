@@ -70,7 +70,6 @@ public class UserGroup implements java.io.Serializable {
 	private boolean sendDigestMail;
 	private Date statStartDate = new Date();
 	private String filterRule;
-	
 
 	public UserGroup() {
 	}
@@ -104,8 +103,7 @@ public class UserGroup implements java.io.Serializable {
 			boolean allowNonMembersToComment, boolean allowObvCrossPosting, boolean allowUsersToJoin,
 			String description, String domainName, Date foundedOn, String homePage, String icon, boolean isDeleted,
 			String name, float neLatitude, float neLongitude, float swLatitude, float swLongitude, String theme,
-			long visitCount, String webaddress, boolean sendDigestMail, Date statStartDate, String filterRule
-			) {
+			long visitCount, String webaddress, boolean sendDigestMail, Date statStartDate, String filterRule) {
 		this.id = id;
 		this.language = language;
 		this.allowMembersToMakeSpeciesCall = allowMembersToMakeSpeciesCall;
@@ -129,7 +127,7 @@ public class UserGroup implements java.io.Serializable {
 		this.sendDigestMail = sendDigestMail;
 		this.statStartDate = statStartDate;
 		this.filterRule = filterRule;
-	
+
 	}
 
 	@Id
@@ -190,7 +188,7 @@ public class UserGroup implements java.io.Serializable {
 		this.allowUsersToJoin = allowUsersToJoin;
 	}
 
-	@Column(name = "description", columnDefinition="text", nullable = false)
+	@Column(name = "description", columnDefinition = "text", nullable = false)
 	@NotBlank
 	public String getDescription() {
 		return this.description;
@@ -359,7 +357,7 @@ public class UserGroup implements java.io.Serializable {
 
 		return (this.getId() == castOther.getId());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int result = 17;
@@ -367,303 +365,291 @@ public class UserGroup implements java.io.Serializable {
 		result = 37 * result + (int) this.getId();
 		return result;
 	}
-/*	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_group_documents", schema = "public", joinColumns = {
-			@JoinColumn(name = "user_group_id", nullable = false, updatable = false) }, inverseJoinColumns = {
-					@JoinColumn(name = "document_id", nullable = false, updatable = false) })
-	public Set getDocuments() {
-		return this.documents;
-	}
+	/*
+	 * @ManyToMany(fetch = FetchType.LAZY)
+	 * 
+	 * @JoinTable(name = "user_group_documents", schema = "public", joinColumns
+	 * = {
+	 * 
+	 * @JoinColumn(name = "user_group_id", nullable = false, updatable = false)
+	 * }, inverseJoinColumns = {
+	 * 
+	 * @JoinColumn(name = "document_id", nullable = false, updatable = false) })
+	 * public Set getDocuments() { return this.documents; }
+	 * 
+	 * public void setDocuments(Set documents) { this.documents = documents; }
+	 * 
+	 * @ManyToMany(fetch = FetchType.LAZY)
+	 * 
+	 * @JoinTable(name = "user_group_projects", schema = "public", joinColumns =
+	 * {
+	 * 
+	 * @JoinColumn(name = "user_group_id", nullable = false, updatable = false)
+	 * }, inverseJoinColumns = {
+	 * 
+	 * @JoinColumn(name = "project_id", nullable = false, updatable = false) })
+	 * public Set getProjects() { return this.projects; }
+	 * 
+	 * public void setProjects(Set projects) { this.projects = projects; }
+	 * 
+	 * @ManyToMany(fetch = FetchType.LAZY)
+	 * 
+	 * @JoinTable(name = "user_group_species", schema = "public", joinColumns =
+	 * {
+	 * 
+	 * @JoinColumn(name = "user_group_id", nullable = false, updatable = false)
+	 * }, inverseJoinColumns = {
+	 * 
+	 * @JoinColumn(name = "species_id", nullable = false, updatable = false) })
+	 * public Set getSpecieses() { return this.specieses; }
+	 * 
+	 * public void setSpecieses(Set specieses) { this.specieses = specieses; }
+	 * 
+	 * @ManyToMany(fetch = FetchType.LAZY)
+	 * 
+	 * @JoinTable(name = "user_group_observations", schema = "public",
+	 * joinColumns = {
+	 * 
+	 * @JoinColumn(name = "user_group_id", nullable = false, updatable = false)
+	 * }, inverseJoinColumns = {
+	 * 
+	 * @JoinColumn(name = "observation_id", nullable = false, updatable = false)
+	 * }) public Set getObservations() { return this.observations; }
+	 * 
+	 * public void setObservations(Set observations) { this.observations =
+	 * observations; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getUserGroupHabitats() { return this.userGroupHabitats; }
+	 * 
+	 * public void setUserGroupHabitats(Set userGroupHabitats) {
+	 * this.userGroupHabitats = userGroupHabitats; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getDigests() { return this.digests; }
+	 * 
+	 * public void setDigests(Set digests) { this.digests = digests; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getUserGroupObservations() { return this.userGroupObservations; }
+	 * 
+	 * public void setUserGroupObservations(Set userGroupObservations) {
+	 * this.userGroupObservations = userGroupObservations; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getFeatureds() { return this.featureds; }
+	 * 
+	 * public void setFeatureds(Set featureds) { this.featureds = featureds; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getCustomFields() { return this.customFields; }
+	 * 
+	 * public void setCustomFields(Set customFields) { this.customFields =
+	 * customFields; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getUserGroupNewsletters() { return this.userGroupNewsletters; }
+	 * 
+	 * public void setUserGroupNewsletters(Set userGroupNewsletters) {
+	 * this.userGroupNewsletters = userGroupNewsletters; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getUserGroupSpeciesGroups() { return this.userGroupSpeciesGroups; }
+	 * 
+	 * public void setUserGroupSpeciesGroups(Set userGroupSpeciesGroups) {
+	 * this.userGroupSpeciesGroups = userGroupSpeciesGroups; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getSuserUserGroups() { return this.suserUserGroups; }
+	 * 
+	 * public void setSuserUserGroups(Set suserUserGroups) {
+	 * this.suserUserGroups = suserUserGroups; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getUserGroupMemberRoles() { return this.userGroupMemberRoles; }
+	 * 
+	 * public void setUserGroupMemberRoles(Set userGroupMemberRoles) {
+	 * this.userGroupMemberRoles = userGroupMemberRoles; }
+	 * 
+	 * @OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup") public Set
+	 * getNewsletters() { return this.newsletters; }
+	 * 
+	 * public void setNewsletters(Set newsletters) { this.newsletters =
+	 * newsletters; }
+	 * 
+	 * @ManyToMany(fetch = FetchType.LAZY)
+	 * 
+	 * @JoinTable(name = "user_group_discussions", schema = "public",
+	 * joinColumns = {
+	 * 
+	 * @JoinColumn(name = "user_group_id", nullable = false, updatable = false)
+	 * }, inverseJoinColumns = {
+	 * 
+	 * @JoinColumn(name = "discussion_id", nullable = false, updatable = false)
+	 * }) public Set getDiscussions() { return this.discussions; }
+	 * 
+	 * public void setDiscussions(Set discussions) { this.discussions =
+	 * discussions; }
+	 */
 
-	public void setDocuments(Set documents) {
-		this.documents = documents;
-	}
+	public static Set<UserGroup> findAllContainingObj(String objectType, Object object,
+			Set<UserGroup> userGroupsWithFilterRule) throws JsonParseException, IOException, ParseException {
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_group_projects", schema = "public", joinColumns = {
-			@JoinColumn(name = "user_group_id", nullable = false, updatable = false) }, inverseJoinColumns = {
-					@JoinColumn(name = "project_id", nullable = false, updatable = false) })
-	public Set getProjects() {
-		return this.projects;
-	}
-
-	public void setProjects(Set projects) {
-		this.projects = projects;
-	}
-
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_group_species", schema = "public", joinColumns = {
-			@JoinColumn(name = "user_group_id", nullable = false, updatable = false) }, inverseJoinColumns = {
-					@JoinColumn(name = "species_id", nullable = false, updatable = false) })
-	public Set getSpecieses() {
-		return this.specieses;
-	}
-
-	public void setSpecieses(Set specieses) {
-		this.specieses = specieses;
-	}
-
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_group_observations", schema = "public", joinColumns = {
-			@JoinColumn(name = "user_group_id", nullable = false, updatable = false) }, inverseJoinColumns = {
-					@JoinColumn(name = "observation_id", nullable = false, updatable = false) })
-	public Set getObservations() {
-		return this.observations;
-	}
-
-	public void setObservations(Set observations) {
-		this.observations = observations;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getUserGroupHabitats() {
-		return this.userGroupHabitats;
-	}
-
-	public void setUserGroupHabitats(Set userGroupHabitats) {
-		this.userGroupHabitats = userGroupHabitats;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getDigests() {
-		return this.digests;
-	}
-
-	public void setDigests(Set digests) {
-		this.digests = digests;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getUserGroupObservations() {
-		return this.userGroupObservations;
-	}
-
-	public void setUserGroupObservations(Set userGroupObservations) {
-		this.userGroupObservations = userGroupObservations;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getFeatureds() {
-		return this.featureds;
-	}
-
-	public void setFeatureds(Set featureds) {
-		this.featureds = featureds;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getCustomFields() {
-		return this.customFields;
-	}
-
-	public void setCustomFields(Set customFields) {
-		this.customFields = customFields;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getUserGroupNewsletters() {
-		return this.userGroupNewsletters;
-	}
-
-	public void setUserGroupNewsletters(Set userGroupNewsletters) {
-		this.userGroupNewsletters = userGroupNewsletters;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getUserGroupSpeciesGroups() {
-		return this.userGroupSpeciesGroups;
-	}
-
-	public void setUserGroupSpeciesGroups(Set userGroupSpeciesGroups) {
-		this.userGroupSpeciesGroups = userGroupSpeciesGroups;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getSuserUserGroups() {
-		return this.suserUserGroups;
-	}
-
-	public void setSuserUserGroups(Set suserUserGroups) {
-		this.suserUserGroups = suserUserGroups;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getUserGroupMemberRoles() {
-		return this.userGroupMemberRoles;
-	}
-
-	public void setUserGroupMemberRoles(Set userGroupMemberRoles) {
-		this.userGroupMemberRoles = userGroupMemberRoles;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userGroup")
-	public Set getNewsletters() {
-		return this.newsletters;
-	}
-
-	public void setNewsletters(Set newsletters) {
-		this.newsletters = newsletters;
-	}
-
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_group_discussions", schema = "public", joinColumns = {
-			@JoinColumn(name = "user_group_id", nullable = false, updatable = false) }, inverseJoinColumns = {
-					@JoinColumn(name = "discussion_id", nullable = false, updatable = false) })
-	public Set getDiscussions() {
-		return this.discussions;
-	}
-
-	public void setDiscussions(Set discussions) {
-		this.discussions = discussions;
-	}
-*/
-
-	public static Set<UserGroup> findAllContainingObj(String objectType,Object object, Set<UserGroup> userGroupsWithFilterRule) throws JsonParseException, IOException, ParseException {
-		
 		Set<UserGroup> allGroupsContainingObv = new HashSet<UserGroup>();
-		for(UserGroup ug : userGroupsWithFilterRule)
-		{
-			if(ug.filterRule != null)
-			{		
-				try{
-						ObjectMapper mapper = new ObjectMapper();
-						
-						JsonNode rootNode = mapper.readValue(ug.filterRule, JsonNode.class);
-						String field = "";
-						String rule = "";
-						JsonNode ruleValue = null;
-						boolean belongs = false;
-						for(int i=0; i<rootNode.size(); i++) {
-							 field = rootNode.get(i).get("fieldName").asText();
-							 rule = rootNode.get(i).get("ruleName").asText();	
-							JsonNode ruleValues = rootNode.get(i).get("ruleValues");
-							for(int j=0; j<ruleValues.size();j++) {
-								 ruleValue = ruleValues.get(i);
-								//System.out.println(ruleValue.asText());
-							}
-						}	
-			
-						if(field.equalsIgnoreCase("topology") && rule.equalsIgnoreCase("dwithin"))
-						{	
-							Geometry topology;
-							Geometry boundary = convertToGeometry(ruleValue.asText());
-							switch(objectType){
-							
-							case "biodiv.observation.Observation":
-								
-								topology = ((Observation) object).getTopology();
-								belongs = Observation.obvIsWithinUserGroupBoundary(topology,boundary);
-								
-							default:
-								//
-							}
-							
-							
+		for (UserGroup ug : userGroupsWithFilterRule) {
+			if (ug.getFilterRule() != null) {
+				try {
+					ObjectMapper mapper = new ObjectMapper();
+					//System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"+ug.getFilterRule());
+					JsonNode rootNode = mapper.readValue(ug.getFilterRule(), JsonNode.class);
+					//System.out.println(rootNode);
+					String field = "";
+					String rule = "";
+					JsonNode ruleValue = null;
+					boolean belongs = false;
+					for (int i = 0; i < rootNode.size(); i++) {
+						//System.out.println(rootNode.get(i));
+						field = rootNode.get(i).get("fieldName").asText();
+						rule = rootNode.get(i).get("ruleName").asText();
+						JsonNode ruleValues = rootNode.get(i).get("ruleValues");
+						for (int j = 0; j < ruleValues.size(); j++) {
+							ruleValue = ruleValues.get(i);
+							// System.out.println(ruleValue.asText());
 						}
-						if(belongs == true)
-						{
-							allGroupsContainingObv.add(ug);
+					}
+
+					if (field.equalsIgnoreCase("topology") && rule.equalsIgnoreCase("dwithin")) {
+						Geometry topology;
+						Geometry boundary = convertToGeometry(ruleValue.asText());
+						switch (objectType) {
+
+						case "biodiv.observation.Observation":
+
+							topology = ((Observation) object).getTopology();
+							belongs = Observation.obvIsWithinUserGroupBoundary(topology, boundary);
+
+						default:
+							//
 						}
-					 
-				}catch (JsonGenerationException e) {
+
+					}
+					if (belongs == true) {
+						allGroupsContainingObv.add(ug);
+					}
+
+				} catch (JsonGenerationException e) {
 					e.printStackTrace();
 				} catch (JsonMappingException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
-				}		
-			 }			
-		 }
+				}
+			}
+		}
 		return allGroupsContainingObv;
 	}
 
-private static Geometry convertToGeometry(String ruleValue) throws ParseException {
-	GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(),4326);
-    WKTReader wkt = new WKTReader(geometryFactory);
-    Geometry boundary = null;
-    try {
-    	 boundary = wkt.read(ruleValue);
-    } catch(ParseException e) {
-        e.printStackTrace();
-    }
-    //System.out.println("geometryyyyyyyyyyyyyyyyy" + boundary);
-	return boundary;
-}
-
-public static <T> List<List<T>> collate( List<T> list, int size, int step ) {
-    return Stream.iterate( 0, i -> i + step )
-                    .limit( ( list.size() / step ) + 1 )
-                    .map( i -> list.stream()
-                                   .skip( i )
-                                   .limit( size )
-                                   .collect( Collectors.toList() ) )
-                    .filter( i -> !i.isEmpty() )
-                    .collect( Collectors.toList() ) ;
-}
-
-public static byte[][] splitBytes(final byte[] data, final int chunkSize)
-{
-  final int length = data.length;
-  final byte[][] dest = new byte[(length + chunkSize - 1)/chunkSize][];
-  int destIndex = 0;
-  int stopIndex = 0;
-
-  for (int startIndex = 0; startIndex + chunkSize <= length; startIndex += chunkSize)
-  {
-    stopIndex += chunkSize;
-    dest[destIndex++] = Arrays.copyOfRange(data, startIndex, stopIndex);
-  }
-
-  if (stopIndex < length)
-    dest[destIndex] = Arrays.copyOfRange(data, stopIndex, length);
-
-  return dest;
-}
-
-
-//public Map<String, List<String>> splitQuery(URL url) {
-//    if (Strings.isNullOrEmpty(url.getQuery())) {
-//        return Collections.emptyMap();
-//    }
-//    return Arrays.stream(url.getQuery().split("&"))
-//            .map(this::splitQueryParameter)
-//            .collect(Collectors.groupingBy(SimpleImmutableEntry::getKey, LinkedHashMap::new, mapping(Map.Entry::getValue, toList())));
-//}
-//
-//public SimpleImmutableEntry<String, String> splitQueryParameter(String it) {
-//    final int idx = it.indexOf("=");
-//    final String key = idx > 0 ? it.substring(0, idx) : it;
-//    final String value = idx > 0 && it.length() > idx + 1 ? it.substring(idx + 1) : null;
-//    return new SimpleImmutableEntry<>(key, value);
-//}
-
-public static Map<String, String> filterUrlParser(String uri){
-	String query =  uri.split("\\?")[1];
-	Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(query);
-	return map;
-}
-
-public static String getActivityObjectType(Object obj,String submitType,String rootHolderType,Long count) {
-	
-	String type = obj.getClass().getSimpleName();
-	String result = "";
-	
-	switch(type){
-
-	case "Observation":
-		if(rootHolderType.equalsIgnoreCase("UserGroup")){		
-			result = submitType.equalsIgnoreCase("post")?("Posted "+ count + " observation(s) to group"):("Removed "+ count +" observation(s) from group");
-			
-		}else{
-			result = submitType.equalsIgnoreCase("post")?"Posted observation to group":"Removed observation from group";
+	private static Geometry convertToGeometry(String ruleValue) throws ParseException {
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+		WKTReader wkt = new WKTReader(geometryFactory);
+		Geometry boundary = null;
+		try {
+			boundary = wkt.read(ruleValue);
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
-		break;
-	
-	default:
-		//
+		// System.out.println("geometryyyyyyyyyyyyyyyyy" + boundary);
+		return boundary;
 	}
-	return result;
+
+	public static <T> List<List<T>> collate(List<T> list, int size, int step) {
+		return Stream.iterate(0, i -> i + step).limit((list.size() / step) + 1)
+				.map(i -> list.stream().skip(i).limit(size).collect(Collectors.toList())).filter(i -> !i.isEmpty())
+				.collect(Collectors.toList());
+	}
+
+	public static byte[][] splitBytes(final byte[] data, final int chunkSize) {
+		final int length = data.length;
+		final byte[][] dest = new byte[(length + chunkSize - 1) / chunkSize][];
+		int destIndex = 0;
+		int stopIndex = 0;
+
+		for (int startIndex = 0; startIndex + chunkSize <= length; startIndex += chunkSize) {
+			stopIndex += chunkSize;
+			dest[destIndex++] = Arrays.copyOfRange(data, startIndex, stopIndex);
+		}
+
+		if (stopIndex < length)
+			dest[destIndex] = Arrays.copyOfRange(data, stopIndex, length);
+
+		return dest;
+	}
+
+	// public Map<String, List<String>> splitQuery(URL url) {
+	// if (Strings.isNullOrEmpty(url.getQuery())) {
+	// return Collections.emptyMap();
+	// }
+	// return Arrays.stream(url.getQuery().split("&"))
+	// .map(this::splitQueryParameter)
+	// .collect(Collectors.groupingBy(SimpleImmutableEntry::getKey,
+	// LinkedHashMap::new, mapping(Map.Entry::getValue, toList())));
+	// }
+	//
+	// public SimpleImmutableEntry<String, String> splitQueryParameter(String
+	// it) {
+	// final int idx = it.indexOf("=");
+	// final String key = idx > 0 ? it.substring(0, idx) : it;
+	// final String value = idx > 0 && it.length() > idx + 1 ? it.substring(idx
+	// + 1) : null;
+	// return new SimpleImmutableEntry<>(key, value);
+	// }
+
+	public static Map<String, String> filterUrlParser(String uri) {
+		String query = uri.split("\\?")[1];
+		Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(query);
+		return map;
+	}
+
+	public static String getActivityObjectType(Object obj, String submitType, String rootHolderType, Long count) {
+
+		String type = obj.getClass().getSimpleName();
+		String result = "";
+
+		switch (type) {
+
+		case "Observation":
+			if (rootHolderType.equalsIgnoreCase("UserGroup")) {
+				result = submitType.equalsIgnoreCase("post") ? ("Posted " + count + " observation(s) to group")
+						: ("Removed " + count + " observation(s) from group");
+
+			} else {
+				result = submitType.equalsIgnoreCase("post") ? "Posted observation to group"
+						: "Removed observation from group";
+			}
+			break;
+
+		default:
+			//
+		}
+		return result;
+
+	}
 
 }
 
-}
+//public class FilterRule {
+//    String fieldName;
+//    String ruleName;
+//    List<String> ruleValues;
+//
+//    FilterRule(String fieldName, String ruleName,  ruleValues) {
+//        this.fieldName = fieldName;
+//        this.ruleName = ruleName;
+//        this.ruleValues = ruleValues;
+//    }
+// 
+//    static getFilterRule(String filterRuleJSON) {
+//    	return new FilterRule();
+//    
+//    }
+//}
