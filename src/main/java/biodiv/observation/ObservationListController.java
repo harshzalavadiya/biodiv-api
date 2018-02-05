@@ -33,7 +33,7 @@ import biodiv.maps.MapAndRangeQuery;
 import biodiv.maps.MapResponse;
 import biodiv.maps.MapSearchQuery;
 
-@Path("/maps")
+@Path("/naksha")
 public class ObservationListController {
 	
 	@POST
