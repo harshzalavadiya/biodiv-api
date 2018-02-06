@@ -10,7 +10,6 @@ import java.util.Map;
 import biodiv.Intercept;
 import biodiv.comment.Comment;
 import biodiv.comment.CommentService;
-import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
 import biodiv.common.MyJson;
 import biodiv.follow.FollowService;

@@ -2,7 +2,9 @@ package biodiv.common;
 
 import java.io.Serializable;
 
-public class MyJson implements Serializable{
+
+public class MyJson implements java.io.Serializable{
+
 
 	private Long aid;
 	private String name;
