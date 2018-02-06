@@ -11,6 +11,7 @@ import javax.persistence.Query;
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 import biodiv.user.User;
+import biodiv.userGroupMemberRole.UserGroupMemberRole;
 
 public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoInterface<UserGroup, Long>{
 
@@ -108,6 +109,19 @@ public class UserGroupDao  extends AbstractDao<UserGroup, Long> implements DaoIn
 		
 		
 		return results;
+	}
+
+	public Boolean isFounder(Long ugId, Long userId,Long roleId) {
+		
+		String hql = "from UserGroupMemberRole ugmr where ugmr.user.id =:userId and ugmr.role.id =:roleId and ugmr.userGroup.id =:ugId";
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("userId",userId);
+		query.setParameter("roleId",roleId);
+		query.setParameter("ugId",ugId);
+		
+		UserGroupMemberRole ugmr = (UserGroupMemberRole) query.getSingleResult();
+		if(ugmr == null) return false;
+		else return true;
 	}
 
 	
