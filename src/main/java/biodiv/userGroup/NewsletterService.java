@@ -30,7 +30,7 @@ public class NewsletterService extends AbstractService<Newsletter>{
 	}
 	
 	public List<Map<String, Object>> getPages(Long ugId, Long max, Long offset, String sort, String order,
-			String currentLanguage, Map<String,Object> filterParams,Long userId) {
+			String currentLanguage, Map<String,Object> filterParams,Long userId,Boolean showInFooter) {
 		
 		User user;
 		if(userId != null){
@@ -60,6 +60,10 @@ public class NewsletterService extends AbstractService<Newsletter>{
 			nl.setSticky(true);
 		}
 		
+		if(showInFooter != null){
+			query += " and nl.showInFooter =:showInFooter";
+			nl.setShowInFooter(showInFooter);
+		}
 		if(currentLanguage != null){
 			Language language = null;
 			query += " and nl.language =:language";
@@ -91,10 +95,10 @@ public class NewsletterService extends AbstractService<Newsletter>{
 				query += " and nl.parentId =:parentId";
 				nl.setParentId((Long)filterParams.get("parentId"));
 			}
-			if(filterParams.get("showInFooter") != null){
-				query += " and nl.showInFooter =:showInFooter";
-				nl.setShowInFooter((Boolean)filterParams.get("showInFooter"));
-			}
+//			if(filterParams.get("showInFooter") != null){
+//				query += " and nl.showInFooter =:showInFooter";
+//				nl.setShowInFooter((Boolean)filterParams.get("showInFooter"));
+//			}
 		}
 		
 		if(max != null && max != -1){

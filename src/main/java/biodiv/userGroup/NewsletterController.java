@@ -39,8 +39,8 @@ public class NewsletterController {
 		filterParams.put("title", title);
 		filterParams.put("displayOrder", displayOrder);
 		filterParams.put("parentId", parentId);
-		filterParams.put("showInFooter", showInFooter);
-		List<Map<String, Object>> nl = newsletterService.getPages(ugId,max,offset,sort,order,currentLanguage,filterParams,userId);
+		//filterParams.put("showInFooter", showInFooter);
+		List<Map<String, Object>> nl = newsletterService.getPages(ugId,max,offset,sort,order,currentLanguage,filterParams,userId,showInFooter);
 		return nl;
 	}
 }
