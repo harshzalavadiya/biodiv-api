@@ -17,6 +17,8 @@ import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.DataObject;
 import biodiv.observation.ObservationService;
+import biodiv.user.Role;
+import biodiv.user.RoleService;
 import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.util.HibernateUtil;
@@ -27,13 +29,14 @@ public class UserGroupService extends AbstractService<UserGroup> {
 	
 	@Inject
 	ObservationService observationService;
-	
+	RoleService roleService;
 	
 	
 	private UserGroupDao userGroupDao;
 
 	public UserGroupService() {
 		this.userGroupDao = new UserGroupDao();
+		roleService = new RoleService();
 	}
 
 	@Override
@@ -277,5 +280,18 @@ public class UserGroupService extends AbstractService<UserGroup> {
 		name=name.trim();
 		UserGroup userGroup=userGroupDao.findByName(name);
 		return userGroup;
+	}
+	
+	public Boolean isFounder(UserGroup ug,Long userId){
+		
+		try{
+			Role role = roleService.findRoleByAuthority("ROLE_USERGROUP_FOUNDER");
+			Boolean founder = getDao().isFounder(ug.getId(),userId,role.getId());
+			return founder;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			
+		}	
 	}
 }
