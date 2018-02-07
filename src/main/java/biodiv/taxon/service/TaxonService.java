@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.elasticsearch.search.suggest.Suggest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,36 +209,11 @@ public class TaxonService extends AbstractService<Taxon> {
 	 * @return
 	 * dummy
 	 */
-	public List<Map<String, Object>> search(String term) {
+	public Object search(String term) {
 		
-//		try {
-//			taxonDao.openCurrentSession();
-//			List<Object[]> result = new ArrayList<Object[]>();
-//			
-//			result = taxonDao.search(term);
-//			
-//			List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
-//
-//			for (Object[] re : result) {
-//				Map<String, Object> res = new HashMap<String, Object>();
-//				res.put("name", (String) re[0]);
-//				res.put("status",(String) re[1]);
-//				res.put("position",(String) re[2]);
-//				res.put("id",(Long)re[3]);
-//				res.put("rank",(Integer)re[4]);
-//				results.add(res);
-//			}
-//			
-//			return results;
-//		} catch (Exception e) {
-//			throw e;
-//		} finally {
-//			taxonDao.closeCurrentSession();
-//		}
 		SearchTaxon searchTaxon=new SearchTaxon();
-		
-			 List<Map<String, Object>> name= searchTaxon.search(term);
-			return name;
+		Object name= searchTaxon.search(term);
+		return name;
 		
 		
 		
