@@ -1,10 +1,17 @@
 package biodiv.user;
 
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.pac4j.core.profile.CommonProfile;
 
 import biodiv.auth.register.RegistrationCode;
 import biodiv.common.AbstractService;
+import biodiv.common.Language;
+import biodiv.auth.AuthUtils;
 
 public class UserService extends AbstractService<User> {
 
@@ -62,4 +69,36 @@ public class UserService extends AbstractService<User> {
 		}
 	}
 
+    public CommonProfile createUserProfile(User user) {
+		if(user == null) return null;
+		try {
+            userDao.openCurrentSession();
+            Set<Role> roles = user.getRoles();
+            List authorities = new ArrayList();
+            for (Role role : roles) {
+                authorities.add(role.getAuthority()); 
+            }
+            return AuthUtils.createUserProfile(user.getId(), user.getName(), user.getEmail(), authorities);
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            userDao.closeCurrentSession();
+		}
+	}
+
+    public void updateUserProfile(CommonProfile profile, User user) {
+		try {
+            userDao.openCurrentSession();
+            Set<Role> roles = user.getRoles();
+            List authorities = new ArrayList();
+            for (Role role : roles) {
+                authorities.add(role.getAuthority()); 
+            }
+            AuthUtils.updateUserProfile(profile, user.getId(), user.getName(), user.getEmail(), authorities);
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            userDao.closeCurrentSession();
+		}
+	}
 }

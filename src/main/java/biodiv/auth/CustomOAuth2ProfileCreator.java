@@ -47,7 +47,7 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
             if(user == null) {
             	throwsException("Not a valid user");
             } else {
-            	AuthUtils.updateUserProfile(profile, user);
+            	userService.updateUserProfile(profile, user);
             }
             return profile;
         } catch (final OAuthException e) {

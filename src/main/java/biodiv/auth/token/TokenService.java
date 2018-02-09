@@ -10,6 +10,7 @@ import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.pac4j.core.profile.CommonProfile;
 
 import biodiv.auth.AuthUtils;
 import biodiv.auth.Constants;
@@ -226,5 +227,23 @@ public class TokenService extends AbstractService<Token> {
 			tokenDao.closeCurrentSession();
 		}
 	}
+
+	public CommonProfile createUserProfile(String refreshToken) {
+		try {
+            tokenDao.openCurrentSession();
+            Token refreshTokenInstance = findByValue(refreshToken);
+            if(refreshTokenInstance != null) {
+                User user = refreshTokenInstance.getUser();
+                return userService.createUserProfile(user);
+            } else {
+                return null;
+            }
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			tokenDao.closeCurrentSession();
+		}
+	}
+
 
 }

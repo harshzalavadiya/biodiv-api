@@ -46,7 +46,7 @@ public class SimpleUsernamePasswordAuthenticator implements Authenticator<Userna
         else if(!passwordEncoder.isPasswordValid(user.getPassword(), password, null)) {
         	throwsException("Password is not valid");
         } else {
-        	CommonProfile profile = AuthUtils.createUserProfile(user);
+        	CommonProfile profile = userService.createUserProfile(user);
         	log.debug("Setting profile in the context: "+profile);        	
         	credentials.setUserProfile(profile);
         }

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 import org.pac4j.core.config.Config;
 import org.pac4j.core.config.ConfigFactory;
@@ -47,22 +48,20 @@ public class AuthUtils {
 		return configFactory.build(properties);
 	}
 	
-	public static CommonProfile createUserProfile(User user) {
-		if(user == null) return null;
+	public static CommonProfile createUserProfile(Long userId, String username, String email, List authorities) {
 		CommonProfile profile = new CommonProfile();
-		updateUserProfile(profile, user);
+		updateUserProfile(profile, userId, username, email, authorities);
 		return profile;
 	}
 	
-	public static void updateUserProfile(CommonProfile profile, User user) {
-		if(user == null || profile == null) return;
-		profile.setId(user.getId());
-		profile.addAttribute(Pac4jConstants.USERNAME, user.getUsername());
-		profile.addAttribute(CommonProfileDefinition.EMAIL, user.getEmail());
+	public static void updateUserProfile(CommonProfile profile, Long userId, String username, String email, List authorities) {
+		if(profile == null) return;
+		profile.setId(userId);
+		profile.addAttribute(Pac4jConstants.USERNAME, username);
+		profile.addAttribute(CommonProfileDefinition.EMAIL, email);
 		profile.addAttribute(JwtClaims.EXPIRATION_TIME, getAccessTokenExpiryDate().getTime());
-		Set<Role> roles = user.getRoles();
-		for (Role role : roles) {
-			profile.addRole(role.getAuthority());
+		for (Object authority: authorities) {
+			profile.addRole((String)authority);
 		}
 	}
 
