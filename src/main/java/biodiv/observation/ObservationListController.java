@@ -122,7 +122,13 @@ public class ObservationListController {
 			@DefaultValue("0") @QueryParam("offset") Integer offset,
 			
 			@DefaultValue("")@QueryParam("geoAggregationField") String geoAggregationField,
-			@DefaultValue("1")@QueryParam("geoAggegationPrecision") Integer geoAggegationPrecision
+			@DefaultValue("1")@QueryParam("geoAggegationPrecision") Integer geoAggegationPrecision,
+			
+			@QueryParam("left") Double left,
+			@QueryParam("right") Double right,
+			@QueryParam("top") Double top,
+			@QueryParam("bottom") Double bottom
+			
 			) {
 		
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
@@ -341,7 +347,9 @@ public class ObservationListController {
 		if(!traits_15.isEmpty()){
 			boolAndLists.add(new MapAndBoolQuery("trait_15", traits_15));
 		}
-		
+		/**
+		 * lft, right, top bottom
+		 */
 		
 		
 		
@@ -357,7 +365,7 @@ public class ObservationListController {
 		
 		ObservationList observationList = new ObservationList();
 		
-		MapBiodivResponse mapResponse = observationList.search(index, type, mapSearchQuery, max, offset,sortOn, geoAggregationField, geoAggegationPrecision);
+		MapBiodivResponse mapResponse = observationList.search(index, type, mapSearchQuery, max, offset,sortOn, geoAggregationField, geoAggegationPrecision,left,right,top,bottom);
 		
 		return mapResponse;
 	}

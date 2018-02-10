@@ -41,6 +41,7 @@ public class SearchTaxon {
 		SearchResponse searchResponse=null;
 		try {
 			 searchResponse = client.search(searchRequest);
+			 client.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
