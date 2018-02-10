@@ -1,5 +1,8 @@
 package biodiv.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +63,14 @@ public class UserService extends AbstractService<User> {
 		} finally {
 			userDao.closeCurrentSessionWithTransaction();
 		}
+	}
+
+	public Map<String,Object> findAuthorSignature(User user) {
+			Map<String,Object> author = new HashMap<String,Object>();
+			author.put("id", user.getId());
+			author.put("icon", user.getIcon());
+			author.put("name",user.getName());
+			return author;
 	}
 
 }

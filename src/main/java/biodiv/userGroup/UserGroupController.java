@@ -87,7 +87,6 @@ public class UserGroupController {
 		return msg;
 	}
 	
-	
 	@Path("/{groupName}/{x}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object mapfunc(@PathParam("x") String x){	

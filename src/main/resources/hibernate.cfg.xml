@@ -85,7 +85,7 @@
 		<mapping class="biodiv.customField.CustomField"/>
 		<mapping class="biodiv.customField.CustomFieldsGroup18"/>
 		<mapping class="biodiv.userGroup.Newsletter"/>
-
+		<mapping class="biodiv.observation.RecoVoteDetails"/>
 	</session-factory>
 
 </hibernate-configuration>

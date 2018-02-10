@@ -203,4 +203,15 @@ public class CommentService extends AbstractService<Comment>{
 	private boolean isMainThread(Comment comment) {
 		return comment.getParentId() ==  null;
 	}
+
+	public Long getTotalRecoCommentCount(Long recoId, Long obvId) {
+		try{
+			Long totalCount = getDao().getTotalRecoCommentCount(recoId,obvId);
+			return totalCount;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			//
+		}
+	}
 }
