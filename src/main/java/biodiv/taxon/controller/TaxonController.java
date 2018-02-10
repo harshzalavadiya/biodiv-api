@@ -14,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.elasticsearch.search.suggest.Suggest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,9 +92,9 @@ public class TaxonController {
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
-	public List<Map<String, Object>> search(@QueryParam("term") String term){
+	public Object search(@QueryParam("term") String term){
         
-		 List<Map<String, Object>> name=taxonService.search(term);
+		 Object name=taxonService.search(term);
 		 return name;
 		
 	}

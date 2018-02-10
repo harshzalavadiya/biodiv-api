@@ -22,7 +22,6 @@
 		
 		
 		
-		
 		<!-- Disable the second-level cache -->
 		<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
 

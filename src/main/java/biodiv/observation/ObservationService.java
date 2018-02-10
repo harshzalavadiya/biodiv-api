@@ -76,10 +76,7 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 
-	public List<Map<String, Object>> list() {
-			List<Map<String, Object>> results = observationDao.list();
-		return results;
-	}
+	
 
 
 	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId) {
@@ -120,7 +117,7 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 
-	public Object updateGroup(Long userId,Long objectid, Long newgroupid,Long oldGroupId) {
+	public Object updateGroup(Long objectid, Long newgroupid,Long oldGroupId,Long userId) {
 		// TODO Auto-generated method stub
 		User user = userService.findById(userId);
 		Object obj;
@@ -130,8 +127,11 @@ public class ObservationService extends AbstractService<Observation> {
 		String oldSpeciesGroupName = oldSpeciesGroup.getName();
 		Observation obseravtion=show(objectid);
 		obj =  observationDao.updateGroup(obseravtion,speciesGroup);
+		
 		//activityFeed
+		
 		String activityDescription = oldSpeciesGroupName+" to "+newSpeciesGroupName;
+		System.out.println(activityDescription);
 		Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectid,obseravtion,
 				"species.participation.Observation","species.participation.Observation",objectid,"Observation species group updated",
 				"Species group updated",activityDescription,activityDescription,null,null,true,null);

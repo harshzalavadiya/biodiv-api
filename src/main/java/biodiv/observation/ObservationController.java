@@ -26,20 +26,7 @@ public class ObservationController {
 	@Inject
 	ObservationService observationService;
 
-	@GET
-	@Path("/list")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
-	public List<Map<String, Object>> list() {
-		List<Map<String, Object>> obvs = null;
-
-		try {
-			obvs = observationService.list();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return obvs;
-	}
+	
 
 	@GET
 	@Path("/{id}")
