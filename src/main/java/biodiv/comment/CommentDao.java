@@ -32,4 +32,21 @@ public class CommentDao extends AbstractDao<Comment,Long> implements DaoInterfac
 		return listResult;
 	}
 
+	public Long getTotalRecoCommentCount(Long recoId, Long obvId) {
+		String hql = "select count(*) from Comment c where c.commentHolderType =:commentHolderType and c.commentHolderId =:commentHolderId and"
+				+ " c.rootHolderType =:rootHolderType and c.rootHolderId =:rootHolderId";
+		
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("commentHolderType", "species.participation.Recommendation");
+		query.setParameter("commentHolderId", recoId);
+		query.setParameter("rootHolderType", "species.participation.Observation");
+		query.setParameter("rootHolderId", obvId);
+		System.out.println(recoId);
+		System.out.println(obvId);
+		Long count = (Long) query.getSingleResult();
+		System.out.println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+		System.out.println(count);
+		return count;
+	}
+
 }

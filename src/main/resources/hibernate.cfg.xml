@@ -17,8 +17,10 @@
 
 		<!-- SQL dialect -->
 		<property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
-		<property name="hibernate.dialect"> org.hibernate.spatial.dialect.postgis.PostgisDialect</property>
 		<property name="hibernate.dialect">biodiv.common.MyPostgreSQL93Dialect</property>
+		<property name="hibernate.dialect"> org.hibernate.spatial.dialect.postgis.PostgisDialect</property>
+		
+		
 		
 		
 		<!-- Disable the second-level cache -->
@@ -84,7 +86,7 @@
 		<mapping class="biodiv.customField.CustomField"/>
 		<mapping class="biodiv.customField.CustomFieldsGroup18"/>
 		<mapping class="biodiv.userGroup.Newsletter"/>
-
+		<mapping class="biodiv.observation.RecoVoteDetails"/>
 	</session-factory>
 
 </hibernate-configuration>

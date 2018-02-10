@@ -1,8 +1,10 @@
 package biodiv.observation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +34,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.vividsolutions.jts.geom.Geometry;
 
 import biodiv.common.DataObject;
+import biodiv.common.LanguageService;
 import biodiv.resource.Resource;
 import biodiv.userGroup.UserGroup;
 
@@ -514,6 +517,59 @@ public class Observation extends DataObject implements java.io.Serializable{
 
 	public String toString() {
 		return "Observation [id=" + id + "]";
+	}
+
+	
+	public static String getFormattedCommonNames(Map<String, Object> langToCommonName, Boolean addLanguage) {
+		if(langToCommonName.isEmpty()){
+			return "";
+		}
+		LanguageService languageService = new LanguageService();
+		System.out.println("langToCommonName "+langToCommonName);
+		Long englishId = 205L; // dont know
+		//System.out.println("remove "+langToCommonName.remove(englishId.toString()));
+		Set<Recommendation> englishNames = (Set<Recommendation>) langToCommonName.remove(englishId.toString());
+		System.out.println("langToCommonName "+langToCommonName);
+		
+		List<String> cnList = new ArrayList<String>();
+		
+		for(String key : langToCommonName.keySet()){
+			//System.out.println(langToCommonName.get(key));
+			String langSuffix = null;
+			Set<Recommendation> langInstance = (Set<Recommendation>) langToCommonName.get(key);
+			for(Recommendation reco : langInstance){
+				langSuffix = reco.getName()+",";
+			}
+			System.out.println("langSuffix "+langSuffix);
+			if (langSuffix.endsWith(",")) {
+				  langSuffix = langSuffix.substring(0, langSuffix.length() - 1);
+			}
+			System.out.println("langSuffix "+langSuffix);
+			if(addLanguage == true){
+				langSuffix = languageService.findById(Long.parseLong(key)).getName() + ": "+langSuffix;
+			}
+			cnList.add(langSuffix);
+		}
+		
+		String engNamesString = null;
+		if(!englishNames.isEmpty()){
+			for(Recommendation reco : englishNames){
+				engNamesString = reco.getName()+",";
+			}
+			System.out.println("engNamesString "+engNamesString);
+			if (engNamesString.endsWith(",")) {
+				  engNamesString = engNamesString.substring(0, engNamesString.length() - 1);
+			}
+			if(addLanguage == true){
+				engNamesString = languageService.findById(205L).getName() + ": "+engNamesString;
+			}
+		}
+		
+		if(engNamesString != null){
+			cnList.add(0,engNamesString);
+		}
+		String cNames = String.join(",", cnList);
+		return cNames;
 	}
 	
 	

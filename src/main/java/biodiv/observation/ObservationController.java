@@ -109,5 +109,16 @@ public class ObservationController {
 		Object observation=observationService.updateGroup(objectid,newGroupId,oldGroupId,Long.parseLong(profile.getId()));
 		return observation;
 	}
+	
+	@GET
+	@Path("/recommendationVotes")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
+	public Map<String,Object> getRecommendationVotes(@QueryParam("obvIds") String obvs){
+		
+		Map<String,Object> recoVotes = observationService.getRecommendationVotes(obvs);
+		return recoVotes;
+		
+	}
 
 }

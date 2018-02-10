@@ -86,4 +86,9 @@ public class AuthUtils {
 		System.out.println("Setting refresh token expiry to  : "+cal.toString());
 		return cal.getTime();
 	}
+
+	public static Boolean isLoggedIn() {
+		
+		return false;
+	}
 }
