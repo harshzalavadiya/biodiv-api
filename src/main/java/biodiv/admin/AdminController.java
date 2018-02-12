@@ -27,7 +27,7 @@ public class AdminController {
 	@POST
 	@Path("/{index}/uploadmapping")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Pac4JSecurity(clients = "headerClient", authorizers = "isAuthenticated")
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public void uploadMapping(@PathParam("index") String index,String settingsAndMappings){
 		
 		ObservationList observationList=new ObservationList();

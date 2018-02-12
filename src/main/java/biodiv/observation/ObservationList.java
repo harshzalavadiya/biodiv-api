@@ -113,10 +113,16 @@ public class ObservationList implements MapService {
 	
 
 	@Override
-	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision) {
+	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision,Double left, Double right, Double top, Double bottom) {
 		// TODO Auto-generated method stub
-		String newurl = URL+"naksha/services/search/" + index + "/" + type+"?from="+offset+"&limit="+max
+		String newurl= URL+"naksha/services/search/" + index + "/" + type+"?from="+offset+"&limit="+max
 				+"&geoAggregationField="+geoAggregationField +"&geoAggegationPrecision="+geoAggegationPrecision;
+		
+		if(left!=null &&right!=null && top!=null && bottom!=null){
+			 newurl += "&top="+top+"&bottom="+bottom+"&left="+left+"&right="+right;
+		}
+		 
+		
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 		MapBiodivResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);
 		

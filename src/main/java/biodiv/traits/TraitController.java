@@ -105,7 +105,7 @@ public class TraitController {
 	@Path("/fact/update")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
-	@Pac4JSecurity(clients = "headerClient", authorizers = "isAuthenticated")
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public Serializable list(@QueryParam("traits") String trait, @QueryParam("traitId") Long traitId,
 			@QueryParam("objectId") Long objectId, @QueryParam("objectType") String objectType,
 			@Pac4JProfile CommonProfile profile) {

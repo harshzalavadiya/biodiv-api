@@ -1,5 +1,13 @@
 package biodiv.observation;
 
+import java.lang.reflect.ParameterizedType;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.LongStream;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -63,6 +71,24 @@ class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterf
 		Object data=observationList.fetch("observation", "observations",observation.getId().toString());
 		return data;
 		
+	}
+
+	public List<Object[]> getRecommendationVotes(String q, Boolean singleObv, Long obvId,String allObvs) {
+		
+		String hql = q;
+		//LongStream obvs = Arrays.asList(allObvs.split(",")).stream().map(String::trim).mapToLong(Long::parseLong);
+		//List<Long> obvs =  Arrays.asList(allObvs.split(","));
+		Query query =  getCurrentSession().createSQLQuery(hql);
+		if(singleObv == true){
+			query.setParameter("obvId", obvId);
+		}else{
+			//query.setParameter("obvs",allObvs);
+		}
+		//query.setMaxResults(5);
+		List<Object[]> listResult = query.getResultList();
+		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		System.out.println(listResult.get(0));
+		return listResult;
 	}
 
 	

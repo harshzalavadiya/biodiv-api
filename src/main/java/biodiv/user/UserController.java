@@ -47,7 +47,7 @@ public class UserController {
 	@GET
 	@Path("/currentUserUserGroups")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	@Intercept
 	public List<UserGroup> currentUserUserGroups(@Pac4JProfile CommonProfile profile){
 		UserGroupService userGroupService = new UserGroupService();
