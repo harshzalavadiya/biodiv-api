@@ -44,6 +44,7 @@ public class CommentDao extends AbstractDao<Comment,Long> implements DaoInterfac
 		System.out.println(recoId);
 		System.out.println(obvId);
 		Long count = (Long) query.getSingleResult();
+		System.out.println(query.getSingleResult());
 		System.out.println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 		System.out.println(count);
 		return count;

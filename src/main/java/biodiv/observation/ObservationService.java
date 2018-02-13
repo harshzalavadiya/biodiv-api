@@ -183,7 +183,7 @@ public class ObservationService extends AbstractService<Observation> {
 				reco.put("name", obj[9]);
 				reco.put("isScientificName", obj[10]);
 				reco.put("languageId",  obj[11]);
-				reco.put("taxonConceptId", ((java.math.BigInteger) obj[12]).longValue());
+				reco.put("taxonConceptId",  obj[12]);
 				reco.put("normalizedForm", obj[13]);
 				reco.put("status", obj[14]);
 				reco.put("speciesId",  obj[15]);
