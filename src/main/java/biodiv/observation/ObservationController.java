@@ -67,7 +67,7 @@ public class ObservationController {
 	@POST
 	@Path("/updateCustomField")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	@Intercept
 	public String updateCustomField(@QueryParam("fieldValue") String fieldValue, @QueryParam("cfId") Long cfId,
 			@QueryParam("obvId") Long obvId,@Pac4JProfile CommonProfile profile){
@@ -89,7 +89,7 @@ public class ObservationController {
 	@Path("/updategroup")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Intercept
-	@Pac4JSecurity(clients = "headerClient", authorizers = "isAuthenticated")
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public Object updateGroup(@QueryParam("objectid") Long objectid,@QueryParam("newGroupId") Long newGroupId,
 			@QueryParam("oldGroupId") Long oldGroupId,@Pac4JProfile CommonProfile profile){
 		

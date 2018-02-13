@@ -162,8 +162,7 @@ public class ObservationService extends AbstractService<Observation> {
 			}
 			
 			List<Object[]> rv =  getDao().getRecommendationVotes(query,singleObv,obvIds[0],obvs);
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-			System.out.println(rv.get(0));
+		
 			//return rv;
 			List<Map<String,Object>> recoVotes = new ArrayList<Map<String,Object>>();
 			

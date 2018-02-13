@@ -22,7 +22,7 @@ public class CommentController {
 	@POST
 	@Path("/addComment")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	@Intercept
 	public String addComment(@QueryParam("commentId") Long commentId,@QueryParam("commentBody") String commentBody,@QueryParam("tagUserId") String tagUserId,
 			@QueryParam("commentHolderId") Long commentHolderId,@QueryParam("commentHolderType") String commentHolderType,
@@ -46,7 +46,7 @@ public class CommentController {
 	@POST
 	@Path("/removeComment")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Pac4JSecurity(clients="headerClient", authorizers = "isAuthenticated")
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	@Intercept
 	public String removeComment(@QueryParam("commentId") Long commentId,@Pac4JProfile CommonProfile profile){
 		String msg;
