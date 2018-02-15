@@ -1,6 +1,7 @@
 package biodiv.userGroup;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +19,6 @@ import biodiv.activityFeed.ActivityFeed;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.DataObject;
-import biodiv.observation.ObservationService;
 import biodiv.user.Role;
 import biodiv.user.RoleService;
 import biodiv.user.User;
@@ -30,25 +30,22 @@ public class UserGroupService extends AbstractService<UserGroup> {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	private UserGroupDao userGroupDao;
-
-	@Inject
-	private ObservationService observationService;
-
 	@Inject
 	private RoleService roleService;
 
 	@Inject
-	private UserService userService;
+	UserService userService;
 
 	@Inject
-	private ActivityFeedService activityFeedService;
+	ActivityFeedService activityFeedService;
+
+	private UserGroupDao userGroupDao;
 
 	@Inject
 	UserGroupService(UserGroupDao userGroupDao) {
 		super(userGroupDao);
 		this.userGroupDao = userGroupDao;
-		System.out.println("UserGroupService constructor");
+		log.trace("UserGroupService constructor");
 	}
 
 	@Transactional
@@ -128,13 +125,14 @@ public class UserGroupService extends AbstractService<UserGroup> {
 			// System.out.println(abc[0]);
 
 			// System.out.println(UserGroup.splitBytes(objects,3));
+			Date dateCreated = new Date();
+			Date lastUpdated = dateCreated;
 
 			User user = userService.findById((Long) userId);
 			User admin = userService.findById((long) 1);
 			List<UserGroup> allowedUsrGrps = userUserGroups(userId);
 			Set<UserGroup> allowed = new HashSet<UserGroup>(allowedUsrGrps);
 			Set<UserGroup> userGroupsWithFilterRule = findAllByFilterRuleIsNotNull();
-			System.out.println("ObservationService class");
 
 			long i = 1;
 
@@ -178,7 +176,7 @@ public class UserGroupService extends AbstractService<UserGroup> {
 						String name = ug.getName();
 						Map<String, Object> afNew = activityFeedService.createMapforAf("Object", object, dataObj, null,
 								"species.groups.UserGroup", ugId, "Posted resource", activityDescription,
-								activityDescription, null, name, "UserGroup", true, null);
+								activityDescription, null, name, "UserGroup", true, null, dateCreated, lastUpdated);
 						activityFeedService.addActivityFeed(user, afNew, dataObj, null);
 						if (pullType.equalsIgnoreCase("bulk")) {
 							groupFeed_ByUser.merge(ugId, (long) 1, Long::sum);
@@ -191,7 +189,7 @@ public class UserGroupService extends AbstractService<UserGroup> {
 						String name = ug.getName();
 						Map<String, Object> afNew = activityFeedService.createMapforAf("Object", object, dataObj, null,
 								"species.groups.UserGroup", ugId, "Posted resource", activityDescription,
-								activityDescription, null, name, "UserGroup", true, null);
+								activityDescription, null, name, "UserGroup", true, null, dateCreated, lastUpdated);
 						activityFeedService.addActivityFeed(admin, afNew, dataObj, null);
 						if (pullType.equalsIgnoreCase("bulk")) {
 							groupFeed_ByAdmin.merge(ugId, (long) 1, Long::sum);
@@ -205,7 +203,7 @@ public class UserGroupService extends AbstractService<UserGroup> {
 						String name = ug.getName();
 						Map<String, Object> afNew = activityFeedService.createMapforAf("Object", object, dataObj, null,
 								"species.groups.UserGroup", ugId, "Removed resoruce", activityDescription,
-								activityDescription, null, name, "UserGroup", true, null);
+								activityDescription, null, name, "UserGroup", true, null, dateCreated, lastUpdated);
 						activityFeedService.addActivityFeed(user, afNew, dataObj, null);
 						if (pullType.equalsIgnoreCase("bulk")) {
 							groupFeed_ByUser.merge(ugId, (long) 1, Long::sum);
@@ -233,7 +231,7 @@ public class UserGroupService extends AbstractService<UserGroup> {
 								"UserGroup", countOfObjs);
 						Map<String, Object> afNew = activityFeedService.createMapforAf("UserGroup", ugId, typeOfObject,
 								null, "species.groups.UserGroup", ugId, "Posted resource", description, description,
-								null, name, "UserGroup", true, null);
+								null, name, "UserGroup", true, null, dateCreated, lastUpdated);
 						activityFeedService.addActivityFeed(user, afNew, null, null);
 					}
 
@@ -245,7 +243,7 @@ public class UserGroupService extends AbstractService<UserGroup> {
 								"UserGroup", countOfObjs);
 						Map<String, Object> afNew = activityFeedService.createMapforAf("UserGroup", ugId, typeOfObject,
 								null, "species.groups.UserGroup", ugId, "Posted resource", description, description,
-								null, name, "UserGroup", true, null);
+								null, name, "UserGroup", true, null, dateCreated, lastUpdated);
 						activityFeedService.addActivityFeed(admin, afNew, null, null);
 					}
 				} else {
@@ -257,7 +255,7 @@ public class UserGroupService extends AbstractService<UserGroup> {
 								"UserGroup", countOfObjs);
 						Map<String, Object> afNew = activityFeedService.createMapforAf("UserGroup", ugId, typeOfObject,
 								null, "species.groups.UserGroup", ugId, "Removed resoruce", description, description,
-								null, name, "UserGroup", true, null);
+								null, name, "UserGroup", true, null, dateCreated, lastUpdated);
 						activityFeedService.addActivityFeed(user, afNew, null, null);
 					}
 

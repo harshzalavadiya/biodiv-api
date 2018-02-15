@@ -126,19 +126,19 @@ public class ObservationService extends AbstractService<Observation> {
 		String newSpeciesGroupName = speciesGroup.getName();
 		SpeciesGroup oldSpeciesGroup = speciesGroupService.findById(oldGroupId);
 		String oldSpeciesGroupName = oldSpeciesGroup.getName();
-		Observation obseravtion = show(objectid);
-		obj = observationDao.updateGroup(obseravtion, speciesGroup);
-
-		// activityFeed
-
-		String activityDescription = oldSpeciesGroupName + " to " + newSpeciesGroupName;
+		Observation obseravtion=show(objectid);
+		obj =  observationDao.updateGroup(obseravtion,speciesGroup);
+		
+		//activityFeed
+		Date dateCreated = new java.util.Date();
+		Date lastUpdated = dateCreated;
+		String activityDescription = oldSpeciesGroupName+" to "+newSpeciesGroupName;
 		System.out.println(activityDescription);
-		Map<String, Object> afNew = activityFeedService.createMapforAf("Object", objectid, obseravtion,
-				"species.participation.Observation", "species.participation.Observation", objectid,
-				"Observation species group updated", "Species group updated", activityDescription, activityDescription,
-				null, null, true, null);
-		activityFeedService.addActivityFeed(user, afNew, obseravtion, (String) afNew.get("rootHolderType"));
-		// activityFeed
+		Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectid,obseravtion,
+				"species.participation.Observation","species.participation.Observation",objectid,"Observation species group updated",
+				"Species group updated",activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
+		activityFeedService.addActivityFeed(user,afNew,obseravtion,(String)afNew.get("rootHolderType"));
+		//activityFeed
 		return obj;
 	}
 
@@ -183,8 +183,8 @@ public class ObservationService extends AbstractService<Observation> {
 				reco.put("recoId", ((java.math.BigInteger) obj[8]).longValue());
 				reco.put("name", obj[9]);
 				reco.put("isScientificName", obj[10]);
-				reco.put("languageId", obj[11]);
-				reco.put("taxonConceptId", ((java.math.BigInteger) obj[12]).longValue());
+				reco.put("languageId",  obj[11]);
+				reco.put("taxonConceptId",  obj[12]);
 				reco.put("normalizedForm", obj[13]);
 				reco.put("status", obj[14]);
 				reco.put("speciesId", obj[15]);
