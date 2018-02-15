@@ -2,6 +2,7 @@ package biodiv.customField;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,8 @@ public class CustomFieldService extends AbstractService<CustomField> {
 	
 		try{
 			
+			Date dateCreated = new Date();
+			Date lastUpdated = dateCreated;
 			CustomField cf = findById(cfId);
 			if(cf == null){
 				return "cf not found error";
@@ -65,7 +68,7 @@ public class CustomFieldService extends AbstractService<CustomField> {
 						String description = activityDescription;
 						Map<String, Object> afNew = activityFeedService.createMapforAf("Object",obvId,null,
 								"species.participation.Observation","species.participation.Observation",obvId,
-								"Custom field edited","Custom field edited",activityDescription,description,null,null,true,null);
+								"Custom field edited","Custom field edited",activityDescription,description,null,null,true,null,dateCreated,lastUpdated);
 						
 						activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
 					}

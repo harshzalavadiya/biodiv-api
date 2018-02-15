@@ -171,14 +171,15 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 	}
 	
 	public  Map<String, Object> createMapforAf(String rootType,Long rhId,Object rootHolder,String rootHolderTyp,String activityHolderType,Long activityHolderId,
-			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isShowable,Long subRootId) {
+			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isShowable,Long subRootId,
+			Date dateCreated,Date lastUpdated) {
 		
 		//String activityDescrption;
 	    //Long activityHolderId ;  
 		//String activityHolderType ;
 		//String activityType ;
-		Date dateCreated = new java.util.Date();
-		Date lastUpdated = new java.util.Date();
+		//Date dateCreated = new java.util.Date();
+		//Date lastUpdated = new java.util.Date();
 		
 		
 

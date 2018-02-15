@@ -129,12 +129,13 @@ public class ObservationService extends AbstractService<Observation> {
 		obj =  observationDao.updateGroup(obseravtion,speciesGroup);
 		
 		//activityFeed
-		
+		Date dateCreated = new java.util.Date();
+		Date lastUpdated = dateCreated;
 		String activityDescription = oldSpeciesGroupName+" to "+newSpeciesGroupName;
 		System.out.println(activityDescription);
 		Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectid,obseravtion,
 				"species.participation.Observation","species.participation.Observation",objectid,"Observation species group updated",
-				"Species group updated",activityDescription,activityDescription,null,null,true,null);
+				"Species group updated",activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
 		activityFeedService.addActivityFeed(user,afNew,obseravtion,(String)afNew.get("rootHolderType"));
 		//activityFeed
 		return obj;

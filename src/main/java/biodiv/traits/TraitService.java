@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import javax.ws.rs.NotFoundException;
 
 import org.pac4j.core.profile.CommonProfile;
 
+import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
 import biodiv.common.License;
@@ -25,10 +27,12 @@ public class TraitService extends AbstractService<Trait> {
 	private static final String multiple_category = "MULTIPLE_CATEGORICAL";
 	private static final String range_category = "RANGE";
 
+	ActivityFeedService activityFeedService;
 	public TraitService() {
 
 		// TODO Auto-generated constructor stub
 		this.traitDao = new TraitDao();
+		activityFeedService = new ActivityFeedService();
 	}
 
 	@Override
@@ -134,7 +138,7 @@ public class TraitService extends AbstractService<Trait> {
 			listFact = traitDao.getFact(objectId, objectType, traitId);
 
 			Fact fact1 = new Fact();
-
+			
 			if (listFact.size() == 0) {
 				Fact newupdated = new Fact();
 				newupdated.setFromDate(new Date());
@@ -186,11 +190,25 @@ public class TraitService extends AbstractService<Trait> {
 				 * Updating fact Table
 				 */
 				newupdated.save();
+				
+				
+				//activityFeed
+				Long factId = newupdated.getId();
+				Date dateCreated = new java.util.Date();
+				Date lastUpdated = dateCreated;
+				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
+				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
+						"species.participation.Observation","species.trait.Fact",factId,"Added a fact",
+						"Added a fact",activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
+				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
+				//activityFeed
 
 			} else {
-
+					
 				int Deleteresult = traitDao.deleteFact(objectId, objectType, traitId);
 				Fact newupdated = new Fact();
+				User user=new User();
+				User s =  (User) user.get(Long.parseLong(profile.getId()));
 				for (Fact fact : listFact) {
 
 					newupdated.setFromDate(new Date());
@@ -219,13 +237,23 @@ public class TraitService extends AbstractService<Trait> {
 							return null;
 						}
 					}
-					User user=new User();
-					User s =  (User) user.get(Long.parseLong(profile.getId()));
+					
 					newupdated.setUser(s);
 					newupdated.setVersion(fact.getVersion() + 1L);
 
 				}
 				newupdated.save();
+				
+				//activityFeed
+				Long factId = newupdated.getId();
+				Date dateCreated = new java.util.Date();
+				Date lastUpdated = dateCreated;
+				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
+				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
+						"species.participation.Observation","species.trait.Fact",factId,"Updated fact",
+						"Updated fact",activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
+				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
+				//activityFeed
 			}
 
 		} else if (trait.getTraitTypes().equalsIgnoreCase(multiple_category)) {
@@ -240,7 +268,7 @@ public class TraitService extends AbstractService<Trait> {
 
 			User user=new User();
 			User s =  (User) user.get(Long.parseLong(profile.getId()));
-
+			String activityType = Deleteresult == 0?"Added a fact":"Updated fact";
 			for (Long traitValue : traitValues) {
 				Fact newupdated = new Fact();
 				newupdated.setFromDate(new Date());
@@ -270,7 +298,17 @@ public class TraitService extends AbstractService<Trait> {
 				newupdated.setVersion(0L);
 
 				newupdated.save();
-
+				
+				//activityFeed
+				Long factId = newupdated.getId();
+				Date dateCreated = new java.util.Date();
+				Date lastUpdated = dateCreated;
+				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
+				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
+						"species.participation.Observation","species.trait.Fact",factId,activityType,
+						activityType,activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
+				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
+				//activityFeed
 			}
 
 		}

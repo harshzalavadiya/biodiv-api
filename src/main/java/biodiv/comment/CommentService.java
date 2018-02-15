@@ -61,8 +61,8 @@ public class CommentService extends AbstractService<Comment>{
 		try{
 			Language lang = languageService.findByTwoLetterCode(userLang);
 			User user = userService.findById((Long)userId);
-			Date dateCreated = new java.util.Date();
-			Date lastUpdated = new java.util.Date();
+			Date dateCreated = new java.util.Date(newerTimeRef);
+			Date lastUpdated = new java.util.Date(newerTimeRef);
 			//Timestamp refTym = new java.sql.Timestamp(newerTimeRef);
 			
 			if(parentId != null){
@@ -109,7 +109,7 @@ public class CommentService extends AbstractService<Comment>{
 						Long subRootId = isMainThread(c)?activityHolderId:fetchMainThreadId(c);
 						Map<String, Object> afNew = activityFeedService.createMapforAf("Object",rootHolderId,null,
 									rootHolderType,"species.participation.Comment",activityHolderId,
-									"Added a comment","Added a comment",activityDescription,null,null,null,true,subRootId);
+									"Added a comment","Added a comment",activityDescription,null,null,null,true,subRootId,dateCreated,lastUpdated);
 							
 						activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
 	 
