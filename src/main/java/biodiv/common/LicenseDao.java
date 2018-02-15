@@ -1,13 +1,9 @@
-package biodiv.license;
+package biodiv.common;
 
 import java.util.List;
 
 import javax.persistence.Query;
 import javax.ws.rs.NotFoundException;
-
-import biodiv.common.AbstractDao;
-import biodiv.common.DaoInterface;
-import biodiv.common.License;
 
 public class LicenseDao extends AbstractDao<License, Long> implements DaoInterface<License, Long>{
 

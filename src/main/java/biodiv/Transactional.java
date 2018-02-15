@@ -5,8 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.CONSTRUCTOR, ElementType.METHOD })
+@Target({ ElementType.METHOD })
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface Intercept {
+public @interface Transactional {
 	
 }

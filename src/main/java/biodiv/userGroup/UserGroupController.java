@@ -17,7 +17,7 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
-import biodiv.Intercept;
+import biodiv.Transactional;
 import biodiv.observation.ObservationService;
 import biodiv.user.User;
 
@@ -54,7 +54,7 @@ public class UserGroupController {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public UserGroup show(@PathParam("id") long id){
 		UserGroup usrGrp = userGroupService.findById(Long.valueOf(id));
 		return usrGrp;
@@ -62,7 +62,7 @@ public class UserGroupController {
 	@GET
 	@Path("/find/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public UserGroup show(@PathParam("name") String name){
 		UserGroup usrGrp = userGroupService.findByName(name);
 		return usrGrp;
@@ -80,7 +80,7 @@ public class UserGroupController {
 	@Path("/bulkPost")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
-	@Intercept
+	@Transactional
 	public String bulkPost(@QueryParam("pullType") String pullType,@QueryParam("selectionType") String selectionType,@QueryParam("objectType") String objectType,@QueryParam("objectIds") String objectIds,@QueryParam("submitType") String submitType,@QueryParam("userGroups") String userGroups,@QueryParam("filterUrl") String filterUrl,@Pac4JProfile CommonProfile profile) throws NumberFormatException, Exception{
 		String msg = userGroupService.posttoGroups(objectType,pullType,submitType,objectIds,userGroups, Long.parseLong(profile.getId()),filterUrl);
 		//observationService.update(obv);

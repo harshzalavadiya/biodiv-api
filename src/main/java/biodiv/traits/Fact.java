@@ -26,7 +26,7 @@ import biodiv.user.User;
  */
 @Entity
 @Table(name = "fact", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = { "object_id",
-		"page_taxon_id", "trait_id", "trait_value_id" }))
+		"page_taxon_id", "trait_instance_id", "trait_value_id" }))
 public class Fact extends CommonMethod implements java.io.Serializable {
 	private long id;
 	private long version;
@@ -124,7 +124,7 @@ public class Fact extends CommonMethod implements java.io.Serializable {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trait_id", nullable = false)
+	@JoinColumn(name = "trait_instance_id", nullable = false)
 	public Trait getTrait() {
 		return this.trait;
 	}

@@ -1,4 +1,4 @@
-package biodiv.traits;
+package biodiv.common;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

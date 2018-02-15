@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -48,8 +49,9 @@ import biodiv.userGroup.UserGroup;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Observation extends DataObject implements java.io.Serializable{
 	
-//	@Inject
-//	ObservationService observationService;
+	@Inject
+	LanguageService languageService;
+
 	public static final String QUERY_SELECT_BY_ID = "Observation.findById";
 	public static final String PARAM_ID = "id";
 
@@ -520,11 +522,10 @@ public class Observation extends DataObject implements java.io.Serializable{
 	}
 
 	
-	public static String getFormattedCommonNames(Map<String, Object> langToCommonName, Boolean addLanguage) {
+	public static String getFormattedCommonNames(Map<String, Object> langToCommonName, Boolean addLanguage, LanguageService langService) {
 		if(langToCommonName.isEmpty()){
 			return "";
 		}
-		LanguageService languageService = new LanguageService();
 		System.out.println("langToCommonName "+langToCommonName);
 		Long englishId = 205L; // dont know
 		//System.out.println("remove "+langToCommonName.remove(englishId.toString()));
@@ -546,7 +547,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 			}
 			System.out.println("langSuffix "+langSuffix);
 			if(addLanguage == true){
-				langSuffix = languageService.findById(Long.parseLong(key)).getName() + ": "+langSuffix;
+				langSuffix = langService.findById(Long.parseLong(key)).getName() + ": "+langSuffix;
 			}
 			cnList.add(langSuffix);
 		}
@@ -561,7 +562,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 				  engNamesString = engNamesString.substring(0, engNamesString.length() - 1);
 			}
 			if(addLanguage == true){
-				engNamesString = languageService.findById(205L).getName() + ": "+engNamesString;
+				engNamesString = langService.findById(205L).getName() + ": "+engNamesString;
 			}
 		}
 		

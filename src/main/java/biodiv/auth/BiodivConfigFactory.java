@@ -1,5 +1,7 @@
 package biodiv.auth;
 
+import javax.inject.Inject;
+
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
@@ -12,12 +14,14 @@ import org.pac4j.http.client.direct.HeaderClient;
 
 public class BiodivConfigFactory implements ConfigFactory {
 
+//	@Inject
+//	private SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator;
+
 	@Override
 	public Config build(Object... parameters) {
+		Config config = null;
+	/*	System.out.println("building security configuration...");
 		
-		System.out.println("building security configuration...");
-		
-		final Authenticator<UsernamePasswordCredentials> usernamePasswordAuthenticator = new SimpleUsernamePasswordAuthenticator();
 		final DirectFormClient directFormClient = new DirectFormClient("username", "password",
 				usernamePasswordAuthenticator);
 		
@@ -52,7 +56,7 @@ public class BiodivConfigFactory implements ConfigFactory {
 		//config.addAuthorizer("custom", new CustomAuthorizer());
 		
 		
-		
+*/		
 		return config;
 	}
 

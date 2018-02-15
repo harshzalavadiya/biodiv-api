@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -16,23 +17,23 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
-import biodiv.Intercept;
+import biodiv.Transactional;
 
 @Path("/newsletters")
 public class NewsletterController {
 	
-	NewsletterService newsletterService = new NewsletterService();
+	@Inject
+	NewsletterService newsletterService;
 
 	@GET
 	@Path("/pages")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
 	public List<Map<String, Object>> getPages(@QueryParam("userGroupId") Long ugId,@QueryParam("max") Long max,@QueryParam("offset") Long offset,
 			@QueryParam("sort") String sort,@QueryParam("order") String order,@QueryParam("currentLanguage") String currentLanguage,
 			@QueryParam("date") Date date,@QueryParam("newsitem") String newsitem,@QueryParam("title") String title,
 			@QueryParam("displayOrder") Integer displayOrder,@QueryParam("parentId") Long parentId,@QueryParam("showInFooter") Boolean showInFooter,
 			@QueryParam("userId") Long userId){
-		
+		System.out.println("getPages");
 		Map<String,Object> filterParams = new HashMap<String,Object>();
 		filterParams.put("date", date);
 		filterParams.put("newsitem", newsitem);

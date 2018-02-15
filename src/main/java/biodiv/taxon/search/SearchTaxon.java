@@ -1,11 +1,11 @@
 package biodiv.taxon.search;
 
-
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.apache.http.HttpHost;
 
@@ -18,32 +18,30 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-
 import biodiv.taxon.service.TaxonService;
 
 public class SearchTaxon {
 
-	TaxonService taxonService = new TaxonService();
+	@Inject
+	TaxonService taxonService;
 
 	public Object search(String data) {
 		RestHighLevelClient client = new RestHighLevelClient(
-		        RestClient.builder(
-		                new HttpHost("localhost", 9200, "http")));
-		
-	
-		SearchRequest searchRequest = new SearchRequest("taxon"); 
+				RestClient.builder(new HttpHost("localhost", 9200, "http")));
+
+		SearchRequest searchRequest = new SearchRequest("taxon");
 		searchRequest.types("taxon");
-	
-		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder(); 
-		sourceBuilder.query(QueryBuilders.matchQuery("name", data)); 
-		//sourceBuilder.sort(new FieldSortBuilder("name").order(org.elasticsearch.search.sort.SortOrder.ASC));
+
+		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+		sourceBuilder.query(QueryBuilders.matchQuery("name", data));
+		// sourceBuilder.sort(new
+		// FieldSortBuilder("name").order(org.elasticsearch.search.sort.SortOrder.ASC));
 		searchRequest.source(sourceBuilder);
-		SearchResponse searchResponse=null;
+		SearchResponse searchResponse = null;
 		try {
-			 searchResponse = client.search(searchRequest);
-			 client.close();
+			searchResponse = client.search(searchRequest);
+			client.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		SearchHits hits = searchResponse.getHits();
@@ -52,11 +50,8 @@ public class SearchTaxon {
 		for (SearchHit hit : searchHits) {
 			esData.add(hit.getSourceAsMap());
 		}
-		
-		
+
 		return esData;
-		
-		
 
 	}
 }

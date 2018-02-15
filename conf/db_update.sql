@@ -87,12 +87,12 @@ where row.aid = id and activity_type = 'UnFeatured' and activity_holder_type = '
 update activity_feed
 set description_json = row_to_json(row)
 from ( select af.id as aid , af.activity_descrption as description ,'Removed featured observation in' as activity_performed , 'India Biodiversity Portal' as name , 'true' as is_migrated from activity_feed af) row
-where row.aid = id and activity_type = 'UnFeatured' and activity_holder_type = 'species.participation.Observation' root_holder_type='species.participation.Observation';
+where row.aid = id and activity_type = 'UnFeatured' and activity_holder_type = 'species.participation.Observation' and root_holder_type='species.participation.Observation';
 
  update activity_feed
 set description_json = row_to_json(row)
 from ( select af.id as aid , af.activity_descrption as description ,'Featured observation to group' as activity_performed , ug.name as name ,af.activity_holder_id as ro_id, 'true' as is_migrated from activity_feed af inner join user_group ug on af.activity_holder_id = ug.id) row
-where row.aid = id and activity_type = 'Featured' and activity_holder_type = 'species.groups.UserGroup' root_holder_type='species.participation.Observation';
+where row.aid = id and activity_type = 'Featured' and activity_holder_type = 'species.groups.UserGroup' and root_holder_type='species.participation.Observation';
 
 update activity_feed
 set description_json = row_to_json(row)
@@ -190,10 +190,11 @@ where row.aid = id and activity_type = 'Observation species group updated' and r
 #repeat for all usergroups with filter rules
 
 #Assam filter rule
-\o '/tmp/4256157_geometry.txt'
+\o '/tmp/4087136_geometry.txt'
 select filter_rule from user_group where id=4087136;
-vim '/tmp/4256157_geometry.txt'
-\set content `cat /tmp/assam_geometry.txt`
+\q
+vim '/tmp/4087136_geometry.txt'
+\set content `cat /tmp/4087136_geometry.txt`
 update user_group set filter_rule=:'content' where id=4087136;
 
 #Konkan filter rule

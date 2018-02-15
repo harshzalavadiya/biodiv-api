@@ -16,7 +16,7 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
-import biodiv.Intercept;
+import biodiv.Transactional;
 import biodiv.common.DataObject;
 import biodiv.userGroup.UserGroup;
 
@@ -31,7 +31,7 @@ public class ObservationController {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public Observation show(@PathParam("id") long id) {
 		
 		try {
@@ -57,7 +57,7 @@ public class ObservationController {
 	@GET
 	@Path("/customFields")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public List<Map<String,Object>> getCustomFields(@QueryParam("obvId") Long obvId){
 		
 		List<Map<String,Object>> cf = observationService.getCustomFields(obvId);
@@ -68,7 +68,7 @@ public class ObservationController {
 	@Path("/updateCustomField")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
-	@Intercept
+	@Transactional
 	public String updateCustomField(@QueryParam("fieldValue") String fieldValue, @QueryParam("cfId") Long cfId,
 			@QueryParam("obvId") Long obvId,@Pac4JProfile CommonProfile profile){
 		
@@ -80,7 +80,7 @@ public class ObservationController {
 	@GET
 	@Path("/resource/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public List<ObservationResource> getResource(@PathParam("id") long id) {
 		List<ObservationResource> observationResources = observationService.getResouce(id);
 		return observationResources;
@@ -88,7 +88,7 @@ public class ObservationController {
 	@POST
 	@Path("/updategroup")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public Object updateGroup(@QueryParam("objectid") Long objectid,@QueryParam("newGroupId") Long newGroupId,
 			@QueryParam("oldGroupId") Long oldGroupId,@Pac4JProfile CommonProfile profile){
@@ -100,7 +100,7 @@ public class ObservationController {
 	@GET
 	@Path("/recommendationVotes")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public Map<String,Object> getRecommendationVotes(@QueryParam("obvIds") String obvs){
 		
 		Map<String,Object> recoVotes = observationService.getRecommendationVotes(obvs);

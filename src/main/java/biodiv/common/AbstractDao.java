@@ -32,8 +32,7 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	}
 
 
-	public Session openCurrentSession() {
-		
+	public Session openCurrentSession() {		
 		currentSession = HibernateUtil.getSessionFactory().openSession();
 		return currentSession;
 	}
@@ -45,7 +44,6 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	}
 
 	public void closeCurrentSession() {
-		System.out.println("ABJINAVVVVVVVVVVVVVVVVvvvvvvvvvvvvv");
 		//HibernateUtil.getSessionFactory().getCurrentSession().close();
 	}
 

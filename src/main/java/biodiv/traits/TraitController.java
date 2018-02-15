@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -18,18 +19,25 @@ import javax.ws.rs.core.MediaType;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import biodiv.Intercept;
+import biodiv.Transactional;
 import biodiv.taxon.service.TaxonService;
 
 @Path("/trait")
 
 public class TraitController {
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private static final String IBP = "IBP Taxonomy Hierarchy";
 
-	TraitService traitService = new TraitService();
-	TaxonService taxonService = new TaxonService();
+	@Inject
+	private TraitService traitService;
+	
+	@Inject
+	private TaxonService taxonService;
 
 	/**
 	 * 
@@ -52,7 +60,7 @@ public class TraitController {
 	@GET
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public List<TraitFactUi> list(@QueryParam("sGroup") Long sGroup,
 			@QueryParam("classification") Long classificationId,
 			@DefaultValue("false") @QueryParam("isNotObservationTrait") Boolean isNotObservationTrait,
@@ -78,7 +86,7 @@ public class TraitController {
 	@GET
 	@Path("/observation/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public List<Fact> slist(@PathParam("id") Long id,
 			@DefaultValue("species.participation.Observation") @QueryParam("objectType") String objectType) {
 
@@ -104,7 +112,7 @@ public class TraitController {
 	@POST
 	@Path("/fact/update")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public Serializable list(@QueryParam("traits") String trait, @QueryParam("traitId") Long traitId,
 			@QueryParam("objectId") Long objectId, @QueryParam("objectType") String objectType,
@@ -136,7 +144,7 @@ public class TraitController {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public Trait list(@PathParam("id") Long id) {
 		Trait result = traitService.list(id);
 		return result;
@@ -152,7 +160,7 @@ public class TraitController {
 	@GET
 	@Path("fact/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public Fact listFact(@PathParam("id") Long id) {
 		Fact result = traitService.listFact(id);
 		return result;
@@ -162,7 +170,7 @@ public class TraitController {
 	@GET
 	@Path("observation/list")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public List<Trait> listObservationTrait(){
 		List<Trait> results=traitService.listObservationTrait();
 		return results;
@@ -170,7 +178,7 @@ public class TraitController {
 	@GET
 	@Path("/traitvalue/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public List<TraitValue> getTraitValue(@PathParam("id") Long id){
 		List<TraitValue> results=traitService.getTraitValue(id);
 		return results;

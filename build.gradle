@@ -96,7 +96,12 @@ dependencies {
 	
 	
 	// https://mvnrepository.com/artifact/org.glassfish.hk2/hk2
-	compile group: 'org.glassfish.hk2', name: 'hk2', version: '2.4.0-b10'
+	//compile group: 'org.glassfish.hk2', name: 'hk2', version: '2.4.0-b10'
+	
+	compile group:'com.google.inject', name:'guice', version:'4.1.0'
+	compile group:'com.google.inject.extensions', name:'guice-servlet', version:'4.1.0'
+	compile group:'com.google.inject.extensions', name:'guice-persist', version:'4.1.0'
+	compile group: 'org.glassfish.hk2', name: 'guice-bridge', version: '2.2.0-b14'
 	
 	// https://mvnrepository.com/artifact/org.json/json
 	compile group: 'org.json', name: 'json', version: '20160810'

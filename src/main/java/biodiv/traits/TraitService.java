@@ -8,32 +8,38 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 
+import org.jvnet.hk2.annotations.Service;
 import org.pac4j.core.profile.CommonProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
 import biodiv.common.License;
-import biodiv.license.LicenseService;
+import biodiv.common.LicenseService;
 import biodiv.user.User;
 
+@Service
 public class TraitService extends AbstractService<Trait> {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private TraitDao traitDao;
 	private static final String single_category = "SINGLE_CATEGORICAL";
 	private static final String multiple_category = "MULTIPLE_CATEGORICAL";
 	private static final String range_category = "RANGE";
 
-	public TraitService() {
-
-		// TODO Auto-generated constructor stub
-		this.traitDao = new TraitDao();
-	}
-
-	@Override
-	public AbstractDao<Trait, Long> getDao() {
-		return traitDao;
+	@Inject
+	private LicenseService licenceService;
+	
+	@Inject
+	public TraitService(TraitDao traitDao) {
+		super(traitDao);
+		this.traitDao = traitDao;
+		log.trace("TraitDao constructor");
 	}
 
 	/**
@@ -144,7 +150,6 @@ public class TraitService extends AbstractService<Trait> {
 				/**
 				 * Getting the licence
 				 */
-				LicenseService licenceService = new LicenseService();
 				License license = licenceService.findByName("CC_BY");
 				if (license == null) {
 					throw new NotFoundException("No license find with name : ");
@@ -232,7 +237,6 @@ public class TraitService extends AbstractService<Trait> {
 
 			int Deleteresult = traitDao.deleteFact(objectId, objectType, traitId);
 
-			LicenseService licenceService = new LicenseService();
 			License license = licenceService.findByName("CC_BY");
 			if (license == null) {
 				throw new NotFoundException("No license find with name : ");

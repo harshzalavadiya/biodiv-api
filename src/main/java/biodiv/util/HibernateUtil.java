@@ -39,10 +39,10 @@ public class HibernateUtil {
 		return sessionFactory;
 	}
 
-	public static Session getSession() {
-		Session session = getSessionFactory().openSession();
-		return session;
-	}
+//	public static Session getSession() {
+//		Session session = getSessionFactory().openSession();
+//		return session;
+//	}
 
 	public static void shutdown() {
 		// Close caches and connection pools

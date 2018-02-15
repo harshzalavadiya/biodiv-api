@@ -9,30 +9,22 @@ public abstract class  AbstractService<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractService.class);
 	public Class<T> entityClass;
-	//protected AbstractDao<T, Long> dao;
+	private  AbstractDao<T, Long> dao;
 	
-	
-	public abstract AbstractDao<T, Long> getDao();
-	
-	public AbstractService() {
-		System.out.println("AbstractService constructor");
-		
+	public AbstractService(AbstractDao<T, Long> dao) {
+		System.out.println("\nAbstractService constructor");
+		this.dao = dao;
 		//entityClass = ((Class) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
 	}
-	
 
-	/*public void setDao(AbstractDao<T,Long> dao) {
-		this.dao = dao;
-	}*/
-	
 	public void save(T entity) {
 		log.debug("persisting " + entity.getClass() + " instance " + entity);
 		try {
-			//getDao().openCurrentSessionWithTransaction();
+			//this.dao.openCurrentSessionWithTransaction();
 			//HibernateUtil.getSessionFactory().getCurrentSession().getTransaction();   		
 			//HibernateUtil.getSessionFactory().getCurrentSession();
-			getDao().save(entity);
-			//getDao().closeCurrentSessionWithTransaction();
+			this.dao.save(entity);
+			//this.dao.closeCurrentSessionWithTransaction();
 			log.debug("save successful");
 		} catch (RuntimeException re) {
 			log.error("persist failed", re);
@@ -43,7 +35,7 @@ public abstract class  AbstractService<T> {
 	public void update(T entity)  {
 		log.debug("upting " + entity.getClass() + " instance " + entity);
 		try {
-			getDao().update(entity);
+			this.dao.update(entity);
 			log.debug("update successful");
 		} catch (RuntimeException re) {
 			log.error("update failed", re);
@@ -55,10 +47,10 @@ public abstract class  AbstractService<T> {
 	public void delete(Long id) {
 		log.debug("deleting " + id);
 		try {
-			//getDao().openCurrentSessionWithTransaction();
-			T entity = (T) getDao().findById(id);
-			getDao().delete(entity);
-			//getDao().closeCurrentSessionWithTransaction();
+			//this.dao.openCurrentSessionWithTransaction();
+			T entity = (T) this.dao.findById(id);
+			this.dao.delete(entity);
+			//this.dao.closeCurrentSessionWithTransaction();
 			log.debug("delete successful");
 		} catch (RuntimeException re) {
 			log.error("delete failed", re);
@@ -71,9 +63,9 @@ public abstract class  AbstractService<T> {
 		try {
 			//System.out.println("inside findbyid");
 			//HibernateUtil.getSessionFactory().getCurrentSession();
-			//getDao().openCurrentSession();
-			T entity = (T) getDao().findById(id);
-			//getDao().closeCurrentSession();
+			//this.dao.openCurrentSession();
+			T entity = (T) this.dao.findById(id);
+			//this.dao.closeCurrentSession();
 			
 			return entity;
 		} catch (RuntimeException re) {
@@ -86,9 +78,9 @@ public abstract class  AbstractService<T> {
 		log.debug("findAll");
 		System.out.println("findALL");
 		try {
-			//getDao().openCurrentSession();
-			List<T> entities = getDao().findAll(limit, offset);
-			//getDao().closeCurrentSession();
+			//this.dao.openCurrentSession();
+			List<T> entities = this.dao.findAll(limit, offset);
+			//this.dao.closeCurrentSession();
 			return entities;
 		} catch (RuntimeException re) {
 			log.error("persist failed", re);
@@ -100,9 +92,9 @@ public abstract class  AbstractService<T> {
 		
 		log.debug("findAll");
 		try {
-			//getDao().openCurrentSession();
-			List<T> entities = getDao().findAll();
-			//getDao().closeCurrentSession();
+			//this.dao.openCurrentSession();
+			List<T> entities = this.dao.findAll();
+			//this.dao.closeCurrentSession();
 			return entities;
 		} catch (RuntimeException re) {
 			log.error("persist failed", re);

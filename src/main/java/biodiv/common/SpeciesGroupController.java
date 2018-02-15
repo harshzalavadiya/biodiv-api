@@ -1,7 +1,8 @@
-package biodiv.speciesGroup;
+package biodiv.common;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -10,20 +11,21 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.Intercept;
-import biodiv.common.SpeciesGroup;
+import biodiv.Transactional;
 
 @Path("/species")
 
 public class SpeciesGroupController {
-	private final Logger log = LoggerFactory.getLogger(SpeciesGroup.class);
 	
-	SpeciesGroupService speciesGroupService=new SpeciesGroupService();
+	private final Logger log = LoggerFactory.getLogger(getClass());
+	
+	@Inject
+	SpeciesGroupService speciesGroupService;
 	
 	@GET
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public List<SpeciesGroup> list(){
 		List<SpeciesGroup> results= speciesGroupService.list();
 		return results;

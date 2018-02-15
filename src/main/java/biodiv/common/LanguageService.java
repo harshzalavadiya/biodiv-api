@@ -3,11 +3,17 @@ package biodiv.common;
 import java.util.Locale;
 import java.util.Random;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import biodiv.Intercept;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import biodiv.Transactional;
 
 public class LanguageService extends AbstractService<Language> {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private static final Random NUMBER_GENERATOR = new Random();
 	
@@ -15,13 +21,10 @@ public class LanguageService extends AbstractService<Language> {
 
 	private LanguageDao languageDao;
 
-	public LanguageService() {
+	@Inject
+	LanguageService(LanguageDao languageDao) {
+		super(languageDao);
 		this.languageDao = new LanguageDao();
-	}
-
-	@Override
-	public LanguageDao getDao() {
-		return languageDao;
 	}
 
 	public Language findByName(String languageName) {
@@ -90,7 +93,7 @@ public class LanguageService extends AbstractService<Language> {
 		return null;
 	}
 
-	@Intercept
+	@Transactional
 	public Language findByTwoLetterCode(String code) {
 		Language lang ;
 		try{

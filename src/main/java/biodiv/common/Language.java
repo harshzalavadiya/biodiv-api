@@ -1,5 +1,6 @@
 package biodiv.common;
 
+import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -25,7 +26,8 @@ public class Language {
 	private Boolean isDirty = false;
 	private String region;
 	
-	private LanguageService languageService = new LanguageService();
+	@Inject
+	private LanguageService languageService;
 
 	public Language() {
 	}

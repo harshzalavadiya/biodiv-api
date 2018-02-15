@@ -3,9 +3,8 @@ package biodiv.auth;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.List;
+import java.util.Map;
 
 import org.pac4j.core.config.Config;
 import org.pac4j.core.config.ConfigFactory;
@@ -14,19 +13,16 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.definition.CommonProfileDefinition;
 import org.pac4j.core.profile.jwt.JwtClaims;
 
-import biodiv.user.Role;
-import biodiv.user.User;
-
 public class AuthUtils {
 
 	private static final int ACCESS_TOKEN_EXPIRY_TIME_IN_DAYS = 2;
 	private static final int EXPIRY_TIME_IN_DAYS = -30;
 	
-	public static Config getConfig() {
+//	public static Config getConfig() {
 		//ProvidersHelper.getContext(providers, Config.class);
 		// turn the properties file into a map of properties
 		// TODO
-		final Map<String, Object> properties = new HashMap<String, Object>();
+//		final Map<String, Object> properties = new HashMap<String, Object>();
 		/*
 		 * properties.put(PropertiesConfigFactory.FACEBOOK_ID,
 		 * this.pac4jProperties.getFacebook().getId());
@@ -44,9 +40,9 @@ public class AuthUtils {
 		 * this.pac4jProperties.getCas().getLoginUrl());
 		 */
 
-		final ConfigFactory configFactory = new BiodivConfigFactory();
-		return configFactory.build(properties);
-	}
+//		final ConfigFactory configFactory = new BiodivConfigFactory();
+//		return configFactory.build(properties);
+//	}
 	
 	public static CommonProfile createUserProfile(Long userId, String username, String email, List authorities) {
 		CommonProfile profile = new CommonProfile();

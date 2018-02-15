@@ -9,6 +9,10 @@ import biodiv.common.DaoInterface;
 
 public class CommentDao extends AbstractDao<Comment,Long> implements DaoInterface<Comment,Long>{
 
+	public CommentDao() {
+		System.out.println("CommentDao constructor");
+	}
+	
 	@Override
 	public Comment findById(Long id) {
 		Comment entity = (Comment) getCurrentSession().get(Comment.class, id);

@@ -12,7 +12,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import biodiv.common.ExternalLinks;
 import biodiv.common.SpeciesGroup;
 import biodiv.user.User;
 

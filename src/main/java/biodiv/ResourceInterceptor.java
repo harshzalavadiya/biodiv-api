@@ -13,18 +13,24 @@ public class ResourceInterceptor implements MethodInterceptor {
 	private static final Logger log = LoggerFactory.getLogger(ResourceInterceptor.class);
 	
 	private static SessionFactory sf = HibernateUtil.getSessionFactory();  
+
+	ResourceInterceptor() {
+		System.out.println("ResourceInterceptor constructor");
+	}
 	
     @Override
     public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
-    	System.out.println("test");
+    	log.debug("ResourceInterceptor methodInvocation : "+methodInvocation.getMethod().getName());
     	Object result = null;
     	try{
-    		boolean isActive = sf.getCurrentSession().getTransaction().isActive(); 
-    		System.out.println(isActive);
+    		log.debug("Checking if there is a active transaction");
+    		boolean isActive = (sf.getCurrentSession().getTransaction() != null) ? sf.getCurrentSession().getTransaction().isActive() : false; 
     		if ( !isActive) {  
-                log.debug("Starting a database transaction");  
+                log.debug("Starting a new database transaction");  
                 sf.getCurrentSession().beginTransaction();  
-             }  
+             }  else {
+            	 log.debug("Using existing database transaction");
+             }
 //    		log.debug(methodInvocation.proceed()
 //    		        + "   ResourceInterceptor: Method \""
 //    		        + methodInvocation.getMethod().getName() + "\" intercepted\n");

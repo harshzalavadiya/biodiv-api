@@ -129,9 +129,6 @@ public class MessageDigestPasswordEncoder {
 	public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
 		String pass1 = "" + encPass;
 		String pass2 = encodePassword(rawPass, salt);
-System.out.println(pass1);
-System.out.println(pass2);
-System.out.println(rawPass);
 		return equals(pass1, pass2);
 	}
 

@@ -1,5 +1,7 @@
 package biodiv.auth;
 
+import javax.inject.Inject;
+
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
@@ -21,45 +23,46 @@ import com.github.scribejava.core.model.Token;
 import biodiv.user.User;
 import biodiv.user.UserService;
 
-public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends CommonProfile, O extends OAuthConfiguration, T extends Token> extends OAuth20ProfileCreator<OAuth20Profile> {
+public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends CommonProfile, O extends OAuthConfiguration, T extends Token>
+		extends OAuth20ProfileCreator<OAuth20Profile> {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	UserService userService = new UserService();
+	@Inject
+	private UserService userService;
 
 	public CustomOAuth2ProfileCreator(OAuth20Configuration configuration) {
 		super(configuration);
-		// TODO Auto-generated constructor stub
 	}
-	
+
 	@Override
-    public OAuth20Profile create(final OAuth20Credentials credentials, final WebContext context) {
-        try {
-            final OAuth2AccessToken token = getAccessToken(credentials);
-            OAuth20Profile profile = retrieveUserProfileFromToken(token);
-            log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            log.debug(profile.toString());
-            log.debug(profile.getEmail());
-            log.debug(profile.getLinkedId());
-            log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            String email = profile.getEmail();
-            User user = userService.findByEmail(email);
-            if(user == null) {
-            	throwsException("Not a valid user");
-            } else {
-            	userService.updateUserProfile(profile, user);
-            }
-            return profile;
-        } catch (final OAuthException e) {
-            throw new TechnicalException(e);
-        } catch (HttpAction e) {
-        	throw new TechnicalException(e);
+	public OAuth20Profile create(final OAuth20Credentials credentials, final WebContext context) {
+		try {
+			final OAuth2AccessToken token = getAccessToken(credentials);
+			OAuth20Profile profile = retrieveUserProfileFromToken(token);
+			log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+			log.debug(profile.toString());
+			log.debug(profile.getEmail());
+			log.debug(profile.getLinkedId());
+			log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+			String email = profile.getEmail();
+			User user = userService.findByEmail(email);
+			if (user == null) {
+				throwsException("Not a valid user");
+			} else {
+				userService.updateUserProfile(profile, user);
+			}
+			return profile;
+		} catch (final OAuthException e) {
+			throw new TechnicalException(e);
+		} catch (HttpAction e) {
+			throw new TechnicalException(e);
 		} catch (CredentialsException e) {
 			throw new TechnicalException(e);
 		}
-    }
-	
+	}
+
 	protected void throwsException(final String message) throws CredentialsException {
-        throw new CredentialsException(message);
-    }
+		throw new CredentialsException(message);
+	}
 }

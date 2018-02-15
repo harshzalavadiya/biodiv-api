@@ -1,4 +1,4 @@
-package biodiv.userGroupMemberRole;
+package biodiv.userGroup.userGroupMemberRole;
 // Generated 31 Jul, 2017 7:18:53 AM by Hibernate Tools 3.5.0.Final
 
 import javax.persistence.AttributeOverride;

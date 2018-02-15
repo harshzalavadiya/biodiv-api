@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import biodiv.Intercept;
+import javax.inject.Inject;
+
+import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeed;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
@@ -18,32 +20,30 @@ import biodiv.user.UserService;
 
 public class CommentService extends AbstractService<Comment>{
 
+	
 	private CommentDao commentDao;
+	@Inject
+	private LanguageService languageService;
+	@Inject
+	private UserService userService;
+	@Inject
+	private ActivityFeedService activityFeedService ;
+	@Inject
+	private FollowService followService;
 	
-	LanguageService languageService;
-	UserService userService;
-	ActivityFeedService activityFeedService ;
-	FollowService followService;
-	
-	public CommentService(){
-		languageService = new LanguageService();
-		userService = new UserService();
-		activityFeedService = new ActivityFeedService();
-		this.commentDao = new CommentDao();
+	@Inject
+	CommentService(CommentDao commentDao){
+		super(commentDao);
+		this.commentDao = commentDao;
 	}
 	
-	@Override
-	public CommentDao getDao(){
-		return commentDao;
-	}
-	
-	@Intercept
+	@Transactional
 	public String getCommentBody(long id){
 		
 		String body;
 		
 		try{
-			body = getDao().getCommentBody(id);
+			body = commentDao.getCommentBody(id);
 			return body;
 		}catch(Exception e){
 			throw e;
@@ -53,7 +53,7 @@ public class CommentService extends AbstractService<Comment>{
 		
 	}
 
-	@Intercept
+	@Transactional
 	public String addComment(Long commentId,String commentBody, String tagUserId, Long commentHolderId, String commentHolderType,
 			Long rootHolderId, String rootHolderType,Long mainParentId,Long parentId,String subject, String commentType, Long newerTimeRef, String commentPostUrl,
 			String userLang,long userId) {
@@ -138,7 +138,6 @@ public class CommentService extends AbstractService<Comment>{
 		
 		for(long tagUserId : tagUserIds){
 			User taggedUser = userService.findById(tagUserId);
-			followService = new FollowService();
 			followService.addFollower(null,objectType,objectToFollowId,taggedUser);
 		}
 		
@@ -191,7 +190,7 @@ public class CommentService extends AbstractService<Comment>{
 	private List<Comment> findAllByParentId(Long commentId) {
 		
 		try{
-			List<Comment> childComments = getDao().findAllByParentId(commentId);
+			List<Comment> childComments = commentDao.findAllByParentId(commentId);
 			return childComments;
 		}catch(Exception e){
 			throw e;
@@ -206,7 +205,7 @@ public class CommentService extends AbstractService<Comment>{
 
 	public Long getTotalRecoCommentCount(Long recoId, Long obvId) {
 		try{
-			Long totalCount = getDao().getTotalRecoCommentCount(recoId,obvId);
+			Long totalCount = commentDao.getTotalRecoCommentCount(recoId,obvId);
 			return totalCount;
 		}catch(Exception e){
 			throw e;

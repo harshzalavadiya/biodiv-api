@@ -23,20 +23,33 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.Intercept;
+import biodiv.Transactional;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
 
+import javax.inject.Inject;
+
 @Path("/login")
 public class LoginController {
 
 	private final Logger log = LoggerFactory.getLogger(LoginController.class);
-	private TokenService tokenService = new TokenService();
-	private UserService userService = new UserService();
+    
+    @Inject
+	private TokenService tokenService;
+    
+    @Inject
+	private UserService userService;
+    
+    @Inject
+    private SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator;
 
+    public LoginController() {
+    	System.out.println("Login Controller");
+    }
+    
 	/**
 	 * 
 	 * @param username
@@ -48,10 +61,12 @@ public class LoginController {
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	@Intercept
+	@Transactional
 	public Response auth(@FormParam("username") String username, @FormParam("password") String password) {
 
 		try {
+			System.out.println(userService);
+			System.out.println("AUTH---------------------------------------------");
 			// validate credentials
 			CommonProfile profile = authenticate(username, password);
 
@@ -91,7 +106,6 @@ public class LoginController {
 	 * 			Possible error
 	 */
 	private CommonProfile authenticate(String username, String password) throws Exception {
-		SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator = new SimpleUsernamePasswordAuthenticator();
 		// Authenticate the user using the credentials provided
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password, "");
 		usernamePasswordAuthenticator.validate(credentials, null);
@@ -109,6 +123,7 @@ public class LoginController {
 	@GET
 	@Pac4JCallback(skipResponse = true)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public Response callback(@Pac4JProfile Optional<CommonProfile> profile) {
 		try {
 			if (profile.isPresent()) {
@@ -119,7 +134,7 @@ public class LoginController {
                     Map<String, Object> result = tokenService.buildTokenResponse(profile.get(), user, true);
 
                     log.debug(result.toString());
-                    UriBuilder targetURIForRedirection = UriBuilder.fromPath("http://localhost.indiabiodiversity.org/openId/checkauth");
+                    UriBuilder targetURIForRedirection = UriBuilder.fromPath("http://hybrid.indiabiodiversity.org/openId/checkauth");
                     Iterator it = result.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry pair = (Map.Entry)it.next();
@@ -129,7 +144,7 @@ public class LoginController {
                     return Response.temporaryRedirect(targetURIForRedirection.build()).build();
                 } else {
                     //redirect to createAccount url with details from facebook profile
-                	URI targetURIForRedirection = UriBuilder.fromUri(new URI("http://localhost.indiabiodiversity.org/login/createFacebookAccount")).build();
+                	URI targetURIForRedirection = UriBuilder.fromUri(new URI("http://hybrid.indiabiodiversity.org/login/createFacebookAccount")).build();
                     return Response.temporaryRedirect(targetURIForRedirection).build();
                 }
 				//return Response.ok(result).build();
@@ -162,6 +177,7 @@ public class LoginController {
 	@POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public Response token(@FormParam("grant_type") String grantType,
 			@FormParam("refresh_token") String refreshToken) {
 		try {
