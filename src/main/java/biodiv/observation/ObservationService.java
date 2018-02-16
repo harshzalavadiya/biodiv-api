@@ -141,7 +141,7 @@ public class ObservationService extends AbstractService<Observation> {
 		System.out.println(activityDescription);
 		Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectid,obseravtion,
 				"species.participation.Observation","species.participation.Observation",objectid,"Observation species group updated",
-				"Species group updated",activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
+				"Species group updated",activityDescription,activityDescription,null,null,null,true,null,dateCreated,lastUpdated);
 		activityFeedService.addActivityFeed(user,afNew,obseravtion,(String)afNew.get("rootHolderType"));
 		//activityFeed
 		return obj;
@@ -337,8 +337,7 @@ public class ObservationService extends AbstractService<Observation> {
 					if (map.get("commonNames") != null) {
 
 						// to be written
-						String cNames = Observation
-								.getFormattedCommonNames((Map<String, Object>) map.get("commonNames"), true, languageService);
+						String cNames = getFormattedCommonNames((Map<String, Object>) map.get("commonNames"), true);
 						map.put("commonNames", (cNames.equals("")) ? "" : "(" + cNames + ")");
 					}
 
@@ -353,16 +352,16 @@ public class ObservationService extends AbstractService<Observation> {
 					}
 				}
 				obvRecoVotesResult.put("totalVotes", totalVotes);
-				obvRecoVotesResult.put("uniqueVotes",
-						((List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes")).size());
+				obvRecoVotesResult.put("uniqueVotes",((List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes")).size());
+				
 				List<Map<String, Object>> finalRecos = (List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes");
 				Collections.sort(finalRecos, new Comparator<Map<String, Object>>() {
 					@Override
 					public int compare(Map<String, Object> map1, Map<String, Object> map2) {
 						if ((Integer) map1.get("noOfVotes") > (Integer) map2.get("noOfVotes")) {
-							return +1;
-						} else if ((Integer) map1.get("noOfVotes") < (Integer) map2.get("noOfVotes")) {
 							return -1;
+						} else if ((Integer) map1.get("noOfVotes") < (Integer) map2.get("noOfVotes")) {
+							return +1;
 						} else {
 							return 0;
 						}
@@ -383,6 +382,63 @@ public class ObservationService extends AbstractService<Observation> {
 		Taxon taxon = (recommendationService.findById(recoId) != null)
 				? recommendationService.findById(recoId).getTaxonConcept() : null;
 		return AuthUtils.isLoggedIn();
+	}
+	
+	private String getFormattedCommonNames(Map<String, Object> langToCommonName, Boolean addLanguage) {
+		if(langToCommonName.isEmpty()){
+			return "";
+		}
+		System.out.println("langToCommonName "+langToCommonName);
+		Long englishId = 205L; // dont know
+		//System.out.println("remove "+langToCommonName.remove(englishId.toString()));
+		Set<Recommendation> englishNames = (Set<Recommendation>) langToCommonName.remove(englishId.toString());
+		System.out.println("langToCommonName "+langToCommonName);
+		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		System.out.println("englishNames "+englishNames);
+		
+		List<String> cnList = new ArrayList<String>();
+		
+		for(String key : langToCommonName.keySet()){
+			//System.out.println(langToCommonName.get(key));
+			String langSuffix = null;
+			Set<Recommendation> langInstance = (Set<Recommendation>) langToCommonName.get(key);
+			for(Recommendation reco : langInstance){
+				langSuffix = reco.getName()+",";
+			}
+			System.out.println("langSuffix "+langSuffix);
+			if (langSuffix.endsWith(",")) {
+				  langSuffix = langSuffix.substring(0, langSuffix.length() - 1);
+			}
+			System.out.println("langSuffix "+langSuffix);
+			if(addLanguage == true){
+				langSuffix = languageService.findById(Long.parseLong(key)).getName() + ": "+langSuffix;
+			}
+			cnList.add(langSuffix);
+		}
+		
+		String engNamesString = null;
+		
+		if(englishNames != null){
+			if(!englishNames.isEmpty()){
+				for(Recommendation reco : englishNames){
+					engNamesString = reco.getName()+",";
+				}
+				System.out.println("engNamesString "+engNamesString);
+				if (engNamesString.endsWith(",")) {
+					  engNamesString = engNamesString.substring(0, engNamesString.length() - 1);
+				}
+				if(addLanguage == true){
+					engNamesString = languageService.findById(205L).getName() + ": "+engNamesString;
+				}
+			}
+		}
+		
+		
+		if(engNamesString != null){
+			cnList.add(0,engNamesString);
+		}
+		String cNames = String.join(",", cnList);
+		return cNames;
 	}
 
 }
