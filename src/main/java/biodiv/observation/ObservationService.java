@@ -71,6 +71,7 @@ public class ObservationService extends AbstractService<Observation> {
 		return null;
 	}
 
+	@Transactional
 	public List<UserGroup> obvUserGroups(long id) {
 		try {
 			List<UserGroup> usrGrps = observationDao.obvUserGroups(id);
@@ -82,6 +83,7 @@ public class ObservationService extends AbstractService<Observation> {
 
 	}
 
+	@Transactional
 	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId) {
 
 		String msg;
@@ -97,6 +99,7 @@ public class ObservationService extends AbstractService<Observation> {
 		}
 	}
 
+	@Transactional
 	public List<Map<String, Object>> getCustomFields(Long obvId) {
 
 		try {
@@ -111,6 +114,7 @@ public class ObservationService extends AbstractService<Observation> {
 		}
 	}
 
+	@Transactional
 	public List<ObservationResource> getResouce(long id) {
 		// TODO Auto-generated method stub
 		List<ObservationResource> observationResources = observationDao.getResource(id);
@@ -118,6 +122,7 @@ public class ObservationService extends AbstractService<Observation> {
 
 	}
 
+	@Transactional
 	public Object updateGroup(Long objectid, Long newgroupid, Long oldGroupId, Long userId) {
 		// TODO Auto-generated method stub
 		User user = userService.findById(userId);
@@ -142,11 +147,13 @@ public class ObservationService extends AbstractService<Observation> {
 		return obj;
 	}
 
+	@Transactional
 	public Observation show(long id) {
 		Observation obseravtion = observationDao.findById(id);
 		return obseravtion;
 	}
 
+	@Transactional
 	public Map<String, Object> getRecommendationVotes(String obvs) {
 
 		try {

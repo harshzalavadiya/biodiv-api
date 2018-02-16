@@ -13,6 +13,7 @@ import org.pac4j.http.client.direct.HeaderClient;
 import org.pac4j.jax.rs.features.JaxRsConfigProvider;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
+import org.pac4j.jax.rs.servlet.features.ServletJaxRsContextFactoryProvider;
 
 //@Provider
 public class Pac4JFeature implements Feature {
@@ -31,10 +32,10 @@ public class Pac4JFeature implements Feature {
 		
 				// The Pac4JSecurityFeature enables annotation-based activation
 				// of the filters at the resource method level
-				.register(new Pac4JSecurityFeature());
+				.register(new Pac4JSecurityFeature())
 				
 				//The ServletJaxRsContextFactoryProvider provides session handling (and thus indirect clients support) by replacing the generic JaxRsContextFactoryProvider (for Servlet-based JAX-RS implementations, e.g., Jersey on Netty or Grizzly Servlet, Resteasy on Undertow).
-	            //.register(new ServletJaxRsContextFactoryProvider());		
+	            .register(new ServletJaxRsContextFactoryProvider());		
 
 		return true;
 	}

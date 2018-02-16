@@ -89,11 +89,14 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 				log.trace("==============================");
 
 				ResourceConfig newRC = new ResourceConfig();// container.getConfiguration();
+				
+				//PAC4j related bindings
 				newRC.register(new JaxRsConfigProvider(injector.getInstance(Pac4jConfig.class).config));
-				newRC.register(new JaxRsContextFactoryProvider());
-				newRC.register(new Pac4JValueFactoryProvider.Binder());
-				newRC.register(new Pac4JSecurityFeature());
-
+				newRC.register(injector.getInstance(JaxRsContextFactoryProvider.class));
+				newRC.register(injector.getInstance(Pac4JValueFactoryProvider.Binder.class));
+				newRC.register(injector.getInstance(Pac4JSecurityFeature.class));
+				newRC.register(injector.getInstance(ServletJaxRsContextFactoryProvider.class));
+				
 				newRC.register(new AbstractBinder() {
 					@Override
 					protected void configure() {
@@ -105,7 +108,7 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 				});
 
 				newRC.packages("biodiv");
-				newRC.register(RolesAllowedDynamicFeature.class);
+				//newRC.register(RolesAllowedDynamicFeature.class);
 
 				newRC.register(org.glassfish.jersey.server.filter.UriConnegFilter.class);
 
@@ -113,7 +116,7 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 						Level.ALL, LoggingFeature.Verbosity.PAYLOAD_ANY, Integer.MAX_VALUE));
 
 				newRC.register(JTSObjectMapperProvider.class);
-				newRC.register(new ServletJaxRsContextFactoryProvider());	
+					
 				
 				ObjectMapper objectMapper = new ObjectMapper();
 				objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

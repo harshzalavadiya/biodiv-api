@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.Transactional;
-import biodiv.activityFeed.ActivityFeed;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.DataObject;
@@ -25,7 +24,6 @@ import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.util.HibernateUtil;
 
-@Service
 public class UserGroupService extends AbstractService<UserGroup> {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -76,15 +74,16 @@ public class UserGroupService extends AbstractService<UserGroup> {
 		}
 	}
 
+	@Transactional
 	public List<User> userList(long groupId, long roleId) {
 		try {
-			userGroupDao.openCurrentSession();
+			//userGroupDao.openCurrentSession();
 			List<User> usr = userGroupDao.userList(groupId, roleId);
 			return usr;
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			userGroupDao.closeCurrentSession();
+			//userGroupDao.closeCurrentSession();
 		}
 	}
 

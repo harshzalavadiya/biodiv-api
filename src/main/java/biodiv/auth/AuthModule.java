@@ -9,6 +9,10 @@ import org.pac4j.http.client.direct.CookieClient;
 import org.pac4j.http.client.direct.DirectFormClient;
 import org.pac4j.http.client.direct.HeaderClient;
 import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.jax.rs.features.JaxRsContextFactoryProvider;
+import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
+import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
+import org.pac4j.jax.rs.servlet.features.ServletJaxRsContextFactoryProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,10 @@ public class AuthModule extends ServletModule {
 		//config.setHttpActionAdapter(new Pac4jUserHttpActionAdapter());
 		//bind(Config.class).toInstance(config);
 		bind(Pac4jConfig.class).asEagerSingleton();
+		bind(JaxRsContextFactoryProvider.class).asEagerSingleton();
+		bind(Pac4JValueFactoryProvider.Binder.class).asEagerSingleton();
+		bind(Pac4JSecurityFeature.class).asEagerSingleton();
+		bind(ServletJaxRsContextFactoryProvider.class).asEagerSingleton();
 	}
 
 /*	@Provides

@@ -26,23 +26,20 @@ public class ObservationController {
 	@Inject
 	ObservationService observationService;
 
-	
-
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
 	public Observation show(@PathParam("id") long id) {
-		
+
 		try {
-		Observation observation= observationService.show(id);
-		return observation;
+			Observation observation = observationService.show(id);
+			return observation;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-			
+
 		}
-		
+
 	}
 
 	@GET
@@ -53,59 +50,54 @@ public class ObservationController {
 		return usrGrps;
 	}
 
-	
 	@GET
 	@Path("/customFields")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
-	public List<Map<String,Object>> getCustomFields(@QueryParam("obvId") Long obvId){
-		
-		List<Map<String,Object>> cf = observationService.getCustomFields(obvId);
+	public List<Map<String, Object>> getCustomFields(@QueryParam("obvId") Long obvId) {
+
+		List<Map<String, Object>> cf = observationService.getCustomFields(obvId);
 		return cf;
 	}
-	
+
 	@POST
 	@Path("/updateCustomField")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
-	@Transactional
 	public String updateCustomField(@QueryParam("fieldValue") String fieldValue, @QueryParam("cfId") Long cfId,
-			@QueryParam("obvId") Long obvId,@Pac4JProfile CommonProfile profile){
-		
-		
-		String msg = observationService.updateInlineCf(fieldValue,cfId,obvId,Long.parseLong(profile.getId()));
+			@QueryParam("obvId") Long obvId, @Pac4JProfile CommonProfile profile) {
+
+		String msg = observationService.updateInlineCf(fieldValue, cfId, obvId, Long.parseLong(profile.getId()));
 		return msg;
 	}
-	
+
 	@GET
 	@Path("/resource/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
 	public List<ObservationResource> getResource(@PathParam("id") long id) {
 		List<ObservationResource> observationResources = observationService.getResouce(id);
 		return observationResources;
 	}
+
 	@POST
 	@Path("/updategroup")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
-	public Object updateGroup(@QueryParam("objectid") Long objectid,@QueryParam("newGroupId") Long newGroupId,
-			@QueryParam("oldGroupId") Long oldGroupId,@Pac4JProfile CommonProfile profile){
-		
-		Object observation=observationService.updateGroup(objectid,newGroupId,oldGroupId,Long.parseLong(profile.getId()));
+	public Object updateGroup(@QueryParam("objectid") Long objectid, @QueryParam("newGroupId") Long newGroupId,
+			@QueryParam("oldGroupId") Long oldGroupId, @Pac4JProfile CommonProfile profile) {
+
+		Object observation = observationService.updateGroup(objectid, newGroupId, oldGroupId,
+				Long.parseLong(profile.getId()));
 		return observation;
 	}
-	
+
 	@GET
 	@Path("/recommendationVotes")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
-	public Map<String,Object> getRecommendationVotes(@QueryParam("obvIds") String obvs){
-		
-		Map<String,Object> recoVotes = observationService.getRecommendationVotes(obvs);
+	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs) {
+
+		Map<String, Object> recoVotes = observationService.getRecommendationVotes(obvs);
 		return recoVotes;
-		
+
 	}
 
 }
