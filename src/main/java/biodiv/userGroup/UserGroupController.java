@@ -3,6 +3,7 @@ package biodiv.userGroup;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,6 +19,7 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Transactional;
+import biodiv.auth.AuthUtils;
 import biodiv.user.User;
 
 @Path("/userGroup")
@@ -78,8 +80,9 @@ public class UserGroupController {
 	public String bulkPost(@QueryParam("pullType") String pullType, @QueryParam("selectionType") String selectionType,
 			@QueryParam("objectType") String objectType, @QueryParam("objectIds") String objectIds,
 			@QueryParam("submitType") String submitType, @QueryParam("userGroups") String userGroups,
-			@QueryParam("filterUrl") String filterUrl, @Pac4JProfile CommonProfile profile)
+			@QueryParam("filterUrl") String filterUrl, @Context HttpServletRequest request)
 			throws NumberFormatException, Exception {
+		CommonProfile profile = AuthUtils.currentUser(request);
 		String msg = userGroupService.posttoGroups(objectType, pullType, submitType, objectIds, userGroups,
 				Long.parseLong(profile.getId()), filterUrl);
 		return msg;

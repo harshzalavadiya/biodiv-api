@@ -78,6 +78,11 @@ public class Pac4jConfig {
 		final Config config = new Config(clients);
 		config.addAuthorizer("ROLE_USER", new RequireAnyRoleAuthorizer("ROLE_USER"));
 		config.addAuthorizer("ROLE_ADMIN", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
+		config.addAuthorizer("ROLE_USERGROUP_FOUNDER", new RequireAnyRoleAuthorizer("ROLE_USERGROUP_FOUNDER"));
+		config.addAuthorizer("ROLE_USERGROUP_EXPERT", new RequireAnyRoleAuthorizer("ROLE_USERGROUP_EXPERT"));
+		config.addAuthorizer("ROLE_USERGROUP_MEMBER", new RequireAnyRoleAuthorizer("ROLE_USERGROUP_MEMBER"));
+		config.addAuthorizer("ROLE_SPECIES_ADMIN", new RequireAnyRoleAuthorizer("ROLE_SPECIES_ADMIN"));
+		config.addAuthorizer("ROLE_CEPF_ADMIN", new RequireAnyRoleAuthorizer("ROLE_CEPF_ADMIN"));
 		// config.addAuthorizer("custom", new CustomAuthorizer());
 		return config;
 	}

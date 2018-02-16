@@ -5,13 +5,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.pac4j.core.config.Config;
 import org.pac4j.core.config.ConfigFactory;
+import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.definition.CommonProfileDefinition;
 import org.pac4j.core.profile.jwt.JwtClaims;
+import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 public class AuthUtils {
 
@@ -82,6 +88,12 @@ public class AuthUtils {
 		return cal.getTime();
 	}
 
+	public static CommonProfile currentUser(HttpServletRequest request) {
+		ProfileManager manager = new ProfileManager(new J2EContext(request, null));
+		Optional<CommonProfile> profile = manager.get(true);
+		return profile.get();		
+	}
+	
 	public static Boolean isLoggedIn() {
 		
 		return false;
