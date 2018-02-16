@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.pac4j.core.profile.CommonProfile;
 
+import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
 import biodiv.auth.Constants;
 import biodiv.auth.token.Token.TokenType;
@@ -60,7 +61,7 @@ public class TokenService extends AbstractService<Token> {
 			log.debug("Building token response for " + user);
 			String jwtToken = generateAccessToken(profile);
 
-			tokenDao.openCurrentSessionWithTransaction();
+			//tokenDao.openCurrentSessionWithTransaction();
 			// Return the access_token valid for 2 hrs and a new refreshToken on
 			// the response
 			Map<String, Object> result = new HashMap<String, Object>();
@@ -92,7 +93,7 @@ public class TokenService extends AbstractService<Token> {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			tokenDao.closeCurrentSessionWithTransaction();
+			//tokenDao.closeCurrentSessionWithTransaction();
 		}
 	}
 
@@ -143,7 +144,7 @@ public class TokenService extends AbstractService<Token> {
 		if (refreshToken == null || userId == null)
 			return false;
 		try {
-			tokenDao.openCurrentSession();
+			//tokenDao.openCurrentSession();
 			log.debug("isValidRefreshToken .... " + userId);
 			Token token = tokenDao.findByValueAndUser(refreshToken, userId);
 			if (token == null) {
@@ -158,7 +159,7 @@ public class TokenService extends AbstractService<Token> {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			tokenDao.closeCurrentSession();
+			//tokenDao.closeCurrentSession();
 		}
 	}
 
@@ -167,11 +168,12 @@ public class TokenService extends AbstractService<Token> {
 	 * @param refreshToken
 	 *            dummy
 	 */
+	@Transactional
 	public void removeRefreshToken(String refreshToken) {
 		if (refreshToken == null)
 			return;
 		try {
-			tokenDao.openCurrentSessionWithTransaction();
+			//tokenDao.openCurrentSessionWithTransaction();
 			log.debug("Removing refresh token " + refreshToken);
 			// Removing refreshToken
 			Token existingRefreshToken = tokenDao.findByValue(refreshToken);
@@ -187,15 +189,16 @@ public class TokenService extends AbstractService<Token> {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			tokenDao.closeCurrentSessionWithTransaction();
+			//tokenDao.closeCurrentSessionWithTransaction();
 		}
 	}
 
+	@Transactional
 	public void removeRefreshToken(Long userId, String refreshToken) {
 		if (userId == null || refreshToken == null)
 			return;
 		try {
-			tokenDao.openCurrentSessionWithTransaction();
+			//tokenDao.openCurrentSessionWithTransaction();
 			log.debug("Removing refresh token " + refreshToken + " for user " + userId);
 			// Removing refreshToken
 			Token existingRefreshToken = tokenDao.findByValueAndUser(refreshToken, userId);
@@ -216,25 +219,25 @@ public class TokenService extends AbstractService<Token> {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			tokenDao.closeCurrentSessionWithTransaction();
+			//tokenDao.closeCurrentSessionWithTransaction();
 		}
 	}
 
 	public Token findByValue(String value) {
 		try {
-			tokenDao.openCurrentSession();
+			//tokenDao.openCurrentSession();
 			Token token = tokenDao.findByValue(value);
 			return token;
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			tokenDao.closeCurrentSession();
+			//tokenDao.closeCurrentSession();
 		}
 	}
 
 	public CommonProfile createUserProfile(String refreshToken) {
 		try {
-			tokenDao.openCurrentSession();
+			//tokenDao.openCurrentSession();
 			Token refreshTokenInstance = findByValue(refreshToken);
 			if (refreshTokenInstance != null) {
 				User user = refreshTokenInstance.getUser();
@@ -245,7 +248,7 @@ public class TokenService extends AbstractService<Token> {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			tokenDao.closeCurrentSession();
+			//tokenDao.closeCurrentSession();
 		}
 	}
 

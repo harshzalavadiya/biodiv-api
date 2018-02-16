@@ -25,9 +25,9 @@ public class BiodivJaxRsProfileManager extends JaxRsProfileManager {
     @Inject
 	private UserService userService;
 	
-    BiodivJaxRsProfileManager() {
-    	super(null);
-    }
+    public BiodivJaxRsProfileManager() {
+		super(null);
+	}
     
 	public BiodivJaxRsProfileManager(WebContext context) {
 		super(context);
@@ -52,7 +52,7 @@ public class BiodivJaxRsProfileManager extends JaxRsProfileManager {
         Principal profile = securityContext.getUserPrincipal();
         if(profile != null) {                          
             System.out.println (userService);
-            System.out.println (profile);
+            log.debug ("Found profile : ", profile);
             User user = userService.findById(Long.parseLong(profile.getName()));
             if(user != null && refreshToken != null) {
             	tokenService.removeRefreshToken(user.getId(), refreshToken);

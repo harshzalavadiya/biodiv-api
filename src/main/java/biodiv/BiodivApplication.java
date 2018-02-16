@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.ApplicationPath;
 
@@ -13,7 +12,6 @@ import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -35,7 +33,6 @@ import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module.Feature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.inject.Injector;
 
-import biodiv.auth.Pac4jConfig;
 import biodiv.common.JTSObjectMapperProvider;
 
 @ApplicationPath("/")
@@ -47,7 +44,7 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 
 	public BiodivApplication() {
 
-		System.out.println("Starting Biodiv Api Application");
+		log.debug("Starting Biodiv Api Application");
 		// Yaml yaml = new Yaml();
 		// try {
 		// Map<String, Object> list = (HashMap<String, Object>) yaml.load(new
@@ -77,7 +74,7 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 			@Override
 			public void onStartup(Container container) {
 
-				System.out.println("Configuring GuiceBridge onStartup");
+				log.debug("Configuring GuiceBridge onStartup");
 
 				ServletContainer servletContainer = (ServletContainer) container;
 
@@ -88,19 +85,22 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 				log.trace(injector.getAllBindings().toString());
 				log.trace("==============================");
 
+				log.debug("Registering new resourceConfig");
 				ResourceConfig newRC = new ResourceConfig();// container.getConfiguration();
 				
 				//PAC4j related bindings
-				newRC.register(new JaxRsConfigProvider(injector.getInstance(Pac4jConfig.class).config));
-				newRC.register(injector.getInstance(JaxRsContextFactoryProvider.class));
-				newRC.register(injector.getInstance(Pac4JValueFactoryProvider.Binder.class));
-				newRC.register(injector.getInstance(Pac4JSecurityFeature.class));
+				newRC.register(new JaxRsConfigProvider(injector.getInstance(Config.class)));
+				//newRC.register(injector.getInstance(JaxRsContextFactoryProvider.class));
 				newRC.register(injector.getInstance(ServletJaxRsContextFactoryProvider.class));
+				newRC.register(injector.getInstance(Pac4JSecurityFeature.class));
+				newRC.register(injector.getInstance(Pac4JValueFactoryProvider.Binder.class));
+				
+				
 				
 				newRC.register(new AbstractBinder() {
 					@Override
 					protected void configure() {
-						System.out.println("binding interceptor in abstractbinder");
+						log.debug("binding interceptor in abstractbinder");
 						bind(MyInterceptionService.class).to(org.glassfish.hk2.api.InterceptionService.class)
 								.in(Singleton.class);
 						// bind(BiodivResponseFilter.class).to(BiodivResponseFilter.class).in(Singleton.class);
@@ -140,14 +140,18 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 
 				newRC.register(org.glassfish.jersey.jackson.JacksonFeature.class);
 				newRC.register(biodiv.CustomLoggingFilter.class);
+				
+				log.debug("Reloading servletContainer with new resourceconfig");
 				servletContainer.reload(newRC);
 
+				log.debug("Initializing guicebridge with servicelocator");
 				ServiceLocator serviceLocator = container.getApplicationHandler().getServiceLocator();
 
 				GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
 
 				GuiceIntoHK2Bridge guiceBridge = serviceLocator.getService(GuiceIntoHK2Bridge.class);
 
+				log.debug("Injecting guice injector into guicebridge");
 				guiceBridge.bridgeGuiceInjector(injector);
 
 			}

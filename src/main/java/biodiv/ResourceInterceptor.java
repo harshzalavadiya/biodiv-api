@@ -15,7 +15,7 @@ public class ResourceInterceptor implements MethodInterceptor {
 	private static SessionFactory sf = HibernateUtil.getSessionFactory();  
 
 	ResourceInterceptor() {
-		System.out.println("ResourceInterceptor constructor");
+		log.debug("ResourceInterceptor constructor");
 	}
 	
     @Override
