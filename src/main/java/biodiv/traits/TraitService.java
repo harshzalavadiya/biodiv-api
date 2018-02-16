@@ -205,7 +205,7 @@ public class TraitService extends AbstractService<Trait> {
 				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
 				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
 						"species.participation.Observation","species.trait.Fact",factId,"Added a fact",
-						"Added a fact",activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
+						"Added a fact",activityDescription,activityDescription,null,null,null,true,null,dateCreated,lastUpdated);
 				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
 				//activityFeed
 
@@ -257,7 +257,7 @@ public class TraitService extends AbstractService<Trait> {
 				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
 				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
 						"species.participation.Observation","species.trait.Fact",factId,"Updated fact",
-						"Updated fact",activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
+						"Updated fact",activityDescription,activityDescription,null,null,null,true,null,dateCreated,lastUpdated);
 				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
 				//activityFeed
 			}
@@ -311,7 +311,7 @@ public class TraitService extends AbstractService<Trait> {
 				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
 				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
 						"species.participation.Observation","species.trait.Fact",factId,activityType,
-						activityType,activityDescription,activityDescription,null,null,true,null,dateCreated,lastUpdated);
+						activityType,activityDescription,activityDescription,null,null,null,true,null,dateCreated,lastUpdated);
 				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
 				//activityFeed
 			}

@@ -109,7 +109,7 @@ public class CommentService extends AbstractService<Comment>{
 						Long subRootId = isMainThread(c)?activityHolderId:fetchMainThreadId(c);
 						Map<String, Object> afNew = activityFeedService.createMapforAf("Object",rootHolderId,null,
 									rootHolderType,"species.participation.Comment",activityHolderId,
-									"Added a comment","Added a comment",activityDescription,null,null,null,true,subRootId,dateCreated,lastUpdated);
+									"Added a comment","Added a comment",activityDescription,null,null,null,null,true,subRootId,dateCreated,lastUpdated);
 							
 						activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
 	 

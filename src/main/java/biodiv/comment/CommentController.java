@@ -1,11 +1,13 @@
 package biodiv.comment;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.pac4j.core.profile.CommonProfile;
@@ -13,6 +15,7 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Transactional;
+import biodiv.auth.AuthUtils;
 
 @Path("/comment")
 public class CommentController {
@@ -32,7 +35,9 @@ public class CommentController {
 			@QueryParam("parentId") Long parentId, @QueryParam("subject") String subject,
 			@QueryParam("commentType") String commentType, @QueryParam("newerTimeRef") Long newerTimeRef,
 			@QueryParam("commentPostUrl") String commentPostUrl, @QueryParam("userLanguage") String userLang,
-			@Pac4JProfile CommonProfile profile) throws NumberFormatException, Exception {
+			@Context HttpServletRequest request) throws NumberFormatException, Exception {
+		
+		CommonProfile profile = AuthUtils.currentUser(request);
 		String msg;
 		if (commentBody != null && commentBody.trim().length() > 0) {
 			msg = commentService.addComment(commentId, commentBody, tagUserId, commentHolderId, commentHolderType,

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.Transactional;
+import biodiv.auth.AuthUtils;
 import biodiv.taxon.service.TaxonService;
 
 @Path("/trait")
@@ -116,8 +118,9 @@ public class TraitController {
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public Serializable list(@QueryParam("traits") String trait, @QueryParam("traitId") Long traitId,
 			@QueryParam("objectId") Long objectId, @QueryParam("objectType") String objectType,
-			@Pac4JProfile CommonProfile profile) {
+			@Context HttpServletRequest request) {
 
+		CommonProfile profile = AuthUtils.currentUser(request);
 		String[] arr = trait.trim().split(",");
 
 		Set<Long> traits = null;

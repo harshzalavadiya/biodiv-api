@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.pac4j.core.profile.CommonProfile;
@@ -17,6 +19,7 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Transactional;
+import biodiv.auth.AuthUtils;
 import biodiv.common.DataObject;
 import biodiv.userGroup.UserGroup;
 
@@ -64,8 +67,9 @@ public class ObservationController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public String updateCustomField(@QueryParam("fieldValue") String fieldValue, @QueryParam("cfId") Long cfId,
-			@QueryParam("obvId") Long obvId, @Pac4JProfile CommonProfile profile) {
+			@QueryParam("obvId") Long obvId, @Context HttpServletRequest request) {
 
+		CommonProfile profile = AuthUtils.currentUser(request);
 		String msg = observationService.updateInlineCf(fieldValue, cfId, obvId, Long.parseLong(profile.getId()));
 		return msg;
 	}
@@ -83,8 +87,8 @@ public class ObservationController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public Object updateGroup(@QueryParam("objectid") Long objectid, @QueryParam("newGroupId") Long newGroupId,
-			@QueryParam("oldGroupId") Long oldGroupId, @Pac4JProfile CommonProfile profile) {
-
+			@QueryParam("oldGroupId") Long oldGroupId, @Context HttpServletRequest request) {
+		CommonProfile profile = AuthUtils.currentUser(request);
 		Object observation = observationService.updateGroup(objectid, newGroupId, oldGroupId,
 				Long.parseLong(profile.getId()));
 		return observation;

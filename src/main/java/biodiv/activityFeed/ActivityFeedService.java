@@ -177,7 +177,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 	}
 	
 	public  Map<String, Object> createMapforAf(String rootType,Long rhId,Object rootHolder,String rootHolderTyp,String activityHolderType,Long activityHolderId,
-			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isShowable,Long subRootId,
+			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isScientificName,Boolean isShowable,Long subRootId,
 			Date dateCreated,Date lastUpdated) {
 		
 		//String activityDescrption;
@@ -217,7 +217,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 		    	myJson.setIs_migrated("true");
 		    	
 		    	myJson.setActivity_performed(activityPerformed);
-		    	//myJson.setIs_scientific_name(null);
+		    	myJson.setIs_scientific_name(isScientificName);
 		    }
 		    
 	    	
