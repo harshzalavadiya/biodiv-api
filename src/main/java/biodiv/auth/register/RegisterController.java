@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.POST;
@@ -29,12 +30,20 @@ import biodiv.util.Utils;
 
 @Path("/register")
 public class RegisterController {
+
 	private final Logger log = LoggerFactory.getLogger(LoginController.class);
 
-	private UserService userService = new UserService();
-	private LanguageService languageService = new LanguageService();
-	private MessageService messageService = new MessageService();
-	private MailService mailService = new MailService();
+	@Inject
+	private UserService userService;
+	
+	@Inject
+	private LanguageService languageService;
+	
+	@Inject
+	private MessageService messageService;
+	
+	@Inject
+	private MailService mailService;
 
 	/**
 	 * 

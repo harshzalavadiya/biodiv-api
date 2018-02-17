@@ -12,10 +12,14 @@ import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 
 
-class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<Token, Long> {
+public class TokenDao extends AbstractDao<Token, Long> implements DaoInterface<Token, Long> {
 
 	private static final Logger log = LoggerFactory.getLogger(TokenDao.class);
 
+	public TokenDao() {
+		System.out.println("TokenDao constructor");
+	}
+	
 	@Override
 	public Token findById(Long id) {
 		Token entity = (Token) getCurrentSession().get(Token.class, id);

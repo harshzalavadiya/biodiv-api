@@ -24,7 +24,7 @@ import biodiv.common.SpeciesGroup;
 import biodiv.userGroup.UserGroup;
 import net.minidev.json.JSONObject;
 
-class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterface<Observation, Long> {
+public class ObservationDao extends AbstractDao<Observation, Long> implements DaoInterface<Observation, Long> {
 	
 	private static final Logger log = LoggerFactory.getLogger(ObservationDao.class);
 

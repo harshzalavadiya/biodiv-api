@@ -24,6 +24,10 @@ public class TaxonRelation {
 		@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	    private List<TaxonRelation> children = new ArrayList<>();
 		
+		TaxonRelation() {
+			
+		}
+		
 	    public TaxonRelation(long taxonid, String path, long parent, String text, long classification, long id,
 				int rank, String position, long speciesId, Set<String> data) {
 			super();

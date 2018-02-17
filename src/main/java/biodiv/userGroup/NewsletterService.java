@@ -6,6 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import biodiv.Transactional;
 import biodiv.common.AbstractDao;
 import biodiv.common.AbstractService;
 import biodiv.common.Language;
@@ -14,21 +20,24 @@ import biodiv.user.UserService;
 
 public class NewsletterService extends AbstractService<Newsletter>{
 	
-	private NewsletterDao newsletterDao;
-	UserService userService;
-	UserGroupService userGroupService;
-	
-	public NewsletterService(){
-		this.newsletterDao = new NewsletterDao();
-		userService = new UserService();
-		userGroupService = new UserGroupService();
-	}
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	@Override
-	public NewsletterDao getDao() {
-		return newsletterDao;
+	private NewsletterDao newsletterDao;
+	
+	@Inject
+	private UserService userService;
+	
+	@Inject
+	private UserGroupService userGroupService;
+	
+	@Inject
+	NewsletterService(NewsletterDao newsletterDao) {
+		super(newsletterDao);
+		this.newsletterDao = newsletterDao;
+		log.trace("NewsletterService constructor");
 	}
 	
+	@Transactional
 	public List<Map<String, Object>> getPages(Long ugId, Long max, Long offset, String sort, String order,
 			String currentLanguage, Map<String,Object> filterParams,Long userId,Boolean showInFooter) {
 		
@@ -127,7 +136,7 @@ public class NewsletterService extends AbstractService<Newsletter>{
 			query += " "+order;
 		}
 		
-		List<Object[]> n = getDao().getPages(nl,params,query);
+		List<Object[]> n = newsletterDao.getPages(nl,params,query);
 		List<Map<String, Object>> pages = new ArrayList<Map<String, Object>>();
 		for(Object[] obj : n){
 			Map<String, Object> res = new HashMap<String, Object>();

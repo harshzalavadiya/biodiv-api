@@ -12,7 +12,11 @@ import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 
 
-class UserDao extends AbstractDao<User, Long> implements DaoInterface<User, Long>{
+public class UserDao extends AbstractDao<User, Long> implements DaoInterface<User, Long>{
+	
+	public UserDao() {
+		System.out.println("UserDao constructor");
+	}
 	
 	@Override
 	public User findById(Long id) {

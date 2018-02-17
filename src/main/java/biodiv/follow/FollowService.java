@@ -2,24 +2,28 @@ package biodiv.follow;
 
 import java.util.Date;
 
-import biodiv.Intercept;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import biodiv.Transactional;
 import biodiv.common.AbstractService;
 import biodiv.user.User;
 
 public class FollowService extends AbstractService<Follow>{
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private FollowDao followDao;
 	
-	public FollowService(){
-		this.followDao = new FollowDao();
+	@Inject
+	FollowService(FollowDao followDao){
+		super(followDao);
+		this.followDao = followDao;
 	}
 	
-	@Override
-	public FollowDao getDao() {
-		return followDao;
-	}
-	
-	@Intercept
+	@Transactional
 	public void addFollower(Object objectToFollow,String objectTyp,Long objectToFollowId,User user){
 		
 		//String objectType = objectToFollow.getClass().getCanonicalName();
@@ -49,13 +53,13 @@ public class FollowService extends AbstractService<Follow>{
 		
 	}
 	
-	@Intercept
+	@Transactional
 	public Boolean isFollowing(String objectToFollowType,Long objectToFollowId , long userId){
 		if(objectToFollowType == null || userId == 0 || objectToFollowId == null){
 			return false;
 		}
 		
-		Boolean whetherFollowing = getDao().isFollowing(objectToFollowType,objectToFollowId,userId);
+		Boolean whetherFollowing = followDao.isFollowing(objectToFollowType,objectToFollowId,userId);
 		System.out.println("follow************* "+whetherFollowing);
 		return whetherFollowing;
 	}

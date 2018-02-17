@@ -7,7 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import biodiv.Intercept;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import biodiv.Transactional;
 import biodiv.comment.Comment;
 import biodiv.comment.CommentService;
 import biodiv.common.AbstractService;
@@ -17,21 +22,23 @@ import biodiv.user.User;
 
 public class ActivityFeedService extends AbstractService<ActivityFeed>{
 	
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private ActivityFeedDao activityFeedDao;
 	
-	FollowService followService =  new FollowService();
-	CommentService commentService;
+	@Inject
+	private FollowService followService;
 	
-	public ActivityFeedService(){
-		this.activityFeedDao = new ActivityFeedDao();
+	@Inject
+	private CommentService commentService;
+	
+	@Inject
+	ActivityFeedService(ActivityFeedDao activityFeedDao){
+		super(activityFeedDao);
+		this.activityFeedDao = activityFeedDao;
+		log.trace("ActivityFeedService constructor");
 	}
 
-	@Override
-	public ActivityFeedDao getDao() {	
-		return activityFeedDao;
-	}
-	
-	
 	public Map<String,Object>  getFeeds(long rhId,String rootHolderType,String activityType,String feedType,String feedCategory,String feedClass,String feedPermission,
 			String feedOrder,long fhoId,String feedHomeObjectType,String refreshtype,String timeLine,long refTym ,boolean isShowable,int max){
 		
@@ -48,7 +55,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 				max=100;
 			}
 			
-			List<Object[]> af = getDao().getFeeds(_af,hql,rhId,rootHolderType,feedType,feedPermission,feedOrder, fhoId, feedHomeObjectType,
+			List<Object[]> af = activityFeedDao.getFeeds(_af,hql,rhId,rootHolderType,feedType,feedPermission,feedOrder, fhoId, feedHomeObjectType,
 					 refreshtype,timeLine, refTym ,max);
 			
 			if(feedOrder.equalsIgnoreCase("oldestFirst")){
@@ -80,7 +87,6 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 			    res.put("subRootHolderType", (String) obj[15]);
 			    res.put("isShowable", (boolean) obj[16]);
 			    if(activityTyp.equalsIgnoreCase("Added a comment")){
-			    	commentService = new CommentService();
 			    	MyJson myJson = new MyJson();
 			    	myJson.setAid((Long) obj[3]);
 			    	
@@ -124,7 +130,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 					feedOrder,fhoId,feedHomeObjectType,refreshtype,timeLine,refTym ,isShowable,max,true,olderTimeRef);
 			ActivityFeed acf = (ActivityFeed) queryAndObject.get("afObject");
 			hql = (String) queryAndObject.get("query");
-			long count = getDao().getFeedCount(acf,hql);
+			long count = activityFeedDao.getFeedCount(acf,hql);
 			long remainingFeedCount = count ;
 			
 			
@@ -143,7 +149,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 		}
 	}
 	
-	@Intercept
+	@Transactional
 	public void addActivityFeed(User user,Map<String, Object> afNew,Object objectToFollow,String objectToFollowType){
 		
 		try{			
@@ -171,14 +177,15 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 	}
 	
 	public  Map<String, Object> createMapforAf(String rootType,Long rhId,Object rootHolder,String rootHolderTyp,String activityHolderType,Long activityHolderId,
-			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isShowable,Long subRootId) {
+			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isScientificName,Boolean isShowable,Long subRootId,
+			Date dateCreated,Date lastUpdated) {
 		
 		//String activityDescrption;
 	    //Long activityHolderId ;  
 		//String activityHolderType ;
 		//String activityType ;
-		Date dateCreated = new java.util.Date();
-		Date lastUpdated = new java.util.Date();
+		//Date dateCreated = new java.util.Date();
+		//Date lastUpdated = new java.util.Date();
 		
 		
 
@@ -210,7 +217,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 		    	myJson.setIs_migrated("true");
 		    	
 		    	myJson.setActivity_performed(activityPerformed);
-		    	//myJson.setIs_scientific_name(null);
+		    	myJson.setIs_scientific_name(isScientificName);
 		    }
 		    
 	    	
@@ -284,7 +291,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 			default:
 				//
 		}
-		ActivityFeed af = getDao().findActivityFeed(query,params);
+		ActivityFeed af = activityFeedDao.findActivityFeed(query,params);
 		delete(af.getId());
 	}
 

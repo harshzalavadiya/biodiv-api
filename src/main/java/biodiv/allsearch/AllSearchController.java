@@ -67,7 +67,7 @@ private final AllSearchService allSearchService=new AllSearchService();
 			return allSearchService.userSearch(location,content,name);
 		}
 		else if(module.equalsIgnoreCase("documents")){
-			return allSearchService.documentSearch(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,doctype);
+			return  allSearchService.documentSearch(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,doctype);
 		}
 		else if(module.equalsIgnoreCase("newsletter")){
 			return allSearchService.search(speciesname,location,license,query,name,contributor,tag,content,attribution,participants);

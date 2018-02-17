@@ -1,18 +1,23 @@
 package biodiv.observation;
 
-import biodiv.common.AbstractDao;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import biodiv.common.AbstractService;
 
-public class RecommendationService extends AbstractService<Recommendation>{
+public class RecommendationService extends AbstractService<Recommendation> {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private RecommendationDao recommendationDao;
-	
-	public RecommendationService(){
-		this.recommendationDao = new RecommendationDao();
-	}
-	@Override
-	public RecommendationDao getDao() {
-		return recommendationDao;
+
+	@Inject
+	RecommendationService(RecommendationDao recommendationDao) {
+		super(recommendationDao);
+		this.recommendationDao = recommendationDao;
+		log.trace("RecommendationService constructor");
 	}
 
 }

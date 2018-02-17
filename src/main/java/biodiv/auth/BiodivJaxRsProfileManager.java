@@ -13,14 +13,22 @@ import org.slf4j.LoggerFactory;
 import biodiv.auth.token.TokenService;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import javax.inject.Inject;
 
 public class BiodivJaxRsProfileManager extends JaxRsProfileManager {
 
 	protected Logger log = LoggerFactory.getLogger(getClass());
 
-	private TokenService tokenService = new TokenService();
-	private UserService userService = new UserService();
+    @Inject
+	private TokenService tokenService;
+
+    @Inject
+	private UserService userService;
 	
+    public BiodivJaxRsProfileManager() {
+		super(null);
+	}
+    
 	public BiodivJaxRsProfileManager(WebContext context) {
 		super(context);
 	}
@@ -28,7 +36,7 @@ public class BiodivJaxRsProfileManager extends JaxRsProfileManager {
 	@Override
 	public void logout() {
 		SecurityContext securityContext = getJaxRsContext().getRequestContext().getSecurityContext();
-
+		log.debug("SecurityContext : {0}", securityContext);
         //TODO:delete only refresh token if refreshtoken was provided in the request
 		//tokenService.removeRefreshToken(Long.parseLong(securityContext.getUserPrincipal().getName()));
         MultivaluedMap<String, String> queryParams = getJaxRsContext().getRequestContext().getUriInfo().getQueryParameters();
@@ -43,6 +51,8 @@ public class BiodivJaxRsProfileManager extends JaxRsProfileManager {
         //TODO: get userId and remove token for user and refreshToken
         Principal profile = securityContext.getUserPrincipal();
         if(profile != null) {                          
+            System.out.println (userService);
+            log.debug ("Found profile : ", profile);
             User user = userService.findById(Long.parseLong(profile.getName()));
             if(user != null && refreshToken != null) {
             	tokenService.removeRefreshToken(user.getId(), refreshToken);

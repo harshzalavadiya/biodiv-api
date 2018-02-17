@@ -2,12 +2,16 @@ package biodiv.customField;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import biodiv.activityFeed.ActivityFeed;
 import biodiv.activityFeed.ActivityFeedService;
@@ -20,25 +24,28 @@ import biodiv.userGroup.UserGroup;
 
 public class CustomFieldService extends AbstractService<CustomField> {
 	
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private CustomFieldDao customFieldDao;
 	
+	@Inject
+	private UserService userService;
 	
-	UserService userService = new UserService();
-	ActivityFeedService activityFeedService = new ActivityFeedService();
+	@Inject
+	private ActivityFeedService activityFeedService;
 	
-	public CustomFieldService(){
-		this.customFieldDao = new CustomFieldDao();
-	}
-
-	@Override
-	public CustomFieldDao getDao(){
-		return customFieldDao;
+	@Inject
+	CustomFieldService(CustomFieldDao customFieldDao){
+		super(customFieldDao);
+		this.customFieldDao = customFieldDao;
 	}
 
 	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId,Set<UserGroup> obvUserGrps) {
 	
 		try{
 			
+			Date dateCreated = new Date();
+			Date lastUpdated = dateCreated;
 			CustomField cf = findById(cfId);
 			if(cf == null){
 				return "cf not found error";
@@ -65,7 +72,7 @@ public class CustomFieldService extends AbstractService<CustomField> {
 						String description = activityDescription;
 						Map<String, Object> afNew = activityFeedService.createMapforAf("Object",obvId,null,
 								"species.participation.Observation","species.participation.Observation",obvId,
-								"Custom field edited","Custom field edited",activityDescription,description,null,null,true,null);
+								"Custom field edited","Custom field edited",activityDescription,description,null,null,null,true,null,dateCreated,lastUpdated);
 						
 						activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
 					}
@@ -90,11 +97,11 @@ public class CustomFieldService extends AbstractService<CustomField> {
 			if(isRowExist(CustomField.getTableNameForGroup(cf.getUserGroup().getId(),false),(Long) map.get("obvId"))){
 				query = "update "+CustomField.getTableNameForGroup(cf.getUserGroup().getId(),true)+" set "+
 						map.get("columnName")+" =:columnValue where observation_id =:obvId";
-				getDao().updateOrInsertRow(query,map,true);
+				customFieldDao.updateOrInsertRow(query,map,true);
 			}else{
 				query = "insert into "+CustomField.getTableNameForGroup(cf.getUserGroup().getId(),true)+"  ( observation_id, "+
 						map.get("columnName")+ " ) "+ " values (:obvId, :columnValue)";
-				getDao().updateOrInsertRow(query,map,false);
+				customFieldDao.updateOrInsertRow(query,map,false);
 			}
 		}catch(Exception e){
 			throw e;
@@ -108,7 +115,7 @@ public class CustomFieldService extends AbstractService<CustomField> {
 		
 		try{
 			String query = "select count(*) from "+tableName+" where observation.id =:obvId";
-			Long result = getDao().isRowExist(query,obvId);
+			Long result = customFieldDao.isRowExist(query,obvId);
 			if(result>0){
 				return true;
 			}else{
@@ -130,7 +137,7 @@ public class CustomFieldService extends AbstractService<CustomField> {
 			String query = "select cf1."+cf.fetchSqlColumnName(cf.getId(),false)+ " from "
 					+CustomField.getTableNameForGroup(cf.getUserGroup().getId(),false)+" cf1 where cf1.observation.id =:obvId";
 			//String query = "from "+CustomField.getTableNameForGroup(cf.getUserGroup().getId());
-			Object result = getDao().fetchValue(query,obvId);
+			Object result = customFieldDao.fetchValue(query,obvId);
 			return result;
 		}catch(Exception e){
 			throw e;
@@ -201,7 +208,7 @@ public class CustomFieldService extends AbstractService<CustomField> {
 	private List<CustomField> fetchCustomFieldsByGroup(UserGroup ug) {
 		
 		try{
-			List<CustomField> cf = getDao().fetchCustomFieldsByGroup(ug);
+			List<CustomField> cf = customFieldDao.fetchCustomFieldsByGroup(ug);
 			return cf;
 		}catch(Exception e){
 			throw e;

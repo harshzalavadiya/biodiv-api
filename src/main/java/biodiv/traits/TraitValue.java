@@ -16,7 +16,7 @@ import biodiv.common.CommonMethod;
  */
 @Entity
 @Table(name = "trait_value", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = { "value",
-		"trait_id" }))
+		"trait_instance_id" }))
 public class TraitValue extends CommonMethod implements java.io.Serializable {
 
 	private long id;
@@ -92,7 +92,7 @@ public class TraitValue extends CommonMethod implements java.io.Serializable {
 	}
 
 	
-	@Column(name = "trait_id", nullable = false)
+	@Column(name = "trait_instance_id", nullable = false)
 	public long getTraitId() {
 		return traitId;
 	}

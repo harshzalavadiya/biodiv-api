@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.elasticsearch.search.suggest.Suggest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,9 @@ import biodiv.taxon.datamodel.ui.TaxonRelation;
 import biodiv.taxon.search.SearchTaxon;
 
 public class TaxonService extends AbstractService<Taxon> {
-	private final Logger log = LoggerFactory.getLogger(TaxonService.class);
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private static final String ID = "id";
 	private static final String taxonid = "taxonid";
 	private static final String text = "text";
@@ -30,18 +34,14 @@ public class TaxonService extends AbstractService<Taxon> {
 	private static final String parent = "parent";
 	private static final String position = "position";
 	private static final String speciesId = "speciesId";
+	
 	private TaxonDao taxonDao;
 	
-
-	public TaxonService() {
-		this.taxonDao = new TaxonDao();
-	}
-	
-	
-	@Override
-	public TaxonDao getDao() {
-		// TODO Auto-generated method stub
-		return taxonDao;
+	@Inject
+	public TaxonService(TaxonDao taxonDao) {
+		super(taxonDao);
+		this.taxonDao = taxonDao;
+		log.trace("TaxonService constructor");
 	}
 	
 
