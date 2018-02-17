@@ -18,19 +18,17 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-
+import biodiv.esclient.ESClientProvider;
+import biodiv.esclient.ElasticSearchClient;
 import biodiv.taxon.service.TaxonService;
 
 public class SearchTaxon {
 
-	TaxonService taxonService = new TaxonService();
+	private final TaxonService taxonService = new TaxonService();
+	private final ElasticSearchClient client = ESClientProvider.getClient();
 
 	public Object search(String data) {
-		RestHighLevelClient client = new RestHighLevelClient(
-		        RestClient.builder(
-		                new HttpHost("localhost", 9200, "http")));
-		
-	
+
 		SearchRequest searchRequest = new SearchRequest("taxon"); 
 		searchRequest.types("taxon");
 	
@@ -41,7 +39,6 @@ public class SearchTaxon {
 		SearchResponse searchResponse=null;
 		try {
 			 searchResponse = client.search(searchRequest);
-			 client.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

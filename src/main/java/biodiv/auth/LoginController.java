@@ -109,6 +109,7 @@ public class LoginController {
 	@GET
 	@Pac4JCallback(skipResponse = true)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
 	public Response callback(@Pac4JProfile Optional<CommonProfile> profile) {
 		try {
 			if (profile.isPresent()) {
@@ -162,6 +163,7 @@ public class LoginController {
 	@POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Intercept
 	public Response token(@FormParam("grant_type") String grantType,
 			@FormParam("refresh_token") String refreshToken) {
 		try {
