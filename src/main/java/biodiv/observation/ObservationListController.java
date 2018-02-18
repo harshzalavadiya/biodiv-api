@@ -204,7 +204,7 @@ public class ObservationListController {
 
 		Date date = new Date();
 		SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
-		SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+		SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd 'T' HH:mm:ss");
 		String minDates = null;
 		String maxDates = null;
 		try {
