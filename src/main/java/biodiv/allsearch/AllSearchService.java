@@ -2,11 +2,11 @@ package biodiv.allsearch;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.TimeValue;
@@ -17,7 +17,10 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.InternalOrder.Aggregation;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.filter.Filters;
+import org.elasticsearch.search.aggregations.bucket.filter.Filters.Bucket;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import biodiv.esclient.ESClientProvider;
@@ -28,7 +31,7 @@ public class AllSearchService {
 	private final ElasticSearchClient client = ESClientProvider.getClient();
 	
 	
-	public AllSearchResponse search(String speciesname, String location, String license,String query,String name, String contributor, String tag, String content, String attribution, String participants) {
+	public AllSearchResponse search(String speciesname, String location, String license,String query,String name, String contributor, String tag, String content, String attribution, String participants,Integer from,Integer limit ) {
 		// TODO Auto-generated method stub
 		
 		//for seacrhing in all indices
@@ -102,9 +105,13 @@ public class AllSearchService {
 		}
 		
 		sourceBuilder.query(masterBoolQuery); 
+		if(from!=null){
+			sourceBuilder.from(from); 
+		}
+		if(limit!=null){
+			sourceBuilder.size(limit); 
+		}
 		
-		sourceBuilder.from(0); 
-		sourceBuilder.size(10); 
 		sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
 		sourceBuilder
 		.aggregation(AggregationBuilders.filters("user",QueryBuilders.typeQuery("user")))
@@ -120,17 +127,72 @@ public class AllSearchService {
 		List<Map<String,Object>> eData=new ArrayList<Map<String, Object>>();
 		SearchHits hits=null;
 		Aggregations aggregations=null;
+		List<Map<String,Object>> agg=new ArrayList<Map<String,Object>>();
 		try {
 			
 			SearchResponse searchResponse = client.search(searchRequest);
 			 hits = searchResponse.getHits();
 			  aggregations= searchResponse.getAggregations();
 			  
+			  Map<String, org.elasticsearch.search.aggregations.Aggregation> aggregationMap = aggregations.getAsMap();
+			  Filters observations = (Filters) aggregationMap.get("observations");
+			  Filters species = (Filters) aggregationMap.get("species");
+			  Filters documents = (Filters) aggregationMap.get("documents");
+			  Filters newsletter = (Filters) aggregationMap.get("newsletter");
+			  Filters user = (Filters) aggregationMap.get("user");
+			  Filters resource = (Filters) aggregationMap.get("resource");
+			  Filters project = (Filters) aggregationMap.get("project");
+			  Filters usergroup = (Filters) aggregationMap.get("usergroup");
+			  
+			  
+			  Bucket observationsB = observations.getBucketByKey("0");
+			  Bucket speciesB = species.getBucketByKey("0");
+			  Bucket documentsB = documents.getBucketByKey("0");
+			  Bucket newsletterB = newsletter.getBucketByKey("0");
+			  Bucket userB = user.getBucketByKey("0");
+			  Bucket resourceB = resource.getBucketByKey("0");
+			  Bucket projectB = project.getBucketByKey("0");
+			  Bucket usergroupB = usergroup.getBucketByKey("0");
+			  
+			  Map<String, Object> obv=new HashMap<String,Object>();
+			  obv.put("observations", observationsB.getDocCount());
+			  Map<String, Object> spe=new HashMap<String,Object>();
+			  spe.put("species", speciesB.getDocCount());
+			  Map<String, Object> doc=new HashMap<String,Object>();
+			  doc.put("documnets", documentsB.getDocCount());
+			  Map<String, Object> news=new HashMap<String,Object>();
+
+			  
+			  news.put("newsletter", newsletterB.getDocCount());
+			  Map<String, Object> use=new HashMap<String,Object>();
+			  use.put("user", userB.getDocCount());
+			  
+			  Map<String, Object> res=new HashMap<String,Object>();
+			  res.put("resource", resourceB.getDocCount());
+			  Map<String, Object> pro=new HashMap<String,Object>();
+			  pro.put("project", projectB.getDocCount());
+			  Map<String, Object> userg=new HashMap<String,Object>();
+			  userg.put("usergroup", usergroupB.getDocCount());
+			  
+			  agg.add(userg);
+			  agg.add(res);
+			  agg.add(use);
+			  agg.add(news);
+			  
+			  agg.add(spe);
+			  agg.add(pro);
+			  agg.add(doc);
+			  agg.add(obv);
 	    	long totalHits = hits.getTotalHits();
 	    	SearchHit[] searchHits = hits.getHits();
 	    	for (SearchHit hit : searchHits) {
 	    	    // do something with the SearchHit
-	    		 eData.add(hit.getSourceAsMap());
+	    		
+	    		Map<String,Object> data=new HashMap<String,Object>();
+	    		data.put("index",hit.getIndex());
+	    		data.put("type",hit.getType());
+	    		data.put("id", hit.getId());
+	    		eData.add(data);
 	    	}
 			
 		} catch (IOException e) {
@@ -138,12 +200,12 @@ public class AllSearchService {
 			e.printStackTrace();
 			
 		}
-		return new AllSearchResponse(hits.getTotalHits(), eData, aggregations.getAsMap());
+		return new AllSearchResponse(hits.getTotalHits(), eData, agg);
 		
 	}
 
 
-	public AllSearchResponse usergroupSearch(String location, String participants, String title, String pages) {
+	public AllSearchResponse usergroupSearch(String location, String participants, String title, String pages,Integer from, Integer limit) {
 		// TODO Auto-generated method stub
 		SearchRequest searchRequest = new SearchRequest("usergroup"); 
 		searchRequest.types("usergroup"); 
@@ -164,8 +226,8 @@ public class AllSearchService {
 		}
 		sourceBuilder.query(masterBoolQuery); 
 		
-		sourceBuilder.from(0); 
-		sourceBuilder.size(10); 
+		sourceBuilder.from(from); 
+		sourceBuilder.size(limit); 
 		sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
 		searchRequest.source(sourceBuilder);
 		List<Map<String,Object>> eData=new ArrayList<Map<String, Object>>();
@@ -180,8 +242,11 @@ public class AllSearchService {
 	    	long totalHits = hits.getTotalHits();
 	    	SearchHit[] searchHits = hits.getHits();
 	    	for (SearchHit hit : searchHits) {
-	    	    // do something with the SearchHit
-	    		 eData.add(hit.getSourceAsMap());
+	    		Map<String,Object> data=new HashMap<String,Object>();
+	    		data.put("index",hit.getIndex());
+	    		data.put("type",hit.getType());
+	    		data.put("id", hit.getId());
+	    		 eData.add(data);
 	    	}
 			
 		} catch (IOException e) {
@@ -193,7 +258,7 @@ public class AllSearchService {
 	}
 
 
-	public AllSearchResponse userSearch(String location, String content, String name) {
+	public AllSearchResponse userSearch(String location, String content, String name,Integer from, Integer limit) {
 		SearchRequest searchRequest = new SearchRequest("user"); 
 		searchRequest.types("user"); 
 		
@@ -210,8 +275,8 @@ public class AllSearchService {
 		
 		sourceBuilder.query(masterBoolQuery); 
 		
-		sourceBuilder.from(0); 
-		sourceBuilder.size(10); 
+		sourceBuilder.from(from); 
+		sourceBuilder.size(limit); 
 		sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
 		searchRequest.source(sourceBuilder);
 		List<Map<String,Object>> eData=new ArrayList<Map<String, Object>>();
@@ -227,7 +292,11 @@ public class AllSearchService {
 	    	SearchHit[] searchHits = hits.getHits();
 	    	for (SearchHit hit : searchHits) {
 	    	    // do something with the SearchHit
-	    		 eData.add(hit.getSourceAsMap());
+	    		Map<String,Object> data=new HashMap<String,Object>();
+	    		data.put("index",hit.getIndex());
+	    		data.put("type",hit.getType());
+	    		data.put("id", hit.getId());
+	    		 eData.add(data);
 	    	}
 			
 		} catch (IOException e) {
@@ -241,7 +310,7 @@ public class AllSearchService {
 
 	public AllSearchResponse documentSearch(String speciesname, String location, String license, String query,
 			String name, String contributor, String tag, String content, String attribution, String participants,
-			String doctype) {
+			String doctype,Integer from, Integer limit) {
 		// TODO Auto-generated method stub
 		SearchRequest searchRequest = new SearchRequest("documents"); 
 		searchRequest.types("documents"); 
@@ -258,8 +327,8 @@ public class AllSearchService {
 		
 		sourceBuilder.query(masterBoolQuery); 
 		
-		sourceBuilder.from(0); 
-		sourceBuilder.size(10); 
+		sourceBuilder.from(from); 
+		sourceBuilder.size(limit); 
 		sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
 		
 		searchRequest.source(sourceBuilder);
@@ -277,7 +346,11 @@ public class AllSearchService {
 	    	SearchHit[] searchHits = hits.getHits();
 	    	for (SearchHit hit : searchHits) {
 	    	    // do something with the SearchHit
-	    		 eData.add(hit.getSourceAsMap());
+	    		Map<String,Object> data=new HashMap<String,Object>();
+	    		data.put("index",hit.getIndex());
+	    		data.put("type",hit.getType());
+	    		data.put("id", hit.getId());
+	    		 eData.add(data);
 	    	}
 			
 		} catch (IOException e) {
