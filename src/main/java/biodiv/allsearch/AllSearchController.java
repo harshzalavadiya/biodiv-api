@@ -12,7 +12,7 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.Intercept;
+import biodiv.Transactional;
 import biodiv.observation.ObservationList;
 import biodiv.user.UserController;
 
@@ -31,7 +31,7 @@ private final AllSearchService allSearchService=new AllSearchService();
 	 */
 	@GET
 	@Path("/all")
-	@Intercept
+	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	public AllSearchResponse search(
 			@QueryParam("module") String module,
