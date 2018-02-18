@@ -86,8 +86,8 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		}
 		//query.setMaxResults(5);
 		List<Object[]> listResult = query.getResultList();
-		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-		System.out.println(listResult.get(0));
+		//System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		//System.out.println(listResult.get(0));
 		return listResult;
 	}
 
