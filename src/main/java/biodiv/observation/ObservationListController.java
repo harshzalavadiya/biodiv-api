@@ -204,7 +204,7 @@ public class ObservationListController {
 
 		Date date = new Date();
 		SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
-		SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd 'T' HH:mm:ss");
+		SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
 		String minDates = null;
 		String maxDates = null;
 		try {
@@ -223,7 +223,11 @@ public class ObservationListController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		System.out.println(minDateValue);
+		System.out.println(maxDateValue);
+		
+		
 		if (minDateValue != null && maxDateValue != null) {
 
 			rangeAndLists.add(new MapAndRangeQuery("fromdate", minDateValue, maxDateValue));

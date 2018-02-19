@@ -9,12 +9,12 @@ public class AllSearchResponse {
 
 	private Long count;
 	private List<Map<String,Object>> eData;
-	Map<String, Aggregation> aggregation;
-	public AllSearchResponse(Long count, List<Map<String, Object>> eData, Map<String, Aggregation> aggregation) {
+	List<Map<String,Object>> docCount;
+	public AllSearchResponse(Long count, List<Map<String, Object>> eData, List<Map<String, Object>> docCount) {
 		super();
 		this.count = count;
 		this.eData = eData;
-		this.aggregation = aggregation;
+		this.docCount = docCount;
 	}
 	public Long getCount() {
 		return count;
@@ -28,15 +28,12 @@ public class AllSearchResponse {
 	public void seteData(List<Map<String, Object>> eData) {
 		this.eData = eData;
 	}
-	public Map<String, Aggregation> getAggregation() {
-		return aggregation;
+	public List<Map<String, Object>> getDocCount() {
+		return docCount;
 	}
-	public void setAggregation(Map<String, Aggregation> aggregation) {
-		this.aggregation = aggregation;
+	public void setDocCount(List<Map<String, Object>> docCount) {
+		this.docCount = docCount;
 	}
-	
-	
-	
 	
 	
 }
