@@ -141,3 +141,4 @@ tomcat {
     //enableSSL = true
     contextPath = 'biodiv-api'
 }
+

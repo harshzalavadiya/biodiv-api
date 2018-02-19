@@ -1,5 +1,10 @@
 package biodiv;
 
+import java.io.File;
+
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,26 +35,25 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 	@Override
 	protected Injector getInjector() {
 		return Guice.createInjector(
-				new BiodivCommonModule(), 
-				new ActivityFeedModule(), 
-				new AuthModule(),
-				new CommentModule(), 
-				new CustomFieldModule(), 
-				new DatasetModule(), 
-				new FollowModule(), 				
-				new MapModule(),
-				new ObservationModule(), 
-				new TaxonModule(), 
-				new TraitModule(), 
-				new UserModule(), 
-				new UserGroupModule(),
-
 				new ServletModule() {
 
 					@Override
 					protected void configureServlets() {
 						log.debug("Configuring Servlets");
 
+						Configurations configs = new Configurations();
+						try
+						{
+							String ENV_NAME = "BIODIV_API_CONFIG";
+							log.info("Reading configuration from : {}", System.getenv(ENV_NAME));
+						    Configuration config = configs.properties(new File(System.getenv(ENV_NAME)));
+						    bind(Configuration.class).toInstance(config);
+						}
+						catch (ConfigurationException cex)
+						{
+							cex.printStackTrace();
+						}
+						
 						// rest("/*").packages("biodiv");
 
 						// INTERCEPTOR
@@ -62,7 +66,21 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 						//bind(BiodivResponseFilter.class).in(Singleton.class);
 
 					}
-				});
+				},
+				new BiodivCommonModule(), 
+				new ActivityFeedModule(), 
+				new AuthModule(),
+				new CommentModule(), 
+				new CustomFieldModule(), 
+				new DatasetModule(), 
+				new FollowModule(), 				
+				new MapModule(),
+				new ObservationModule(), 
+				new TaxonModule(), 
+				new TraitModule(), 
+				new UserModule(), 
+				new UserGroupModule()
+				);
 	}
 
 }
