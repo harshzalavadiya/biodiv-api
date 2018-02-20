@@ -16,12 +16,10 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.InternalOrder.Aggregation;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.filter.Filters;
 import org.elasticsearch.search.aggregations.bucket.filter.Filters.Bucket;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder.IndexBoost;
 
 import biodiv.esclient.ESClientProvider;
 import biodiv.esclient.ElasticSearchClient;
@@ -29,42 +27,57 @@ import biodiv.esclient.ElasticSearchClient;
 public class AllSearchService {
 
 	private final ElasticSearchClient client = ESClientProvider.getClient();
+	private static final String observation="observation";
+	private static final String species="species";
+	private static final String document="document";
+	private static final String newsletter="newsletter";
+	private static final String suser="suser";
+	private static final String resource="resource";
+	private static final String usergroup="usergroup";
 	
-	
-	public AllSearchResponse search(String speciesname, String location, String license,String query,String name, String contributor, String tag, String content, String attribution, String participants,Integer from,Integer limit ) {
+	public AllSearchResponse search(List<String> objectType,String speciesname, String location, String license,String query,String name, String contributor, String tag, String content, String attribution, String participants,String title, String pages, String doctype, Integer from,Integer limit ) {
 		// TODO Auto-generated method stub
 		
-		//for seacrhing in all indices
-		SearchRequest searchRequest = new SearchRequest(); 
+		/**
+		 * Create indices for searching
+		 */
+		String[] stockArr = new String[objectType.size()];
+		stockArr = objectType.toArray(stockArr);
+		SearchRequest searchRequest = new SearchRequest(stockArr); 
 		
 		/**
-		 * SearchSourceBuilder created for searches
+		 * Provide bossting for certain indices
 		 */
+		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder().indexBoost(suser,8).indexBoost(species, 7).indexBoost(observation, 6).indexBoost(usergroup, 5).
+				indexBoost(resource,4).indexBoost(newsletter, 3).indexBoost(document, 2); 
 		
-		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder(); 
-		
+		/**
+		 * Building bool query
+		 * Masterboolquery is for ANDing all the result
+		 * boolquery is for ORing all result
+		 */
 		BoolQueryBuilder boolQuery = null;
 		BoolQueryBuilder masterBoolQuery = QueryBuilders.boolQuery();
 		
-		if(location!=null){
+		if(location!=null && !location.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("location", location));
 			boolQuery.should(QueryBuilders.matchQuery("placename", location));
 			masterBoolQuery.must(boolQuery);
 		}
-		if(license!=null){
+		if(license!=null && !license.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("license.firstValue", license));
 			boolQuery.should(QueryBuilders.matchQuery("license", license));
 			boolQuery.should(QueryBuilders.matchQuery("licensename", license));
 			masterBoolQuery.must(boolQuery);
 		}
-		if(query!=null){
+		if(query!=null && !query.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("all", query));
 			masterBoolQuery.must(boolQuery);
 		}
-		if(name!=null){
+		if(name!=null && !name.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("name", name));
 			boolQuery.should(QueryBuilders.matchQuery("email", name));
@@ -77,7 +90,7 @@ public class AllSearchService {
 			masterBoolQuery.must(boolQuery);
 		}
 		
-		if(contributor!=null){
+		if(contributor!=null && !contributor.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("authorname", contributor));
 			boolQuery.should(QueryBuilders.matchQuery("contributor.value", contributor));
@@ -86,48 +99,76 @@ public class AllSearchService {
 			boolQuery.should(QueryBuilders.matchQuery("member", contributor));
 			masterBoolQuery.must(boolQuery);
 		}
-		if(tag!=null){
+		if(tag!=null && !tag.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("tag", tag));
 			masterBoolQuery.must(boolQuery);
 		}
-		if(attribution!=null){
+		if(attribution!=null && !attribution.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("attribution", attribution));
 			boolQuery.should(QueryBuilders.matchQuery("group_webaddress", name));
 			masterBoolQuery.must(boolQuery);
 		}
-		if(participants!=null){
+		if(participants!=null && !participants.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("participants", participants));
 			boolQuery.should(QueryBuilders.matchQuery("member", participants));
 			masterBoolQuery.must(boolQuery);
 		}
+
+		if(title!=null && !title.isEmpty()){
+			boolQuery=QueryBuilders.boolQuery();
+			boolQuery.should(QueryBuilders.matchQuery("title", title));
+			 masterBoolQuery.must(boolQuery);
+		}
+		if(pages!=null && !pages.isEmpty()){
+			boolQuery=QueryBuilders.boolQuery();
+			boolQuery.should(QueryBuilders.matchQuery("pages", pages));
+			masterBoolQuery.must(boolQuery);
+		}
+		if(doctype!=null && !doctype.isEmpty()){
+			boolQuery=QueryBuilders.boolQuery();
+			boolQuery.should(QueryBuilders.matchQuery("doc_type", doctype));
+			 masterBoolQuery.must(boolQuery);
+		}
+		/**
+		 * Create complete query
+		 */
+		
 		
 		sourceBuilder.query(masterBoolQuery); 
-		if(from!=null){
-			sourceBuilder.from(from); 
-		}
-		if(limit!=null){
-			sourceBuilder.size(limit); 
-		}
+		
+		/**
+		 * Limit offset
+		 */
+		sourceBuilder.from(from); 
+		sourceBuilder.size(limit); 
+		
 		
 		sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+		/**
+		 * Building aggregation on type level
+		 */
 		sourceBuilder
-		.aggregation(AggregationBuilders.filters("user",QueryBuilders.typeQuery("user")))
-		.aggregation(AggregationBuilders.filters("newsletter",QueryBuilders.typeQuery("newsletter")))
-		.aggregation(AggregationBuilders.filters("resource",QueryBuilders.typeQuery("resource")))
-		.aggregation(AggregationBuilders.filters("documents",QueryBuilders.typeQuery("documnets")))
-		.aggregation(AggregationBuilders.filters("usergroup",QueryBuilders.typeQuery("usergroup")))
-		.aggregation(AggregationBuilders.filters("observations",QueryBuilders.typeQuery("observations")))
-		.aggregation(AggregationBuilders.filters("species",QueryBuilders.typeQuery("species")))
-		.aggregation(AggregationBuilders.filters("project",QueryBuilders.typeQuery("project")));
+		.aggregation(AggregationBuilders.filters(suser,QueryBuilders.typeQuery(suser)))
+		.aggregation(AggregationBuilders.filters(newsletter,QueryBuilders.typeQuery(newsletter)))
+		.aggregation(AggregationBuilders.filters(resource,QueryBuilders.typeQuery(resource)))
+		.aggregation(AggregationBuilders.filters(document,QueryBuilders.typeQuery(document)))
+		.aggregation(AggregationBuilders.filters(usergroup,QueryBuilders.typeQuery(usergroup)))
+		.aggregation(AggregationBuilders.filters(observation,QueryBuilders.typeQuery(observation)))
+		.aggregation(AggregationBuilders.filters(species,QueryBuilders.typeQuery(species)));
 		searchRequest.source(sourceBuilder);
 		
+		/**
+		 *Getting the result hits 
+		 */
 		List<Map<String,Object>> eData=new ArrayList<Map<String, Object>>();
 		SearchHits hits=null;
 		Aggregations aggregations=null;
+		
 		List<Map<String,Object>> agg=new ArrayList<Map<String,Object>>();
+		
 		try {
 			
 			SearchResponse searchResponse = client.search(searchRequest);
@@ -135,54 +176,81 @@ public class AllSearchService {
 			  aggregations= searchResponse.getAggregations();
 			  
 			  Map<String, org.elasticsearch.search.aggregations.Aggregation> aggregationMap = aggregations.getAsMap();
-			  Filters observations = (Filters) aggregationMap.get("observations");
-			  Filters species = (Filters) aggregationMap.get("species");
-			  Filters documents = (Filters) aggregationMap.get("documents");
-			  Filters newsletter = (Filters) aggregationMap.get("newsletter");
-			  Filters user = (Filters) aggregationMap.get("user");
-			  Filters resource = (Filters) aggregationMap.get("resource");
-			  Filters project = (Filters) aggregationMap.get("project");
-			  Filters usergroup = (Filters) aggregationMap.get("usergroup");
+			  Filters observationsf = (Filters) aggregationMap.get(observation);
+			  Filters speciesf = (Filters) aggregationMap.get(species);
+			  Filters documentsf = (Filters) aggregationMap.get(document);
+			  Filters newsletterf = (Filters) aggregationMap.get(newsletter);
+			  Filters userf = (Filters) aggregationMap.get(suser);
+			  Filters resourcef = (Filters) aggregationMap.get(resource);
+		
+			  Filters usergroupf = (Filters) aggregationMap.get(usergroup);
+			
 			  
 			  
-			  Bucket observationsB = observations.getBucketByKey("0");
-			  Bucket speciesB = species.getBucketByKey("0");
-			  Bucket documentsB = documents.getBucketByKey("0");
-			  Bucket newsletterB = newsletter.getBucketByKey("0");
-			  Bucket userB = user.getBucketByKey("0");
-			  Bucket resourceB = resource.getBucketByKey("0");
-			  Bucket projectB = project.getBucketByKey("0");
-			  Bucket usergroupB = usergroup.getBucketByKey("0");
+			  Bucket observationsB = observationsf.getBucketByKey("0");
+			  Bucket speciesB = speciesf.getBucketByKey("0");
+			  Bucket documentsB = documentsf.getBucketByKey("0");
+			  Bucket newsletterB = newsletterf.getBucketByKey("0");
+			  Bucket userB = userf.getBucketByKey("0");
+			  Bucket resourceB = resourcef.getBucketByKey("0");
+			  Bucket usergroupB = usergroupf.getBucketByKey("0");
 			  
-			  Map<String, Object> obv=new HashMap<String,Object>();
-			  obv.put("observations", observationsB.getDocCount());
-			  Map<String, Object> spe=new HashMap<String,Object>();
-			  spe.put("species", speciesB.getDocCount());
-			  Map<String, Object> doc=new HashMap<String,Object>();
-			  doc.put("documnets", documentsB.getDocCount());
-			  Map<String, Object> news=new HashMap<String,Object>();
-
 			  
-			  news.put("newsletter", newsletterB.getDocCount());
-			  Map<String, Object> use=new HashMap<String,Object>();
-			  use.put("user", userB.getDocCount());
+			  if(observationsB.getDocCount()>0){
+				  Map<String, Object> obv=new HashMap<String,Object>();
+				  obv.put("Observation", observationsB.getDocCount());  
+				  agg.add(obv);
+				  
+			  }
 			  
-			  Map<String, Object> res=new HashMap<String,Object>();
-			  res.put("resource", resourceB.getDocCount());
-			  Map<String, Object> pro=new HashMap<String,Object>();
-			  pro.put("project", projectB.getDocCount());
-			  Map<String, Object> userg=new HashMap<String,Object>();
-			  userg.put("usergroup", usergroupB.getDocCount());
+			 
+			  if(speciesB.getDocCount()>0){
+				  Map<String, Object> spe=new HashMap<String,Object>();
+				  spe.put("Species", speciesB.getDocCount());
+				  agg.add(spe);
+				  
+			  }
 			  
-			  agg.add(userg);
-			  agg.add(res);
-			  agg.add(use);
-			  agg.add(news);
 			  
-			  agg.add(spe);
-			  agg.add(pro);
-			  agg.add(doc);
-			  agg.add(obv);
+			 
+			  if(documentsB.getDocCount()>0){
+				  Map<String, Object> doc=new HashMap<String,Object>();
+				  doc.put("Documnets", documentsB.getDocCount());
+				  agg.add(doc);
+			  }
+			 
+			  
+			  
+			  if(newsletterB.getDocCount()>0){
+				  Map<String, Object> news=new HashMap<String,Object>();
+				  news.put("NewsLetter", newsletterB.getDocCount());
+				  agg.add(news);
+			  }
+			  
+			  
+			  
+			  if(userB.getDocCount()>0){
+				  Map<String, Object> use=new HashMap<String,Object>();
+				  use.put("SUser", userB.getDocCount());
+				  agg.add(use);
+			  }
+			  
+			  
+			 
+			  if(resourceB.getDocCount()>0){
+				  Map<String, Object> res=new HashMap<String,Object>();
+				  res.put("Resource", resourceB.getDocCount());
+				  agg.add(res);
+			  }
+			  
+			
+			 
+			  if(usergroupB.getDocCount()>0){
+				  Map<String, Object> userg=new HashMap<String,Object>();
+				  userg.put("UserGroup", usergroupB.getDocCount());
+				  agg.add(userg);
+			  }
+			  
 	    	long totalHits = hits.getTotalHits();
 	    	SearchHit[] searchHits = hits.getHits();
 	    	for (SearchHit hit : searchHits) {
@@ -204,161 +272,205 @@ public class AllSearchService {
 		
 	}
 
-
-	public AllSearchResponse usergroupSearch(String location, String participants, String title, String pages,Integer from, Integer limit) {
+	public AllSearchResponse obvsearch(List<String> objectType, String speciesname, String location, String license,
+			String query, String name, String contributor, String tag, String content, String attribution,
+			String participants, String title, String pages, String doctype, Integer from, Integer limit) {
 		// TODO Auto-generated method stub
-		SearchRequest searchRequest = new SearchRequest("usergroup"); 
-		searchRequest.types("usergroup"); 
 		
-		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder(); 
-		BoolQueryBuilder boolQuery = null;
-		BoolQueryBuilder masterBoolQuery = QueryBuilders.boolQuery();
+				/**
+				 * Create indices for searching
+				 */
+				String[] stockArr = new String[objectType.size()];
+				stockArr = objectType.toArray(stockArr);
+				SearchRequest searchRequest = new SearchRequest(stockArr); 
+				
+				/**
+				 * Provide bossting for certain indices
+				 */
+				SearchSourceBuilder sourceBuilder = new SearchSourceBuilder().indexBoost(suser,8).indexBoost(species, 7).indexBoost(observation, 6).indexBoost(usergroup, 5).
+						indexBoost(resource,4).indexBoost(newsletter, 3).indexBoost(document, 2); 
+				
+				/**
+				 * Building bool query
+				 * Masterboolquery is for ANDing all the result
+				 * boolquery is for ORing all result
+				 */
+				BoolQueryBuilder boolQuery = null;
+				BoolQueryBuilder masterBoolQuery = QueryBuilders.boolQuery();
+				
+				if(location!=null && !location.isEmpty()){
+					boolQuery=QueryBuilders.boolQuery();
+					boolQuery.should(QueryBuilders.matchQuery("placename", location));
+					masterBoolQuery.must(boolQuery);
+				}
+				if(license!=null && !license.isEmpty()){
+					boolQuery=QueryBuilders.boolQuery();
+					boolQuery.should(QueryBuilders.matchQuery("licensename", license));
+					masterBoolQuery.must(boolQuery);
+				}
+				if(query!=null && !query.isEmpty()){
+					boolQuery=QueryBuilders.boolQuery();
+					boolQuery.should(QueryBuilders.matchQuery("all", query));
+					masterBoolQuery.must(boolQuery);
+				}
+				if(name!=null && !name.isEmpty()){
+					boolQuery=QueryBuilders.boolQuery();
+					boolQuery.should(QueryBuilders.matchQuery("name", name));
+					masterBoolQuery.must(boolQuery);
+				}
+				
+				if(contributor!=null && !contributor.isEmpty()){
+					boolQuery=QueryBuilders.boolQuery();
+					boolQuery.should(QueryBuilders.matchQuery("authorname", contributor));
+					masterBoolQuery.must(boolQuery);
+				}
 		
-		if(title!=null){
-			boolQuery=QueryBuilders.boolQuery();
-			boolQuery.should(QueryBuilders.matchQuery("title", title));
-			 masterBoolQuery.must(boolQuery);
-		}
-		if(pages!=null){
-			boolQuery=QueryBuilders.boolQuery();
-			boolQuery.should(QueryBuilders.matchQuery("pages", pages));
-			masterBoolQuery.must(boolQuery);
-		}
-		sourceBuilder.query(masterBoolQuery); 
-		
-		sourceBuilder.from(from); 
-		sourceBuilder.size(limit); 
-		sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
-		searchRequest.source(sourceBuilder);
-		List<Map<String,Object>> eData=new ArrayList<Map<String, Object>>();
-		SearchHits hits=null;
-		
-		try {
-			
-			SearchResponse searchResponse = client.search(searchRequest);
-			 hits = searchResponse.getHits();
-			 
-			  
-	    	long totalHits = hits.getTotalHits();
-	    	SearchHit[] searchHits = hits.getHits();
-	    	for (SearchHit hit : searchHits) {
-	    		Map<String,Object> data=new HashMap<String,Object>();
-	    		data.put("index",hit.getIndex());
-	    		data.put("type",hit.getType());
-	    		data.put("id", hit.getId());
-	    		 eData.add(data);
-	    	}
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
-		}
-		return new AllSearchResponse(hits.getTotalHits(), eData, null);
-	}
+				
+				
 
-
-	public AllSearchResponse userSearch(String location, String content, String name,Integer from, Integer limit) {
-		SearchRequest searchRequest = new SearchRequest("user"); 
-		searchRequest.types("user"); 
-		
-		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder(); 
-		BoolQueryBuilder boolQuery = null;
-		BoolQueryBuilder masterBoolQuery = QueryBuilders.boolQuery();
-		
-		if(name!=null){
-			boolQuery=QueryBuilders.boolQuery();
-			boolQuery.should(QueryBuilders.matchQuery("name", name));
-			boolQuery.should(QueryBuilders.matchQuery("email", name));
-			 masterBoolQuery.must(boolQuery);
-		}
-		
-		sourceBuilder.query(masterBoolQuery); 
-		
-		sourceBuilder.from(from); 
-		sourceBuilder.size(limit); 
-		sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
-		searchRequest.source(sourceBuilder);
-		List<Map<String,Object>> eData=new ArrayList<Map<String, Object>>();
-		SearchHits hits=null;
-		
-		try {
-			
-			SearchResponse searchResponse = client.search(searchRequest);
-			 hits = searchResponse.getHits();
-			 
-			  
-	    	long totalHits = hits.getTotalHits();
-	    	SearchHit[] searchHits = hits.getHits();
-	    	for (SearchHit hit : searchHits) {
-	    	    // do something with the SearchHit
-	    		Map<String,Object> data=new HashMap<String,Object>();
-	    		data.put("index",hit.getIndex());
-	    		data.put("type",hit.getType());
-	    		data.put("id", hit.getId());
-	    		 eData.add(data);
-	    	}
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
-		}
-		return new AllSearchResponse(hits.getTotalHits(), eData, null);
-	}
-
-
-	public AllSearchResponse documentSearch(String speciesname, String location, String license, String query,
-			String name, String contributor, String tag, String content, String attribution, String participants,
-			String doctype,Integer from, Integer limit) {
-		// TODO Auto-generated method stub
-		SearchRequest searchRequest = new SearchRequest("documents"); 
-		searchRequest.types("documents"); 
-		
-		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder(); 
-		BoolQueryBuilder boolQuery = null;
-		BoolQueryBuilder masterBoolQuery = QueryBuilders.boolQuery();
-		
-		if(doctype!=null){
-			boolQuery=QueryBuilders.boolQuery();
-			boolQuery.should(QueryBuilders.matchQuery("doc_type", doctype));
-			 masterBoolQuery.must(boolQuery);
-		}
-		
-		sourceBuilder.query(masterBoolQuery); 
-		
-		sourceBuilder.from(from); 
-		sourceBuilder.size(limit); 
-		sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
-		
-		searchRequest.source(sourceBuilder);
-		
-		List<Map<String,Object>> eData=new ArrayList<Map<String, Object>>();
-		SearchHits hits=null;
-		Aggregations aggregations=null;
-		try {
-			
-			SearchResponse searchResponse = client.search(searchRequest);
-			 hits = searchResponse.getHits();
-			  aggregations= searchResponse.getAggregations();
-			  
-	    	long totalHits = hits.getTotalHits();
-	    	SearchHit[] searchHits = hits.getHits();
-	    	for (SearchHit hit : searchHits) {
-	    	    // do something with the SearchHit
-	    		Map<String,Object> data=new HashMap<String,Object>();
-	    		data.put("index",hit.getIndex());
-	    		data.put("type",hit.getType());
-	    		data.put("id", hit.getId());
-	    		 eData.add(data);
-	    	}
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
-		}
-		return new AllSearchResponse(hits.getTotalHits(), eData, null);
+				if(title!=null && !title.isEmpty()){
+					boolQuery=QueryBuilders.boolQuery();
+					boolQuery.should(QueryBuilders.matchQuery("title", title));
+					 masterBoolQuery.must(boolQuery);
+				}
+				
+				/**
+				 * Create complete query
+				 */
+				
+				
+				sourceBuilder.query(masterBoolQuery); 
+				
+				/**
+				 * Limit offset
+				 */
+				sourceBuilder.from(from); 
+				sourceBuilder.size(limit); 
+				
+				
+				sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+				/**
+				 * Building aggregation on type level
+				 */
+				sourceBuilder
+				.aggregation(AggregationBuilders.filters(suser,QueryBuilders.typeQuery(suser)))
+				.aggregation(AggregationBuilders.filters(newsletter,QueryBuilders.typeQuery(newsletter)))
+				.aggregation(AggregationBuilders.filters(resource,QueryBuilders.typeQuery(resource)))
+				.aggregation(AggregationBuilders.filters(document,QueryBuilders.typeQuery(document)))
+				.aggregation(AggregationBuilders.filters(usergroup,QueryBuilders.typeQuery(usergroup)))
+				.aggregation(AggregationBuilders.filters(observation,QueryBuilders.typeQuery(observation)))
+				.aggregation(AggregationBuilders.filters(species,QueryBuilders.typeQuery(species)));
+				searchRequest.source(sourceBuilder);
+				
+				/**
+				 *Getting the result hits 
+				 */
+				List<Map<String,Object>> eData=new ArrayList<Map<String, Object>>();
+				SearchHits hits=null;
+				Aggregations aggregations=null;
+				
+				List<Map<String,Object>> agg=new ArrayList<Map<String,Object>>();
+				
+				try {
+					
+					SearchResponse searchResponse = client.search(searchRequest);
+					 hits = searchResponse.getHits();
+					  aggregations= searchResponse.getAggregations();
+					  
+					  Map<String, org.elasticsearch.search.aggregations.Aggregation> aggregationMap = aggregations.getAsMap();
+					  Filters observationsf = (Filters) aggregationMap.get(observation);
+					  Filters speciesf = (Filters) aggregationMap.get(species);
+					  Filters documentsf = (Filters) aggregationMap.get(document);
+					  Filters newsletterf = (Filters) aggregationMap.get(newsletter);
+					  Filters userf = (Filters) aggregationMap.get(suser);
+					  Filters resourcef = (Filters) aggregationMap.get(resource);
+				
+					  Filters usergroupf = (Filters) aggregationMap.get(usergroup);
+					
+					  
+					  
+					  Bucket observationsB = observationsf.getBucketByKey("0");
+					  Bucket speciesB = speciesf.getBucketByKey("0");
+					  Bucket documentsB = documentsf.getBucketByKey("0");
+					  Bucket newsletterB = newsletterf.getBucketByKey("0");
+					  Bucket userB = userf.getBucketByKey("0");
+					  Bucket resourceB = resourcef.getBucketByKey("0");
+					  Bucket usergroupB = usergroupf.getBucketByKey("0");
+					  
+					  
+					  if(observationsB.getDocCount()>0){
+						  Map<String, Object> obv=new HashMap<String,Object>();
+						  obv.put("Observation", observationsB.getDocCount());  
+						  agg.add(obv);
+						  
+					  }
+					  
+					 
+					  if(speciesB.getDocCount()>0){
+						  Map<String, Object> spe=new HashMap<String,Object>();
+						  spe.put("Species", speciesB.getDocCount());
+						  agg.add(spe);
+						  
+					  }
+					  
+					  
+					 
+					  if(documentsB.getDocCount()>0){
+						  Map<String, Object> doc=new HashMap<String,Object>();
+						  doc.put("Documnets", documentsB.getDocCount());
+						  agg.add(doc);
+					  }
+					 
+					  
+					  
+					  if(newsletterB.getDocCount()>0){
+						  Map<String, Object> news=new HashMap<String,Object>();
+						  news.put("NewsLetter", newsletterB.getDocCount());
+						  agg.add(news);
+					  }
+					  
+					  
+					  
+					  if(userB.getDocCount()>0){
+						  Map<String, Object> use=new HashMap<String,Object>();
+						  use.put("SUser", userB.getDocCount());
+						  agg.add(use);
+					  }
+					  
+					  
+					 
+					  if(resourceB.getDocCount()>0){
+						  Map<String, Object> res=new HashMap<String,Object>();
+						  res.put("Resource", resourceB.getDocCount());
+						  agg.add(res);
+					  }
+					  
+					
+					 
+					  if(usergroupB.getDocCount()>0){
+						  Map<String, Object> userg=new HashMap<String,Object>();
+						  userg.put("UserGroup", usergroupB.getDocCount());
+						  agg.add(userg);
+					  }
+					  
+			    	long totalHits = hits.getTotalHits();
+			    	SearchHit[] searchHits = hits.getHits();
+			    	for (SearchHit hit : searchHits) {
+			    	    // do something with the SearchHit
+			    		
+			    		Map<String,Object> data=new HashMap<String,Object>();
+			    		data.put("index",hit.getIndex());
+			    		data.put("type",hit.getType());
+			    		data.put("id", hit.getId());
+			    		eData.add(data);
+			    	}
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					
+				}
+				return new AllSearchResponse(hits.getTotalHits(), eData, agg);
 	}
 
 }

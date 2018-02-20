@@ -77,6 +77,7 @@ public class ObservationListMapper {
 	private String thumbnail;
 	private String path;
 	private String frommonth;
+	private String all;
 	private String classificationid;
 	private List<String> usergroupid;
 	private List<String> usergroupname;
@@ -92,6 +93,8 @@ public class ObservationListMapper {
 	private List<Double> trait_15;
 	private List<String> imageresource;
 	private List<Double> traits;
+	
+	
 	public ObservationListMapper() {
 		super();
 	}
@@ -783,10 +786,14 @@ public class ObservationListMapper {
 	public void setTraits(List<Double> traits) {
 		this.traits = traits;
 	}
-	
-	
-	
-	
+
+	public String getAll() {
+		return all;
+	}
+
+	public void setAll(String all) {
+		this.all = all;
+	}
 	
 	
 }

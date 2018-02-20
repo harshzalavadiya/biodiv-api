@@ -1,5 +1,12 @@
 package biodiv.allsearch;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -36,7 +43,6 @@ private final AllSearchService allSearchService=new AllSearchService();
 	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	public AllSearchResponse search(
-			@QueryParam("module") String module,
 			@QueryParam("speciesname") String speciesname,
 			@QueryParam("location") String location,
 			@QueryParam("license") String license,
@@ -44,43 +50,32 @@ private final AllSearchService allSearchService=new AllSearchService();
 			@QueryParam("name") String name,
 			@QueryParam("contributor") String contributor,
 			@QueryParam("tag") String tag,
-			@QueryParam("content") String content,
+			@QueryParam("text") String content,
 			@QueryParam("attribution") String attribution,
-			@QueryParam("participants") String participants,
+			@QueryParam("member") String participants,
 			@QueryParam("title") String title,
 			@QueryParam("pages") String pages,
 			@QueryParam("doctype") String doctype,
 			@DefaultValue("0") @QueryParam("from") Integer from,
-			@DefaultValue("10") @QueryParam("limit") Integer limit
+			@DefaultValue("12") @QueryParam("limit") Integer limit,
+			@QueryParam("object_type") String object_type
 			){
-		
-		if(module.equalsIgnoreCase("all")){
-			return allSearchService.search(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,from, limit);	
+		List<String> listData=new ArrayList<>();
+		if(object_type!=null){
+			String [] objectType = object_type.split("OR");
 			
+			for(String data:objectType){
+				listData.add(data.trim().toLowerCase());
+				
+			}
 		}
-		else if(module.equalsIgnoreCase("observations")){
-			return allSearchService.search(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,from,limit);
+		if(listData.size()==1 && listData.contains("observation")){
+			return allSearchService.obvsearch(listData,speciesname,location,license,query,name,contributor,tag,content,
+					attribution,participants,title,pages,doctype,from, limit);	
 		}
-		else if(module.equalsIgnoreCase("species")){
-			return allSearchService.search(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,from,limit);
-		}
-		else if(module.equalsIgnoreCase("usergroups")){
-			return allSearchService.usergroupSearch(location,participants,title,pages,from,limit);
-		}
-		else if(module.equalsIgnoreCase("users")){
-			return allSearchService.userSearch(location,content,name,from,limit);
-		}
-		else if(module.equalsIgnoreCase("documents")){
-			return  allSearchService.documentSearch(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,doctype,from,limit);
-		}
-		else if(module.equalsIgnoreCase("newsletter")){
-			return allSearchService.search(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,from,limit);
-		}
-		else if(module.equalsIgnoreCase("resouces")){
-			return allSearchService.search(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,from,limit);
-		}
-		else{
-			return allSearchService.search(speciesname,location,license,query,name,contributor,tag,content,attribution,participants,from,limit);
-		}	
+		
+		return allSearchService.search(listData,speciesname,location,license,query,name,contributor,tag,content,
+				attribution,participants,title,pages,doctype,from, limit);	
+			
 	}
 }
