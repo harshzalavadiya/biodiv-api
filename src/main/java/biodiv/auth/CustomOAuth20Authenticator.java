@@ -24,6 +24,8 @@ public class CustomOAuth20Authenticator extends OAuth20Authenticator {
 	        // no request token saved in context and no token (OAuth v2.0)
 	        final String code = oAuth20Credentials.getCode();
 	        logger.debug("code: {}", code);
+	        logger.debug("{}", this.configuration);
+
 	        final OAuth2AccessToken accessToken;
 	        try {
 	            accessToken = this.configuration.getService().getAccessToken(code);

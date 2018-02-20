@@ -22,6 +22,7 @@ import biodiv.auth.register.RegisterController;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenDao;
 import biodiv.auth.token.TokenService;
+import biodiv.auth.CustomJaxRsUrlResolver;
 
 public class AuthModule extends ServletModule {
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -118,7 +119,10 @@ public class AuthModule extends ServletModule {
 		config.addAuthorizer("ROLE_SPECIES_ADMIN", new RequireAnyRoleAuthorizer("ROLE_SPECIES_ADMIN"));
 		config.addAuthorizer("ROLE_CEPF_ADMIN", new RequireAnyRoleAuthorizer("ROLE_CEPF_ADMIN"));
 		// config.addAuthorizer("custom", new CustomAuthorizer());
-        //
+        
+        google2Client.setUrlResolver(new CustomJaxRsUrlResolver());
+//        config.getClients().setCallbackUrlResolver(new CustomJaxRsUrlResolver());
+//        config.getClients().setAjaxRequestResolver(new JaxRsAjaxRequestResolver());
 
 		log.trace("Setting LogoutLogic in pac4jConfig");
         config.setLogoutLogic(biodivLogoutLogic);
