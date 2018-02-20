@@ -72,8 +72,13 @@ public class AuthModule extends ServletModule {
 		final String googleSecret = config.getString("googleSecret");
 		final Google2Client google2Client = new Google2Client(googleId, googleSecret);
 		// google2Client.setStateData("biodiv-api-state");
-		google2Client.setAuthenticator(new CustomOAuth20Authenticator(google2Client.getConfiguration()));
-		google2Client.setProfileCreator(new CustomOAuth2ProfileCreator(google2Client.getConfiguration()));
+        CustomOAuth20Authenticator customOAuth20Authenticator = new CustomOAuth20Authenticator(google2Client.getConfiguration());
+        CustomOAuth2ProfileCreator customOAuth2ProfileCreator = new CustomOAuth2ProfileCreator(google2Client.getConfiguration());
+        //used to inject userService
+        injector.injectMembers(customOAuth2ProfileCreator);
+
+		google2Client.setAuthenticator(customOAuth20Authenticator);
+		google2Client.setProfileCreator(customOAuth2ProfileCreator);
 		google2Client.setCallbackUrl(config.getString("googleCallback"));
 
 		return google2Client;

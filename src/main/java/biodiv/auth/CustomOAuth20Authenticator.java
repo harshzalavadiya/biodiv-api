@@ -14,7 +14,7 @@ import com.github.scribejava.core.model.OAuth2AccessToken;
 
 public class CustomOAuth20Authenticator extends OAuth20Authenticator {
 
-	 public CustomOAuth20Authenticator(OAuth20Configuration configuration) {
+    public CustomOAuth20Authenticator(OAuth20Configuration configuration) {
 		super(configuration);
 	}
 

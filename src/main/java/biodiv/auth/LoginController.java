@@ -69,8 +69,6 @@ public class LoginController {
 	public Response auth(@FormParam("username") String username, @FormParam("password") String password) {
 
 		try {
-			System.out.println(userService);
-			System.out.println("AUTH---------------------------------------------");
 			// validate credentials
 			CommonProfile profile = authenticate(username, password);
 
