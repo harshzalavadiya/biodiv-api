@@ -370,6 +370,16 @@ public class ObservationService extends AbstractService<Observation> {
 				obvRecoVotesResult.put("recoVotes", finalRecos); // have to sort
 																	// later
 			}
+			for(Long obvId : obvIds){
+				if(obvListRecoVotesResult.get(obvId.toString()) == null){
+					System.out.println("id not found");
+					Map<String,Object> a =  new HashMap<String,Object>();
+					a.put("recoVotes", new ArrayList());
+					a.put("totalVotes", 0);
+					a.put("uniqueVotes", 0);
+					obvListRecoVotesResult.put(obvId.toString(),a);
+				}
+			}
 			return obvListRecoVotesResult;
 		} catch (Exception e) {
 			throw e;

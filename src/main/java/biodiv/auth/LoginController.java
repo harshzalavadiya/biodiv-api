@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.configuration2.Configuration;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.profile.CommonProfile;
@@ -46,8 +47,11 @@ public class LoginController {
     @Inject
     private SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator;
 
+    @Inject
+    Configuration config;
+    
     public LoginController() {
-    	System.out.println("Login Controller");
+    	log.debug("Login Controller");
     }
     
 	/**
@@ -65,8 +69,6 @@ public class LoginController {
 	public Response auth(@FormParam("username") String username, @FormParam("password") String password) {
 
 		try {
-			System.out.println(userService);
-			System.out.println("AUTH---------------------------------------------");
 			// validate credentials
 			CommonProfile profile = authenticate(username, password);
 
@@ -134,7 +136,7 @@ public class LoginController {
                     Map<String, Object> result = tokenService.buildTokenResponse(profile.get(), user, true);
 
                     log.debug(result.toString());
-                    UriBuilder targetURIForRedirection = UriBuilder.fromPath("http://hybrid.indiabiodiversity.org/openId/checkauth");
+                    UriBuilder targetURIForRedirection = UriBuilder.fromPath(config.getString("checkAuthUrl"));
                     Iterator it = result.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry pair = (Map.Entry)it.next();
@@ -144,7 +146,7 @@ public class LoginController {
                     return Response.temporaryRedirect(targetURIForRedirection.build()).build();
                 } else {
                     //redirect to createAccount url with details from facebook profile
-                	URI targetURIForRedirection = UriBuilder.fromUri(new URI("http://hybrid.indiabiodiversity.org/login/createFacebookAccount")).build();
+                	URI targetURIForRedirection = UriBuilder.fromUri(new URI(config.getString("createFacebookAccountUrl"))).build();
                     return Response.temporaryRedirect(targetURIForRedirection).build();
                 }
 				//return Response.ok(result).build();

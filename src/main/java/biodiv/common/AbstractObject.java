@@ -2,10 +2,15 @@ package biodiv.common;
 
 import java.io.Serializable;
 
-import biodiv.util.HibernateUtil;
+import javax.inject.Inject;
+
+import org.hibernate.SessionFactory;
 
 public class AbstractObject {
 
+	@Inject
+	private SessionFactory sessionFactory;
+	
 	/**
 	 * returns generated id. It can be long or string in serializable format 
 	 * @return
@@ -13,7 +18,7 @@ public class AbstractObject {
 	 */
 	public Serializable save() {
 		try {
-			return HibernateUtil.getSessionFactory().getCurrentSession().save(this);
+			return sessionFactory.getCurrentSession().save(this);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

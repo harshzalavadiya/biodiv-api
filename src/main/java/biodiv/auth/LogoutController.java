@@ -73,7 +73,7 @@ public class LogoutController {
 		try {
 
 			//Config config = AuthUtils.getConfig();
-log.debug(config.toString());
+			log.debug(config.toString());
 			LogoutLogic<Object, JaxRsContext> ll = config.getLogoutLogic();
 			log.debug(ll.toString());
             //new BiodivLogoutLogic<Object, JaxRsContext>();

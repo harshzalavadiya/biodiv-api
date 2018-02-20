@@ -1,18 +1,19 @@
 package biodiv;
 
+import javax.inject.Inject;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.util.HibernateUtil;
-
 public class ResourceInterceptor implements MethodInterceptor {
 	
 	private static final Logger log = LoggerFactory.getLogger(ResourceInterceptor.class);
 	
-	private static SessionFactory sf = HibernateUtil.getSessionFactory();  
+	@Inject
+	private SessionFactory sessionFactory;
 
 	ResourceInterceptor() {
 		log.debug("ResourceInterceptor constructor");
@@ -24,10 +25,10 @@ public class ResourceInterceptor implements MethodInterceptor {
     	Object result = null;
     	try{
     		log.debug("Checking if there is a active transaction");
-    		boolean isActive = (sf.getCurrentSession().getTransaction() != null) ? sf.getCurrentSession().getTransaction().isActive() : false; 
+    		boolean isActive = (sessionFactory.getCurrentSession().getTransaction() != null) ? sessionFactory.getCurrentSession().getTransaction().isActive() : false; 
     		if ( !isActive) {  
                 log.debug("Starting a new database transaction");  
-                sf.getCurrentSession().beginTransaction();  
+                sessionFactory.getCurrentSession().beginTransaction();  
              }  else {
             	 log.debug("Using existing database transaction");
              }
@@ -42,7 +43,7 @@ public class ResourceInterceptor implements MethodInterceptor {
     		
     		if (!isActive) {  
                 log.debug("Committing the database transaction");  
-                sf.getCurrentSession().getTransaction().commit();  
+                sessionFactory.getCurrentSession().getTransaction().commit();  
              }  
     		
     		return result;
@@ -52,7 +53,7 @@ public class ResourceInterceptor implements MethodInterceptor {
     		e.printStackTrace();
     		try {  
                 log.warn("Trying to rollback database transaction after exception");  
-                sf.getCurrentSession().getTransaction().rollback();  
+                sessionFactory.getCurrentSession().getTransaction().rollback();  
             } catch (Throwable rbEx) {  
                 log.error("Could not rollback transaction after exception!", rbEx);  
             }  

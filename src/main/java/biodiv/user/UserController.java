@@ -20,6 +20,7 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.auth.AuthUtils;
 import biodiv.userGroup.UserGroup;
 import biodiv.userGroup.UserGroupService;
 
@@ -54,13 +55,10 @@ public class UserController {
 	@Path("/currentUserUserGroups")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
-	// public List<UserGroup> currentUserUserGroups(@Pac4JProfile CommonProfile
-	// profile) {
 	public List<UserGroup> currentUserUserGroups(@Context HttpServletRequest request) {
-		ProfileManager manager = new ProfileManager(new J2EContext(request, null));
-		Optional<CommonProfile> profile = manager.get(true);
+		CommonProfile profile = AuthUtils.currentUser(request);
 		log.debug("Getting usergroups for current user ", profile);
-		List<UserGroup> usrGrps = userGroupService.userUserGroups(Long.parseLong(profile.get().getId()));
+		List<UserGroup> usrGrps = userGroupService.userUserGroups(Long.parseLong(profile.getId()));
 		return usrGrps;
 	}
 }

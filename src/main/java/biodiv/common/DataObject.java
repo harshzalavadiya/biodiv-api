@@ -1,7 +1,9 @@
 package biodiv.common;
 
+import javax.inject.Inject;
 import javax.persistence.MappedSuperclass;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import biodiv.Transactional;
 import biodiv.userGroup.UserGroupModel;
-import biodiv.util.HibernateUtil;
 
 @MappedSuperclass
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,7 +20,10 @@ public abstract class DataObject<T> extends ParticipationMetadata implements Use
 
 	private static final Logger log = LoggerFactory.getLogger(DataObject.class);
 
-	// private static SessionFactory sf = HibernateUtil.getSessionFactory();
+	@Inject
+	private SessionFactory sessionFactory;
+	
+	// private static SessionFactory sf = sessionFactory;
 	public DataObject() {
 
 	}
@@ -29,7 +33,7 @@ public abstract class DataObject<T> extends ParticipationMetadata implements Use
 	public DataObject get(long Id) {
 		System.out.println("DataObject class: " + this.getClass());
 		try {
-			DataObject instance = (DataObject) HibernateUtil.getSessionFactory().getCurrentSession()
+			DataObject instance = (DataObject) sessionFactory.getCurrentSession()
 					.get(this.getClass(), Id);
 			return instance;
 		} catch (RuntimeException re) {
@@ -56,7 +60,7 @@ public abstract class DataObject<T> extends ParticipationMetadata implements Use
 
 		System.out.println("Object to update : " + this);
 		try {
-			HibernateUtil.getSessionFactory().getCurrentSession().update(this);
+			sessionFactory.getCurrentSession().update(this);
 			log.debug("update  successful");
 		} catch (RuntimeException re) {
 			log.error("update  failed", re);
@@ -69,7 +73,7 @@ public abstract class DataObject<T> extends ParticipationMetadata implements Use
 	public void delete() {
 		System.out.println("Object to delete : " + this);
 		try {
-			HibernateUtil.getSessionFactory().getCurrentSession().delete(this);
+			sessionFactory.getCurrentSession().delete(this);
 			log.debug("delete  successful");
 		} catch (RuntimeException re) {
 			log.error("delete  failed", re);
@@ -83,7 +87,7 @@ public abstract class DataObject<T> extends ParticipationMetadata implements Use
 	public void save() {
 		System.out.println("Object to save : " + this);
 		try {
-			HibernateUtil.getSessionFactory().getCurrentSession().save(this);
+			sessionFactory.getCurrentSession().save(this);
 			log.debug("save successful");
 		} catch (RuntimeException re) {
 			log.error("save  failed", re);

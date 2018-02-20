@@ -1,5 +1,6 @@
 package biodiv.auth;
 
+import org.apache.commons.configuration2.Configuration;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
@@ -12,6 +13,7 @@ import org.pac4j.jax.rs.servlet.features.ServletJaxRsContextFactoryProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
@@ -20,6 +22,7 @@ import biodiv.auth.register.RegisterController;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenDao;
 import biodiv.auth.token.TokenService;
+import biodiv.auth.CustomJaxRsUrlResolver;
 
 public class AuthModule extends ServletModule {
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -50,39 +53,52 @@ public class AuthModule extends ServletModule {
 
 	
 	@Provides @Singleton
-	protected FacebookClient provideFacebookClient() {
-		final String fbId = "115305755799166";// configuration.getString("fbId");
-		final String fbSecret = "efe695fb1a053bdd155e4a4ca153d409";// configuration.getString("fbSecret");
-		final FacebookClient facebookClient = new FacebookClient("115305755799166", "efe695fb1a053bdd155e4a4ca153d409");
+	protected FacebookClient provideFacebookClient(Injector injector) {
+		log.debug("Creating facebook client");
+		Configuration config = injector.getInstance(Configuration.class);
+		final String fbId = config.getString("fbId");
+		final String fbSecret = config.getString("fbSecret");
+		final FacebookClient facebookClient = new FacebookClient(fbId, fbSecret);
 		//facebookClient.setStateData("biodiv-api-state");
 		facebookClient.setAuthenticator(new CustomOAuth20Authenticator(facebookClient.getConfiguration()));
-		facebookClient.setCallbackUrl("http://api.local.ibp.org/login/callback?client_name=facebookClient");
+		facebookClient.setCallbackUrl(config.getString("fbCallback"));
 		return facebookClient;
 	}
 
 	@Provides @Singleton
-	protected Google2Client provideGoole2Client() {
-		final String googleId = "317806372709-roromqiujiji1po5jh8adpcr5um895mb.apps.googleusercontent.com";// configuration.getString("fbId");
-		final String googleSecret = "x4QjtRV6n2f6cHjH8tl5epVn";// configuration.getString("fbSecret");
+	protected Google2Client provideGoole2Client(Injector injector) {
+		log.debug("Creating google client");
+		Configuration config = injector.getInstance(Configuration.class);
+		final String googleId = config.getString("googleId");
+		final String googleSecret = config.getString("googleSecret");
 		final Google2Client google2Client = new Google2Client(googleId, googleSecret);
 		// google2Client.setStateData("biodiv-api-state");
-		google2Client.setAuthenticator(new CustomOAuth20Authenticator(google2Client.getConfiguration()));
-		google2Client.setProfileCreator(new CustomOAuth2ProfileCreator(google2Client.getConfiguration()));
-		google2Client.setCallbackUrl("http://api.local.ibp.org/login/callback?client_name=google2Client");
+        CustomOAuth20Authenticator customOAuth20Authenticator = new CustomOAuth20Authenticator(google2Client.getConfiguration());
+        CustomOAuth2ProfileCreator customOAuth2ProfileCreator = new CustomOAuth2ProfileCreator(google2Client.getConfiguration());
+        //used to inject userService
+        injector.injectMembers(customOAuth2ProfileCreator);
+
+		google2Client.setAuthenticator(customOAuth20Authenticator);
+		google2Client.setProfileCreator(customOAuth2ProfileCreator);
+		google2Client.setCallbackUrl(config.getString("googleCallback"));
 
 		return google2Client;
 	}
 
 	@Provides @Singleton
-	protected CookieClient provideCookieClient() {
-		final CookieClient cookieClient = new CookieClient("BAToken", new CustomJwtAuthenticator(
+	protected CookieClient provideCookieClient(Injector injector) {
+		log.debug("Creating cookie client");
+		Configuration config = injector.getInstance(Configuration.class);
+		final CookieClient cookieClient = new CookieClient(config.getString("accessToken_cookieName"), new CustomJwtAuthenticator(
 				new org.pac4j.jwt.config.signature.SecretSignatureConfiguration(Constants.JWT_SALT)));
 		return cookieClient;
 	}
 
 	@Provides @Singleton
-	protected HeaderClient provideHeaderClient() {
-		final HeaderClient headerClient = new HeaderClient("X-AUTH-TOKEN", new CustomJwtAuthenticator(
+	protected HeaderClient provideHeaderClient(Injector injector) {
+		log.debug("Creating header client");
+		Configuration config = injector.getInstance(Configuration.class);
+		final HeaderClient headerClient = new HeaderClient(config.getString("headerName"), new CustomJwtAuthenticator(
 				new org.pac4j.jwt.config.signature.SecretSignatureConfiguration(Constants.JWT_SALT)));
 		return headerClient;
 	}
@@ -103,7 +119,10 @@ public class AuthModule extends ServletModule {
 		config.addAuthorizer("ROLE_SPECIES_ADMIN", new RequireAnyRoleAuthorizer("ROLE_SPECIES_ADMIN"));
 		config.addAuthorizer("ROLE_CEPF_ADMIN", new RequireAnyRoleAuthorizer("ROLE_CEPF_ADMIN"));
 		// config.addAuthorizer("custom", new CustomAuthorizer());
-        //
+        
+        google2Client.setUrlResolver(new CustomJaxRsUrlResolver());
+//        config.getClients().setCallbackUrlResolver(new CustomJaxRsUrlResolver());
+//        config.getClients().setAjaxRequestResolver(new JaxRsAjaxRequestResolver());
 
 		log.trace("Setting LogoutLogic in pac4jConfig");
         config.setLogoutLogic(biodivLogoutLogic);
