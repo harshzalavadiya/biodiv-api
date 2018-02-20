@@ -19,7 +19,6 @@ import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 import org.pac4j.core.config.Config;
 import org.pac4j.jax.rs.features.JaxRsConfigProvider;
-import org.pac4j.jax.rs.features.JaxRsContextFactoryProvider;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
 import org.pac4j.jax.rs.servlet.features.ServletJaxRsContextFactoryProvider;

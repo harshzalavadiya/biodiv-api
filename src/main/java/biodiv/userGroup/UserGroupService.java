@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.jvnet.hk2.annotations.Service;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,6 @@ import biodiv.user.Role;
 import biodiv.user.RoleService;
 import biodiv.user.User;
 import biodiv.user.UserService;
-import biodiv.util.HibernateUtil;
 
 public class UserGroupService extends AbstractService<UserGroup> {
 
@@ -32,11 +31,14 @@ public class UserGroupService extends AbstractService<UserGroup> {
 	private RoleService roleService;
 
 	@Inject
-	UserService userService;
+	private UserService userService;
 
 	@Inject
-	ActivityFeedService activityFeedService;
+	private ActivityFeedService activityFeedService;
 
+	@Inject
+	private SessionFactory sessionFactory;
+	
 	private UserGroupDao userGroupDao;
 
 	@Inject
@@ -212,8 +214,8 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				// activityFeed addition ends here for Object Entry
 
 				if (i % 50 == 0) {
-					HibernateUtil.getSessionFactory().getCurrentSession().flush();
-					HibernateUtil.getSessionFactory().getCurrentSession().clear();
+					sessionFactory.getCurrentSession().flush();
+					sessionFactory.getCurrentSession().clear();
 				}
 
 				i++;

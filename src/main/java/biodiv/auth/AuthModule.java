@@ -1,7 +1,5 @@
 package biodiv.auth;
 
-import javax.inject.Inject;
-
 import org.apache.commons.configuration2.Configuration;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;

@@ -4,19 +4,23 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import biodiv.util.HibernateUtil;
 
 public abstract class AbstractDao<T, K extends Serializable> {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractDao.class);
 
 	private Session currentSession;
+	
+	@Inject
+	private SessionFactory sessionFactory;
 	
 //	@Inject
 //	private javax.inject.Provider<Session> session;
@@ -26,25 +30,25 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	protected Class<? extends T> daoType;
 
 	protected AbstractDao() {
-		System.out.println("AbstractDao constructor");
+		log.trace("AbstractDao constructor");
 
 		daoType = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
 
 	public Session openCurrentSession() {		
-		currentSession = HibernateUtil.getSessionFactory().openSession();
+		currentSession = sessionFactory.openSession();
 		return currentSession;
 	}
 
 	public Session openCurrentSessionWithTransaction() {
-		currentSession = HibernateUtil.getSessionFactory().openSession();
+		currentSession = sessionFactory.openSession();
 		currentTransaction = currentSession.beginTransaction();
 		return currentSession;
 	}
 
 	public void closeCurrentSession() {
-		//HibernateUtil.getSessionFactory().getCurrentSession().close();
+		//sessionFactory.getCurrentSession().close();
 	}
 
 	public void closeCurrentSessionWithTransaction() {
@@ -54,8 +58,8 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	}
 
 	public Session getCurrentSession() {
-		System.out.println(System.identityHashCode(HibernateUtil.getSessionFactory().getCurrentSession()));
-		return HibernateUtil.getSessionFactory().getCurrentSession();
+		System.out.println(System.identityHashCode(sessionFactory.getCurrentSession()));
+		return sessionFactory.getCurrentSession();
 	}
 
 	public void setCurrentSession(Session currentSession) {

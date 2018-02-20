@@ -5,10 +5,15 @@ import java.util.List;
 
 import javax.persistence.Query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SpeciesGroupDao extends AbstractDao<SpeciesGroup, Long> implements DaoInterface<SpeciesGroup, Long> {
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	public SpeciesGroupDao() {
-		System.out.println("SpeciesGroupDao constructor");
+		log.trace("SpeciesGroupDao constructor");
 	}
 	
 	public List<SpeciesGroup> list() {
