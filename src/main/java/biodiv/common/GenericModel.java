@@ -12,30 +12,32 @@ public interface GenericModel<T> {
 
 	/**
 	 * 
-	 * @param obvId
+	 * @param id
 	 * dummy
 	 * @return
 	 * dummy
 	 */
-	public T get(long obvId);
+	public T get(long id);
+	//TODO:HACK to pass service as injection was not possible in domain objects
+	public T get(long id, AbstractService<T> abstractService);
 		
 	/**
 	 * 
-	 * @param obvId
+	 * @param id
 	 * dummy
 	 * @return
 	 * dummy
 	 */
-	public T read(long obvId);
+	public T read(long id);
 	
 	/**
 	 * 
-	 * @param obvId
+	 * @param id
 	 * dummy
 	 * @return
 	 * dummy
 	 */
-	public T load(long obvId);
+	public T load(long id);
 	
 	/**
 	 * 
@@ -51,6 +53,5 @@ public interface GenericModel<T> {
 	
 	
 	public void delete();
-
 
 }

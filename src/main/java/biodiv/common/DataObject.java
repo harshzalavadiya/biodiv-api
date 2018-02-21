@@ -14,43 +14,41 @@ import biodiv.userGroup.UserGroupModel;
 
 @MappedSuperclass
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class DataObject<T> extends ParticipationMetadata implements UserGroupModel, java.io.Serializable {
+public abstract class DataObject extends ParticipationMetadata implements UserGroupModel, java.io.Serializable {
 
-	public Class<T> entityClass;
+	//public Class<T> entityClass;
 
-	private static final Logger log = LoggerFactory.getLogger(DataObject.class);
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Inject
 	private SessionFactory sessionFactory;
 	
-	// private static SessionFactory sf = sessionFactory;
 	public DataObject() {
 
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public DataObject get(long Id) {
+	public DataObject get(long id, AbstractService<DataObject> abstractService) {
 		System.out.println("DataObject class: " + this.getClass());
 		try {
 			DataObject instance = (DataObject) sessionFactory.getCurrentSession()
-					.get(this.getClass(), Id);
+					.get(this.getClass(), id);
 			return instance;
 		} catch (RuntimeException re) {
-			log.error("get  failed", re);
+			log.error("get  failed : {}", re.getMessage());
 			throw re;
 		}
 
 	}
 
 	@Override
-	public T read(long obvId) {
+	public DataObject read(long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public T load(long obvId) {
+	public DataObject load(long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
