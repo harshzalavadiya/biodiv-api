@@ -24,7 +24,7 @@ public class LanguageService extends AbstractService<Language> {
 	@Inject
 	LanguageService(LanguageDao languageDao) {
 		super(languageDao);
-		this.languageDao = new LanguageDao();
+		this.languageDao = languageDao;
 	}
 
 	public Language findByName(String languageName) {
