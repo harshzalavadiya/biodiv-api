@@ -29,8 +29,8 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	@Inject
-	private UserService userService;
+//	@Inject
+//	private UserService userService;
 
     @Inject
 	private SessionFactory sessionFactory;
@@ -52,7 +52,7 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 
 			final OAuth2AccessToken token = getAccessToken(credentials);
 			OAuth20Profile profile = retrieveUserProfileFromToken(token);
-			log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+/*			log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 			log.debug(profile.toString());
 			log.debug(profile.getEmail());
 			log.debug(profile.getLinkedId());
@@ -68,13 +68,11 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
                 log.debug("Committing the database transaction");  
                 sessionFactory.getCurrentSession().getTransaction().commit();  
              }  
- 
+*/
 			return profile;
 		} catch (final OAuthException e) {
 			throw new TechnicalException(e);
 		} catch (HttpAction e) {
-			throw new TechnicalException(e);
-		} catch (CredentialsException e) {
 			throw new TechnicalException(e);
 		} catch(Throwable e){
     		e.printStackTrace();

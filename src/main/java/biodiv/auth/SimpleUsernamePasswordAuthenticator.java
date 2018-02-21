@@ -32,7 +32,7 @@ public class SimpleUsernamePasswordAuthenticator implements Authenticator<Userna
 		if (credentials == null) {
 			throwsException("No credential");
 		}
-		String username = credentials.getUsername();
+		String username = credentials.getUsername().toLowerCase();
 		String password = credentials.getPassword();
 
 		if (CommonHelper.isBlank(username)) {
