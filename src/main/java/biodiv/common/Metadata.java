@@ -25,7 +25,7 @@ import biodiv.dataset.Dataset;
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class Metadata implements GenericModel,java.io.Serializable {
+public abstract class Metadata implements GenericModel<DataObject>,java.io.Serializable {
 
 	
 	public enum LocationScale {
@@ -330,6 +330,9 @@ public abstract class Metadata implements GenericModel,java.io.Serializable {
 	public void setDataset(Dataset dataset) {
 		this.dataset = dataset;
 	}
+
+	@Override
+	public abstract DataObject get(long id, AbstractService<DataObject> abstractService);
 
 
 }

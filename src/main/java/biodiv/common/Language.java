@@ -26,8 +26,7 @@ public class Language {
 	private Boolean isDirty = false;
 	private String region;
 	
-	@Inject
-	private LanguageService languageService;
+	
 
 	public Language() {
 	}
@@ -107,7 +106,7 @@ public class Language {
 	}
 
 	@Transient
-	public Language getDefaultLanguage() {
+	public Language getDefaultLanguage(LanguageService languageService) {
 		return languageService.findByName(Language.DEFAULT_LANGUAGE);
 	}
 	

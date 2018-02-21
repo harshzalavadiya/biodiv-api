@@ -129,7 +129,7 @@ public class BiodivLogoutLogic<R, C extends WebContext> extends DefaultLogoutLog
         //TODO: get userId and remove token for user and refreshToken
         Principal profile = securityContext.getUserPrincipal();
         if(profile != null) {                          
-            log.debug ("Found profile : {}", profile.getName());
+            log.debug ("Found profile : {}", profile);
             User user = userService.findById(Long.parseLong(profile.getName()));
             if(user != null && refreshToken != null) {
             	tokenService.removeRefreshToken(user.getId(), refreshToken);

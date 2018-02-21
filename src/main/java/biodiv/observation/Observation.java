@@ -1,6 +1,5 @@
 package biodiv.observation;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -49,14 +48,8 @@ import biodiv.userGroup.UserGroup;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Observation extends DataObject implements java.io.Serializable{
 	
-	@Inject
-	LanguageService languageService;
-
 	public static final String QUERY_SELECT_BY_ID = "Observation.findById";
 	public static final String PARAM_ID = "id";
-
-	// @Inject
-	// ObservationService observationService;
 
 	public enum OccurrenceStatus {
 		ABSENT("Absent"), // http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -498,8 +491,14 @@ public class Observation extends DataObject implements java.io.Serializable{
 		this.annotations = annotations;
 	}
 
+	@Override
+	public DataObject get(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public Observation get(long obvId, ObservationService observationService) {
-		System.out.println("testing injection in observation " + observationService);
+		System.out.println(observationService);
 		Observation obv = observationService.findById(obvId);
 		return obv;
 	}
@@ -572,18 +571,5 @@ public class Observation extends DataObject implements java.io.Serializable{
 		String cNames = String.join(",", cnList);
 		return cNames;
 	}
-	
-	
-
-	
-	
-	// @Override
-	// public Observation get(long obvId) {
-	// // TODO Auto-generated method stub
-	// System.out.println("pfday");
-	// ObservationService observationService =new ObservationService();
-	// Observation result=observationService.findById(obvId);
-	// return result;
-	// }
 
 }

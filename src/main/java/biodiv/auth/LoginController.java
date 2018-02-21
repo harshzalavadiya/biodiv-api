@@ -30,6 +30,7 @@ import biodiv.auth.token.TokenService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import javax.ws.rs.NotFoundException;
 
 import javax.inject.Inject;
 
@@ -131,7 +132,13 @@ public class LoginController {
 			if (profile.isPresent()) {
 
 				// Issue a token for the user
-			    User user = userService.findByEmail(profile.get().getEmail());
+			    User user = null;
+                try {
+                    user = userService.findByEmail(profile.get().getEmail());
+                } catch(NotFoundException e) {
+                    log.error("Could not find a user with email : {}", profile.get().getEmail());
+                    log.error("Trying to register...");
+                }
                 if(user != null) {
                     Map<String, Object> result = tokenService.buildTokenResponse(profile.get(), user, true);
 
@@ -146,7 +153,52 @@ public class LoginController {
                     return Response.temporaryRedirect(targetURIForRedirection.build()).build();
                 } else {
                     //redirect to createAccount url with details from facebook profile
-                	URI targetURIForRedirection = UriBuilder.fromUri(new URI(config.getString("createFacebookAccountUrl"))).build();
+                    UriBuilder uriBuilder = UriBuilder.fromUri(new URI(config.getString("createSocialAccountFromProfile")));
+                    if(profile.get() instanceof org.pac4j.oauth.profile.facebook.FacebookProfile) {
+                        org.pac4j.oauth.profile.facebook.FacebookProfile fbProfile = (org.pac4j.oauth.profile.facebook.FacebookProfile) profile.get();
+                        uriBuilder.queryParam("username", fbProfile.getEmail());
+                        uriBuilder.queryParam("name", fbProfile.getDisplayName());
+                        uriBuilder.queryParam("email", fbProfile.getEmail());
+                        if(fbProfile.getWebsite() != null)
+                            uriBuilder.queryParam("website", fbProfile.getWebsite());
+                        if(fbProfile.getPictureUrl() != null)
+                            uriBuilder.queryParam("profilePic", fbProfile.getPictureUrl());
+                        if(fbProfile.getAbout() != null)
+                            uriBuilder.queryParam("aboutMe", fbProfile.getAbout());
+                        if(fbProfile.getLocation() != null)
+                            uriBuilder.queryParam("location", fbProfile.getLocation());
+                        uriBuilder.queryParam("facebookUser",true);
+                        //                    uriBuilder.queryParam("openId", fbProfile.getId());
+                        if(fbProfile.getGender() != null)
+                            uriBuilder.queryParam("sexType", fbProfile.getGender());
+                        uriBuilder.queryParam("link", fbProfile.getProfileUrl());
+                        if(fbProfile.getTimezone() != null) 
+                            uriBuilder.queryParam("timezone", fbProfile.getTimezone());
+                    } else if(profile.get() instanceof org.pac4j.oauth.profile.google2.Google2Profile) {
+                        org.pac4j.oauth.profile.google2.Google2Profile gProfile = (org.pac4j.oauth.profile.google2.Google2Profile) profile.get();
+                        uriBuilder.queryParam("username", gProfile.getEmail());
+                        if(gProfile.getDisplayName() != null)
+                            uriBuilder.queryParam("name", gProfile.getDisplayName());
+
+                        uriBuilder.queryParam("email", gProfile.getEmail());
+                        if(gProfile.getProfileUrl() != null)
+                            uriBuilder.queryParam("website", gProfile.getProfileUrl());
+                        if(gProfile.getPictureUrl() != null)
+                            uriBuilder.queryParam("profilePic", gProfile.getPictureUrl());
+//                        if(gProfile.getAbout() != null)
+//                            uriBuilder.queryParam("aboutMe", gProfile.getAbout());
+                        if(gProfile.getLocation() != null)
+                            uriBuilder.queryParam("location", gProfile.getLocation());
+                        //                    uriBuilder.queryParam("openId", gProfile.getId());
+                        if(gProfile.getGender() != null)
+                            uriBuilder.queryParam("sexType", gProfile.getGender());
+                        if(gProfile.getProfileUrl() != null)
+                        uriBuilder.queryParam("link", gProfile.getProfileUrl());
+//                        if(gProfile.getTimezone() != null) 
+//                            uriBuilder.queryParam("timezone", gProfile.getTimezone());
+
+                    }
+                    URI targetURIForRedirection = uriBuilder.build();
                     return Response.temporaryRedirect(targetURIForRedirection).build();
                 }
 				//return Response.ok(result).build();
@@ -155,14 +207,9 @@ public class LoginController {
 				throw new CredentialsException("Invalid credentials");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-            /*Map result = new HashMap();
-            result.put("status", "403");
-            result.put("message", e.getMessage());
-            return result;
-			*/
+            e.printStackTrace();
             ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, e.getMessage());
-			return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
+            return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
 		}
 	}
 
