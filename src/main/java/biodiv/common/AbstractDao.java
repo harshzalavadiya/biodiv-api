@@ -58,7 +58,7 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	}
 
 	public Session getCurrentSession() {
-		System.out.println(System.identityHashCode(sessionFactory.getCurrentSession()));
+		//System.out.println(System.identityHashCode(sessionFactory.getCurrentSession()));
 		return sessionFactory.getCurrentSession();
 	}
 

@@ -34,10 +34,18 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 	public List<UserGroup> userUserGroups(long userId) {
 		// String hql = "select userGroup.id from UserGroupMemberRole where
 		// suser.id =:Id";
-		String hql = " select ug from UserGroup ug inner join UserGroupMemberRole ugmr on ug = ugmr.userGroup where ugmr.user.id =:userId";
+		String hql;
+		if(userId == 1L){
+			hql =  "from UserGroup ug";
+		}else{
+			hql = " select ug from UserGroup ug inner join UserGroupMemberRole ugmr on ug = ugmr.userGroup where ugmr.user.id =:userId";
 
+		}
 		Query query = getCurrentSession().createQuery(hql);
-		query.setParameter("userId", userId);
+		if(userId != 1L){
+			query.setParameter("userId", userId);
+		}
+		
 
 		List<UserGroup> listResult = query.getResultList();
 		return listResult;
