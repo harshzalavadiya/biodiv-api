@@ -42,7 +42,10 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 
 		}
 		Query query = getCurrentSession().createQuery(hql);
-		query.setParameter("userId", userId);
+		if(userId != 1L){
+			query.setParameter("userId", userId);
+		}
+		
 
 		List<UserGroup> listResult = query.getResultList();
 		return listResult;
