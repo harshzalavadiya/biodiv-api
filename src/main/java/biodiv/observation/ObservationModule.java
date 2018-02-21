@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
 
+import biodiv.common.DataObject;
+
 public class ObservationModule extends ServletModule {
 private final Logger log = LoggerFactory.getLogger(getClass());
 	
@@ -14,7 +16,7 @@ private final Logger log = LoggerFactory.getLogger(getClass());
 		log.debug("Configuring ObservationModule Servlets");
 		
 		bind(Annotation.class);
-		
+		//bind(DataObject.class);
 		bind(Observation.class);
 		bind(ObservationDao.class).in(Singleton.class);
 		bind(ObservationService.class).in(Singleton.class);

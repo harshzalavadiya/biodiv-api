@@ -18,6 +18,8 @@ import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.DataObject;
+import biodiv.observation.Observation;
+import biodiv.observation.ObservationService;
 import biodiv.user.Role;
 import biodiv.user.RoleService;
 import biodiv.user.User;
@@ -32,6 +34,9 @@ public class UserGroupService extends AbstractService<UserGroup> {
 
 	@Inject
 	private UserService userService;
+	
+	@Inject
+	private ObservationService observationService;
 
 	@Inject
 	private ActivityFeedService activityFeedService;
@@ -145,7 +150,13 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				Class<?> clazz = Class.forName(objectType);
 				DataObject _obj = (DataObject) clazz.newInstance();
 				System.out.println("bbbbnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
-				DataObject dataObj = _obj.get(object);
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				Observation dataObj = ((Observation)_obj).get(object, observationService);
 				System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 				typeOfObject = dataObj;
 				Set<UserGroup> obvUsrGrps = dataObj.getUserGroups();

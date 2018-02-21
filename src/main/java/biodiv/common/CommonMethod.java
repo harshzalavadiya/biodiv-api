@@ -11,7 +11,7 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CommonMethod<T> implements GenericModel {
+public class CommonMethod<T> implements GenericModel<T> {
 	
 	private static final Logger log = LoggerFactory.getLogger(CommonMethod.class);
 	
@@ -34,7 +34,7 @@ public class CommonMethod<T> implements GenericModel {
 	}
 
 	@Override
-	public Object load(long obvId) {
+	public T load(long obvId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -80,6 +80,8 @@ public class CommonMethod<T> implements GenericModel {
 		}
 		
 	}
+	
+	//TODO:move this to Utils and change to static
 	public Set<String> cSTSOT(String str){
 		if(str == null|| str== "" || str.isEmpty())
 			return new HashSet<String>();
@@ -88,6 +90,12 @@ public class CommonMethod<T> implements GenericModel {
 		Set<String> strSet1 = Arrays.stream(y).collect(Collectors.toSet());
 		return strSet1;
 		
+	}
+
+	@Override
+	public T get(long id, AbstractService<T> abstractService) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
