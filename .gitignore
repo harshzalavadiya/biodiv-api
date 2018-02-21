@@ -51,3 +51,5 @@ gradle-app.setting
 *.hprof
 .settings/
 .metadata
+#ignore this properties file
+biodiv-api.properties

@@ -51,17 +51,23 @@ public class AllSearchService {
 		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder().indexBoost(suser,8).indexBoost(species, 7).indexBoost(observation, 6).indexBoost(usergroup, 5).
 				indexBoost(resource,4).indexBoost(newsletter, 3).indexBoost(document, 2); 
 		
+		//SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+			
+		
 		/**
+		 * 
 		 * Building bool query
 		 * Masterboolquery is for ANDing all the result
 		 * boolquery is for ORing all result
 		 */
 		BoolQueryBuilder boolQuery = null;
+		
 		BoolQueryBuilder masterBoolQuery = QueryBuilders.boolQuery();
 		
 		if(location!=null && !location.isEmpty()){
+			
 			boolQuery=QueryBuilders.boolQuery();
-			boolQuery.should(QueryBuilders.matchQuery("location", location));
+			
 			boolQuery.should(QueryBuilders.matchQuery("placename", location));
 			masterBoolQuery.must(boolQuery);
 		}
@@ -79,6 +85,7 @@ public class AllSearchService {
 		}
 		if(name!=null && !name.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
+			
 			boolQuery.should(QueryBuilders.matchQuery("name", name));
 			boolQuery.should(QueryBuilders.matchQuery("email", name));
 			boolQuery.should(QueryBuilders.matchQuery("username", name));
@@ -87,6 +94,7 @@ public class AllSearchService {
 			boolQuery.should(QueryBuilders.matchQuery("title", name));
 			boolQuery.should(QueryBuilders.matchQuery("member", name));
 			boolQuery.should(QueryBuilders.matchQuery("group_webaddress", name));
+			
 			masterBoolQuery.must(boolQuery);
 		}
 		
@@ -94,7 +102,6 @@ public class AllSearchService {
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("authorname", contributor));
 			boolQuery.should(QueryBuilders.matchQuery("contributor.value", contributor));
-			boolQuery.should(QueryBuilders.matchQuery("username", contributor));
 			boolQuery.should(QueryBuilders.matchQuery("username", contributor));
 			boolQuery.should(QueryBuilders.matchQuery("member", contributor));
 			masterBoolQuery.must(boolQuery);
