@@ -4,6 +4,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.http.client.direct.CookieClient;
 import org.pac4j.http.client.direct.HeaderClient;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
@@ -22,6 +23,7 @@ import biodiv.auth.register.RegisterController;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenDao;
 import biodiv.auth.token.TokenService;
+import biodiv.common.TechnicalExceptionMapper;
 import biodiv.auth.CustomJaxRsUrlResolver;
 
 public class AuthModule extends ServletModule {
@@ -60,7 +62,14 @@ public class AuthModule extends ServletModule {
 		final String fbSecret = config.getString("fbSecret");
 		final FacebookClient facebookClient = new FacebookClient(fbId, fbSecret);
 		//facebookClient.setStateData("biodiv-api-state");
-		facebookClient.setAuthenticator(new CustomOAuth20Authenticator(facebookClient.getConfiguration()));
+		
+		CustomOAuth20Authenticator customOAuth20Authenticator = new CustomOAuth20Authenticator(facebookClient.getConfiguration());
+        CustomOAuth2ProfileCreator customOAuth2ProfileCreator = new CustomOAuth2ProfileCreator(facebookClient.getConfiguration());
+        //used to inject userService
+        injector.injectMembers(customOAuth2ProfileCreator);
+        
+		facebookClient.setAuthenticator(customOAuth20Authenticator);
+		facebookClient.setProfileCreator(customOAuth2ProfileCreator);
 		facebookClient.setCallbackUrl(config.getString("fbCallback"));
 		return facebookClient;
 	}

@@ -38,7 +38,7 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 		List<TraitObject> objs = new ArrayList<TraitObject>();
 		for (Long id : traitIds) {
 			TraitObject obj = new TraitObject();
-			List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+			List<HashMap<String, Object>> values = new ArrayList<HashMap<String, Object>>();
 			List<Object[]> data1 = new ArrayList<Object[]>();
 			q = getCurrentSession().createQuery(
 					"select name,traitTypes,description,icon,ontologyUrl,isParticipatory,id,showInObservation,isNotObservationTrait from Trait where isNotObservationTrait=:isNotObservationTrait and showInObservation=:showInObservation and id=:id");
@@ -64,7 +64,7 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 					"select tv.id, tv.value,tv.description,tv.icon,tv.source from TraitValue as tv where tv.traitId=:id ");
 			data = q.setParameter("id", id).getResultList();
 			for (Object[] x : data) {
-				Map<String, Object> res = new HashMap<String, Object>();
+				HashMap<String, Object> res = new HashMap<String, Object>();
 				res.put("id", x[0]);
 				res.put("value", x[1]);
 				res.put("description", x[2]);
