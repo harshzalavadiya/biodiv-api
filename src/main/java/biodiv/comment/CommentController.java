@@ -56,8 +56,9 @@ public class CommentController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	@Transactional
-	public String removeComment(@QueryParam("commentId") Long commentId, @Pac4JProfile CommonProfile profile) {
+	public String removeComment(@QueryParam("commentId") Long commentId, @Context HttpServletRequest request) {
 		String msg;
+		CommonProfile profile = AuthUtils.currentUser(request);
 		if (commentService.removeComment(commentId, Long.parseLong(profile.getId()))) {
 			msg = "success";
 		} else {
