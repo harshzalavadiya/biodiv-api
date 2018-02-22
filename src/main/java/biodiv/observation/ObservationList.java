@@ -15,7 +15,7 @@ import biodiv.maps.MapService;
 
 public class ObservationList implements MapService {
 
-	private static final String URL = "http://localhost:8080/";
+	private static final String URL = "http://localhost:8081/";
 
 	@Override
 	public MapResponse create(String index, String type, String documentId, String document) {
