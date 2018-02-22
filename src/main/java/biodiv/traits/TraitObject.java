@@ -2,6 +2,7 @@ package biodiv.traits;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 public class TraitObject {
 	private long id;
@@ -15,7 +16,7 @@ public class TraitObject {
 	private Boolean isNotObservationTrait;
 	private Boolean showInObservation;
 	
-	private List<Map<String, Object>> values;
+	private List<HashMap<String, Object>> values;
 	
 	public long getId() {
 		return id;
@@ -35,10 +36,10 @@ public class TraitObject {
 	public void setAuthor(String author) {
 		this.author = author;
 	}
-	public List<Map<String, Object>> getValues() {
+	public List<HashMap<String, Object>> getValues() {
 		return values;
 	}
-	public void setValues(List<Map<String, Object>> values) {
+	public void setValues(List<HashMap<String, Object>> values) {
 		this.values = values;
 	}
 	public String getTraitTypes() {
