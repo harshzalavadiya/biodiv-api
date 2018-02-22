@@ -56,6 +56,7 @@ private final AllSearchService allSearchService=new AllSearchService();
 			@QueryParam("title") String title,
 			@QueryParam("pages") String pages,
 			@QueryParam("doctype") String doctype,
+			@QueryParam("user") String user,
 			@DefaultValue("0") @QueryParam("from") Integer from,
 			@DefaultValue("12") @QueryParam("limit") Integer limit,
 			@QueryParam("object_type") String object_type
@@ -75,7 +76,7 @@ private final AllSearchService allSearchService=new AllSearchService();
 		}
 		
 		return allSearchService.search(listData,speciesname,location,license,query,name,contributor,tag,content,
-				attribution,participants,title,pages,doctype,from, limit);	
+				attribution,participants,title,pages,doctype,user,from, limit);	
 			
 	}
 }

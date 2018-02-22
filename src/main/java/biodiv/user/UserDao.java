@@ -24,7 +24,7 @@ public class UserDao extends AbstractDao<User, Long> implements DaoInterface<Use
 		return entity;
 	}
 
-	public User findByEmail(String email) {
+	public User findByEmail(String email) throws NotFoundException {
 		Query q = getCurrentSession().createQuery("from User where email=:email");
 		q.setParameter("email", email);
 		List<User> users = q.getResultList();
@@ -32,7 +32,7 @@ public class UserDao extends AbstractDao<User, Long> implements DaoInterface<Use
 		else throw new NotFoundException("No user found with email : "+email);
 	}
 	
-	public User findByEmailAndPassword(String email, String password) {
+	public User findByEmailAndPassword(String email, String password)  throws NotFoundException {
 		Query q = getCurrentSession().createQuery("from User where email=:email and password=:password");
 		q.setParameter("email", email);
 		q.setParameter("password", password);

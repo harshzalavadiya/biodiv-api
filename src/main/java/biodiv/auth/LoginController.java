@@ -30,6 +30,7 @@ import biodiv.auth.token.TokenService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import javax.ws.rs.NotFoundException;
 
 import javax.inject.Inject;
 
@@ -37,31 +38,30 @@ import javax.inject.Inject;
 public class LoginController {
 
 	private final Logger log = LoggerFactory.getLogger(LoginController.class);
-    
-    @Inject
-	private TokenService tokenService;
-    
-    @Inject
-	private UserService userService;
-    
-    @Inject
-    private SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator;
 
-    @Inject
-    Configuration config;
-    
-    public LoginController() {
-    	log.debug("Login Controller");
-    }
-    
+	@Inject
+	private TokenService tokenService;
+
+	@Inject
+	private UserService userService;
+
+	@Inject
+	private SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator;
+
+	@Inject
+	Configuration config;
+
+	public LoginController() {
+		log.debug("Login Controller");
+	}
+
 	/**
 	 * 
 	 * @param username
-	 * 		user name
+	 *            user name
 	 * @param password
-	 * 		password
-	 * @return
-	 * 		returns something
+	 *            password
+	 * @return returns something
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
@@ -74,13 +74,13 @@ public class LoginController {
 
 			// Issue a token for the user
 
-			//Map<String, Object> result = tokenService.buildTokenResponse(profile, true);
-	
-           // Create a proxy object for logged in user
+			// Map<String, Object> result =
+			// tokenService.buildTokenResponse(profile, true);
+
+			// Create a proxy object for logged in user
 
 			User user = userService.findById(Long.parseLong(profile.getId()));
 			Map<String, Object> result = tokenService.buildTokenResponse(profile, user, true);
-
 
 			// TODO When responding with an access token, the server must also
 			// include the additional Cache-Control: no-store and Pragma:
@@ -99,13 +99,12 @@ public class LoginController {
 	/**
 	 * 
 	 * @param username
-	 * 			username
+	 *            username
 	 * @param password
-	 * 			password
-	 * @return
-	 * 		is valid or not
+	 *            password
+	 * @return is valid or not
 	 * @throws Exception
-	 * 			Possible error
+	 *             Possible error
 	 */
 	private CommonProfile authenticate(String username, String password) throws Exception {
 		// Authenticate the user using the credentials provided
@@ -117,9 +116,8 @@ public class LoginController {
 	/**
 	 * 
 	 * @param profile
-	 * 		profile
-	 * @return
-	 * 		profile
+	 *            profile
+	 * @return profile
 	 */
 	@Path("/callback")
 	@GET
@@ -131,37 +129,89 @@ public class LoginController {
 			if (profile.isPresent()) {
 
 				// Issue a token for the user
-			    User user = userService.findByEmail(profile.get().getEmail());
-                if(user != null) {
-                    Map<String, Object> result = tokenService.buildTokenResponse(profile.get(), user, true);
+				User user = null;
+				try {
+					user = userService.findByEmail(profile.get().getEmail());
+				} catch (NotFoundException e) {
+					log.error("Could not find a user with email : {}", profile.get().getEmail());
+					log.error("Trying to register...");
+				}
+				if (user != null) {
+					Map<String, Object> result = tokenService.buildTokenResponse(profile.get(), user, true);
 
-                    log.debug(result.toString());
-                    UriBuilder targetURIForRedirection = UriBuilder.fromPath(config.getString("checkAuthUrl"));
-                    Iterator it = result.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry pair = (Map.Entry)it.next();
-                        targetURIForRedirection.queryParam((String)pair.getKey(), pair.getValue());
-                        it.remove(); // avoids a ConcurrentModificationException
-                    }
-                    return Response.temporaryRedirect(targetURIForRedirection.build()).build();
-                } else {
-                    //redirect to createAccount url with details from facebook profile
-                	URI targetURIForRedirection = UriBuilder.fromUri(new URI(config.getString("createFacebookAccountUrl"))).build();
-                    return Response.temporaryRedirect(targetURIForRedirection).build();
-                }
-				//return Response.ok(result).build();
-                //return result;
+					log.debug(result.toString());
+					UriBuilder targetURIForRedirection = UriBuilder.fromPath(config.getString("checkAuthUrl"));
+					Iterator it = result.entrySet().iterator();
+					while (it.hasNext()) {
+						Map.Entry pair = (Map.Entry) it.next();
+						targetURIForRedirection.queryParam((String) pair.getKey(), pair.getValue());
+						it.remove(); // avoids a ConcurrentModificationException
+					}
+					return Response.temporaryRedirect(targetURIForRedirection.build()).build();
+				} else {
+					// redirect to createAccount url with details from facebook
+					// profile
+					UriBuilder uriBuilder = UriBuilder
+							.fromUri(new URI(config.getString("createSocialAccountFromProfile")));
+					if (profile.get() instanceof org.pac4j.oauth.profile.facebook.FacebookProfile) {
+						org.pac4j.oauth.profile.facebook.FacebookProfile fbProfile = (org.pac4j.oauth.profile.facebook.FacebookProfile) profile
+								.get();
+						uriBuilder.queryParam("username", fbProfile.getEmail());
+						uriBuilder.queryParam("name", fbProfile.getDisplayName());
+						uriBuilder.queryParam("email", fbProfile.getEmail());
+						if (fbProfile.getWebsite() != null)
+							uriBuilder.queryParam("website", fbProfile.getWebsite());
+						if (fbProfile.getPictureUrl() != null)
+							uriBuilder.queryParam("profilePic", fbProfile.getPictureUrl());
+						if (fbProfile.getAbout() != null)
+							uriBuilder.queryParam("aboutMe", fbProfile.getAbout());
+						if (fbProfile.getLocation() != null)
+							uriBuilder.queryParam("location", fbProfile.getLocation());
+						uriBuilder.queryParam("facebookUser", true);
+						// uriBuilder.queryParam("openId", fbProfile.getId());
+						if (fbProfile.getGender() != null)
+							uriBuilder.queryParam("sexType", fbProfile.getGender());
+						uriBuilder.queryParam("link", fbProfile.getProfileUrl());
+						if (fbProfile.getTimezone() != null)
+							uriBuilder.queryParam("timezone", fbProfile.getTimezone());
+					} else if (profile.get() instanceof org.pac4j.oauth.profile.google2.Google2Profile) {
+						org.pac4j.oauth.profile.google2.Google2Profile gProfile = (org.pac4j.oauth.profile.google2.Google2Profile) profile
+								.get();
+						uriBuilder.queryParam("username", gProfile.getEmail());
+						if (gProfile.getDisplayName() != null)
+							uriBuilder.queryParam("name", gProfile.getDisplayName());
+
+						uriBuilder.queryParam("email", gProfile.getEmail());
+						if (gProfile.getProfileUrl() != null)
+							uriBuilder.queryParam("website", gProfile.getProfileUrl());
+						if (gProfile.getPictureUrl() != null)
+							uriBuilder.queryParam("profilePic", gProfile.getPictureUrl());
+						// if(gProfile.getAbout() != null)
+						// uriBuilder.queryParam("aboutMe",
+						// gProfile.getAbout());
+						if (gProfile.getLocation() != null)
+							uriBuilder.queryParam("location", gProfile.getLocation());
+						// uriBuilder.queryParam("openId", gProfile.getId());
+						if (gProfile.getGender() != null)
+							uriBuilder.queryParam("sexType", gProfile.getGender());
+						if (gProfile.getProfileUrl() != null)
+							uriBuilder.queryParam("link", gProfile.getProfileUrl());
+						// if(gProfile.getTimezone() != null)
+						// uriBuilder.queryParam("timezone",
+						// gProfile.getTimezone());
+
+					}
+					URI targetURIForRedirection = uriBuilder.build();
+					return Response.temporaryRedirect(targetURIForRedirection).build();
+				}
+				// return Response.ok(result).build();
+				// return result;
 			} else {
 				throw new CredentialsException("Invalid credentials");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-            /*Map result = new HashMap();
-            result.put("status", "403");
-            result.put("message", e.getMessage());
-            return result;
-			*/
-            ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, e.getMessage());
+			ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, e.getMessage());
 			return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
 		}
 	}
@@ -169,21 +219,19 @@ public class LoginController {
 	/**
 	 * 
 	 * @param grantType
-	 * 			dummy
+	 *            dummy
 	 * @param refreshToken
-	 * 			dummy
-	 * @return
-	 * 			dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	@Path("/token")
 	@POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response token(@FormParam("grant_type") String grantType,
-			@FormParam("refresh_token") String refreshToken) {
+	public Response token(@FormParam("grant_type") String grantType, @FormParam("refresh_token") String refreshToken) {
 		try {
-            log.debug ("Getting new "+grantType);
+			log.debug("Getting new " + grantType);
 			if (refreshToken == null) {
 				ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, "Invalid refresh token");
 				return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
@@ -194,23 +242,24 @@ public class LoginController {
 
 			log.debug("Auth Request : Refresh Token : " + refreshToken + "  grant_type : " + grantType);
 
-			//CustomJwtAuthenticator jwtAuthenticator = new CustomJwtAuthenticator(
-			//		new org.pac4j.jwt.config.signature.SecretSignatureConfiguration(Constants.JWT_SALT));
+			// CustomJwtAuthenticator jwtAuthenticator = new
+			// CustomJwtAuthenticator(
+			// new
+			// org.pac4j.jwt.config.signature.SecretSignatureConfiguration(Constants.JWT_SALT));
 
-		
 			// get user details from access token and validate if the refresh
 			// token was given to this user.
 			if (refreshToken != null) {
-			    CommonProfile profile = tokenService.createUserProfile(refreshToken);
-      			User user = userService.findById(Long.parseLong(profile.getId()));
-				if(tokenService.isValidRefreshToken(refreshToken, user.getId())) {
-                    Map<String, Object> result = tokenService.buildTokenResponse(profile, user,
-                            grantType.equalsIgnoreCase(Token.TokenType.REFRESH.value()) ? true : false);
-                    return Response.ok(result).build();
-                } else {
-				    ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, "Invalid refresh token");
-				    return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
-			    }
+				CommonProfile profile = tokenService.createUserProfile(refreshToken);
+				User user = userService.findById(Long.parseLong(profile.getId()));
+				if (tokenService.isValidRefreshToken(refreshToken, user.getId())) {
+					Map<String, Object> result = tokenService.buildTokenResponse(profile, user,
+							grantType.equalsIgnoreCase(Token.TokenType.REFRESH.value()) ? true : false);
+					return Response.ok(result).build();
+				} else {
+					ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, "Invalid refresh token");
+					return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
+				}
 			} else {
 				ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, "No refresh token");
 				return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();

@@ -35,7 +35,10 @@ public class AllSearchService {
 	private static final String resource="resource";
 	private static final String usergroup="usergroup";
 	
-	public AllSearchResponse search(List<String> objectType,String speciesname, String location, String license,String query,String name, String contributor, String tag, String content, String attribution, String participants,String title, String pages, String doctype, Integer from,Integer limit ) {
+	public AllSearchResponse search(List<String> objectType,String speciesname, String location,
+			String license,String query,String name, String contributor, String tag,
+			String content, String attribution, String participants,String title,
+			String pages, String doctype,String user, Integer from,Integer limit ) {
 		// TODO Auto-generated method stub
 		
 		/**
@@ -137,6 +140,13 @@ public class AllSearchService {
 		if(doctype!=null && !doctype.isEmpty()){
 			boolQuery=QueryBuilders.boolQuery();
 			boolQuery.should(QueryBuilders.matchQuery("doc_type", doctype));
+			 masterBoolQuery.must(boolQuery);
+		}
+		if(user!=null && !user.isEmpty()){
+			boolQuery=QueryBuilders.boolQuery();
+			boolQuery.should(QueryBuilders.matchQuery("user", user));
+			boolQuery.should(QueryBuilders.matchQuery("username", user));
+			boolQuery.should(QueryBuilders.matchQuery("email", user));
 			 masterBoolQuery.must(boolQuery);
 		}
 		/**

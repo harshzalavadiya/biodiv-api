@@ -22,16 +22,12 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	@Inject
 	private SessionFactory sessionFactory;
 	
-//	@Inject
-//	private javax.inject.Provider<Session> session;
-
 	private Transaction currentTransaction;
 
 	protected Class<? extends T> daoType;
 
 	protected AbstractDao() {
 		log.trace("AbstractDao constructor");
-
 		daoType = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
@@ -105,20 +101,6 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	//TODO:improve this to do dynamic finder on any property
 	public T findByPropertyWithCondition(String property, String value, String condition) {
 		
-/*		CriteriaBuilder builder = getCurrentSession().getCriteriaBuilder();
-		
-		//create criteria query
-		CriteriaQuery<? extends T> criteria = builder.createQuery( daoType );
-		
-		//create root class
-		Root<? extends T> root = criteria.from( daoType );
-			
-		criteria.select( root );
-		
-		criteria.where( builder.equal( root.get( daoType.getField(property) ), value ) );
-		
-		T entity = getCurrentSession().createQuery( criteria ).getSingleResult();
-*/
 		String queryStr = "" +
 			    "from "+daoType.getSimpleName()+" t " +
 			    "where t."+property+" "+condition+" :value" ;
@@ -129,12 +111,7 @@ public abstract class AbstractDao<T, K extends Serializable> {
 		T entity = (T) query.getSingleResult();
 		
 		return entity;
-		/*
-		
-		if(entities.size() == 1) return  entities.get(0);
-		
-		else throw new NotFoundException("No entity found with property : "+property+"  with value : "+value);
-		*/
+
 	}
 
 }

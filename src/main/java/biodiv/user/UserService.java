@@ -19,6 +19,7 @@ import biodiv.common.Language;
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
 import org.jvnet.hk2.annotations.Service;
+import javax.ws.rs.NotFoundException;
 
 //@Service
 public class UserService extends AbstractService<User> {
@@ -34,28 +35,12 @@ public class UserService extends AbstractService<User> {
 		log.trace("UserService constructor");
 	}
 	
-	public User findByEmail(String email) {
-		try {
-			//userDao.openCurrentSession();
-			User user = userDao.findByEmail(email);
-			return user;
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			//userDao.closeCurrentSession();
-		}
+	public User findByEmail(String email)  throws NotFoundException {
+	    return userDao.findByEmail(email);
 	}
 
-	public User findByEmailAndPassword(String email, String password) {
-		try {
-			//userDao.openCurrentSession();
-			User user = userDao.findByEmailAndPassword(email, password);
-			return user;
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			//userDao.closeCurrentSession();
-		}
+	public User findByEmailAndPassword(String email, String password) throws NotFoundException {
+		return userDao.findByEmailAndPassword(email, password);
 	}
 
 	public RegistrationCode register(String email) {
