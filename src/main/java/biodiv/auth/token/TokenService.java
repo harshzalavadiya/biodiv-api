@@ -65,7 +65,9 @@ public class TokenService extends AbstractService<Token> {
 			// Return the access_token valid for 2 hrs and a new refreshToken on
 			// the response
 			Map<String, Object> result = new HashMap<String, Object>();
+			result.put("name",user.getName());
 			result.put("userId", user.getId());
+			result.put("pic", user.getProfilePic());
 			result.put("access_token", jwtToken);
 			result.put("token_type", "bearer");
 			result.put("expires_in", (AuthUtils.getAccessTokenExpiryDate().getTime() - (new Date()).getTime()));// Duration.ofDays(1).getSeconds()
