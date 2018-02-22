@@ -115,7 +115,8 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty("hibernate.c3p0.debugUnreturnedConnectionStackTraces", "true");
 					//dbProps.setProperty("hibernate.c3p0.contextClassLoaderSource", "library");
 					//dbProps.setProperty("hibernate.c3p0.privilegeSpawnedThreads", "true");
-					
+					dbProps.setProperty("hibernate.jdbc.lob.non_contextual_creation", "true");
+							
 					dbProps.setProperty("hbm2ddl.auto", "update");
 					
 					dbProps.setProperty("hibernate.id.new_generator_mappings", "false");
@@ -124,18 +125,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty("hibernate.jdbc.batch_size", "50");
 					
 					dbProps.setProperty("show_sql", "true");
-				/*
-					
-			
-					
-					ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-					InputStream input = classLoader.getResourceAsStream("hibernate.cfg.xml");
-					//Properties properties = new Properties();
-					//properties.load(input);
-					//URL configFileURL = getClass().getClassLoader().getResource("/hibernate.cfg.xml");
-					//log.debug("Using hibernate configuration file : {}", configFileURL);
-					
-					dbProps.load(input);*/
+		
 					hibConf.addProperties(dbProps);
 					for (Class cls : getEntityClassesFromPackage("biodiv")) {
 						log.trace("Adding annotated class : {}", cls);
@@ -144,10 +134,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
 							.applySettings(hibConf.getProperties()).build();
 
-					// URL configFileURL = getResource(); //some method to get
-					// hold of the location of your hibernate.cfg.xml
-					// StandardServiceRegistry standardRegistry = new
-					// StandardServiceRegistryBuilder().configure(configFileURL).build();
+			
 					Metadata metaData = new MetadataSources(serviceRegistry).getMetadataBuilder().build();
 					Collection<PersistentClass> entityBindings = metaData.getEntityBindings();
 					log.trace("All entity bindings : {}", entityBindings);
