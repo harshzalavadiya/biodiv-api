@@ -210,19 +210,20 @@ public class ObservationService extends AbstractService<Observation> {
 				Map<String, Object> obvRecoVotesResult = (Map<String, Object>) obvListRecoVotesResult
 						.get(((Long) recoVote.get("observationId")).toString());
 				if (obvRecoVotesResult == null) {
-					System.out.println("no reco found for obv");
+					System.out.println(recoVote.get("observationId"));
+					System.out.println("obv not in obvlist till now");
 					obvRecoVotesResult = new HashMap<String, Object>();
 					obvRecoVotesResult.put("recoVotes", new ArrayList<Map<String, Object>>()); // checkin
 																								// g%%%%%%%%%%%%%%%%%%%%%%%%%
 					obvRecoVotesResult.put("totalVotes", 0);
 					obvRecoVotesResult.put("uniqueVotes", 0);
 					obvListRecoVotesResult.put(((Long) recoVote.get("observationId")).toString(), obvRecoVotesResult);
-					recoMaps = recoMaps;
+					recoMaps = new HashMap<String, Object>();
 				}
 
 				Map<String, Object> map = new HashMap<String, Object>();
 				if (recoMaps.containsKey(recoVote.get("recoId").toString())) {
-					System.out.println("no entry found in recoMaps");
+					System.out.println(" entry found in recoMaps");
 					map = (Map<String, Object>) recoMaps.get(recoVote.get("recoId").toString());
 				} else {
 					map.put("recoId", recoVote.get("recoId"));
@@ -264,9 +265,11 @@ public class ObservationService extends AbstractService<Observation> {
 					// dont know
 
 				}
-
+				
+				System.out.println(map.get("recoId"));
 				if (!map.containsKey("authors")) {
 					System.out.println("no author found");
+					
 					map.put("authors", new ArrayList<List<Object>>());
 				}
 				Map<String, Object> author = userService
