@@ -168,7 +168,14 @@ public class UserGroupService extends AbstractService<UserGroup> {
 						userGroupsContainingObv, obvUsrGrps, pullType, submitType, userGroups, filterUrl);
 
 				dataObj.setUserGroups(updatedObjUsrGrps);
-				dataObj.save();
+				
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				//TODO: HACH HACK HACK CHANGE
+				observationService.save(dataObj);
 
 				// activityFeed addition starts here for Object Entry
 
