@@ -67,8 +67,10 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		JSONObject obj = new JSONObject();
 		obj.put("speciesgroupid", observation.getGroup().getId());
 		obj.put("speciesgroupname", observation.getGroup().getName());
-		observationList.update("observation", "observations", observation.getId().toString(),obj.toString());
-		Object data=observationList.fetch("observation", "observations",observation.getId().toString());
+		observationList.update("observation", "observation", observation.getId().toString(),obj.toString());
+		
+		Object data=observationList.fetch("observation", "observation",observation.getId().toString());
+		
 		return data;
 		
 	}

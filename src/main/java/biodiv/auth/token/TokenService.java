@@ -68,6 +68,7 @@ public class TokenService extends AbstractService<Token> {
 			result.put("userId", user.getId());
 			result.put("access_token", jwtToken);
 			result.put("token_type", "bearer");
+			result.put("pic",user.getProfilePic());
 			result.put("expires_in", (AuthUtils.getAccessTokenExpiryDate().getTime() - (new Date()).getTime()));// Duration.ofDays(1).getSeconds()
 			// result.put("scope", "");
 
