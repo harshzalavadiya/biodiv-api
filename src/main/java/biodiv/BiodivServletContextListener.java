@@ -2,7 +2,6 @@ package biodiv;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,9 +27,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.c3p0.internal.C3P0ConnectionProvider;
-import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
-import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.ServiceRegistry;
 import org.slf4j.Logger;
@@ -51,6 +47,7 @@ import biodiv.dataset.DatasetModule;
 import biodiv.follow.FollowModule;
 import biodiv.maps.MapModule;
 import biodiv.observation.ObservationModule;
+import biodiv.scheduler.SchedulerModule;
 import biodiv.taxon.TaxonModule;
 import biodiv.traits.TraitModule;
 import biodiv.user.UserModule;
@@ -172,7 +169,8 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 			}
 		}, new BiodivCommonModule(), new ActivityFeedModule(), new AuthModule(), new CommentModule(),
 				new CustomFieldModule(), new DatasetModule(), new FollowModule(), new MapModule(),
-				new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(), new UserGroupModule());
+				new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(),
+				new UserGroupModule(), new SchedulerModule());
 	}
 
 	private static List<Class<?>> getEntityClassesFromPackage(String packageName)
