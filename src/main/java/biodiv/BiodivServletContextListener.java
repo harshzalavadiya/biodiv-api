@@ -67,7 +67,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 			@Override
 			protected void configureServlets() {
 				log.debug("Configuring Servlets");
-
+				
 				// Loading external configuration
 				Configurations configs = new Configurations();
 				Configuration config = null;
@@ -113,8 +113,8 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty("hibernate.c3p0.unreturnedConnectionTimeout", "90");
 					dbProps.setProperty("hibernate.c3p0.maxConnectionAge", "1800");
 					dbProps.setProperty("hibernate.c3p0.debugUnreturnedConnectionStackTraces", "true");
-					//dbProps.setProperty("hibernate.c3p0.contextClassLoaderSource", "library");
-					//dbProps.setProperty("hibernate.c3p0.privilegeSpawnedThreads", "true");
+					dbProps.setProperty("hibernate.c3p0.contextClassLoaderSource", "library");
+					dbProps.setProperty("hibernate.c3p0.privilegeSpawnedThreads", "true");
 					dbProps.setProperty("hibernate.jdbc.lob.non_contextual_creation", "true");
 							
 					dbProps.setProperty("hbm2ddl.auto", "update");
@@ -136,8 +136,10 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 
 			
 					Metadata metaData = new MetadataSources(serviceRegistry).getMetadataBuilder().build();
+					
 					Collection<PersistentClass> entityBindings = metaData.getEntityBindings();
 					log.trace("All entity bindings : {}", entityBindings);
+					
 					Iterator<PersistentClass> iterator = entityBindings.iterator();
 					while (iterator.hasNext()) {
 						PersistentClass persistentClass = iterator.next();
@@ -147,12 +149,13 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					SessionFactory sessionFactory = hibConf.buildSessionFactory(serviceRegistry);
 
 					bind(SessionFactory.class).toInstance(sessionFactory);
+					bind(ServiceRegistry.class).toInstance(serviceRegistry);
 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
-				// rest("/*").packages("biodiv");
+				//rest("/*").packages("biodiv");
 
 				// INTERCEPTOR
 				ResourceInterceptor interceptor = new ResourceInterceptor();
@@ -162,6 +165,9 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 
 				// FILTERS
 				// bind(BiodivResponseFilter.class).in(Singleton.class);
+				
+				
+			      
 
 			}
 		}, new BiodivCommonModule(), new ActivityFeedModule(), new AuthModule(), new CommentModule(),
@@ -213,7 +219,13 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		Injector injector = (Injector) sce.getServletContext()
-                 .getAttribute(Injector.class.getName()); 
+                 .getAttribute(Injector.class.getName());
+	
+		ServiceRegistry serviceRegistry = injector.getInstance(ServiceRegistry.class);
+		if (serviceRegistry != null) {
+			StandardServiceRegistryBuilder.destroy(serviceRegistry);
+		}
+	
 		SessionFactory sessionFactory = injector.getInstance(SessionFactory.class);
 /*		if(sessionFactory instanceof SessionFactoryImpl) {
 		      SessionFactoryImpl sf = (SessionFactoryImpl)sessionFactory;
