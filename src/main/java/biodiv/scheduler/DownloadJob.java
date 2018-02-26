@@ -2,6 +2,7 @@ package biodiv.scheduler;
 
 import java.io.IOException;
 
+import org.apache.commons.configuration2.Configuration;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
@@ -18,7 +19,6 @@ import biodiv.Transactional;
 import biodiv.maps.MapHttpResponse;
 import biodiv.maps.MapIntegrationService;
 import biodiv.maps.MapSearchQuery;
-import biodiv.observation.ObservationList;
 import biodiv.scheduler.DownloadLog.DownloadType;
 import biodiv.user.User;
 
@@ -31,7 +31,10 @@ public class DownloadJob implements Job {
 	public static final String DATA_KEY = "data";
 	public static final String USER_KEY = "user";
 	public static final String SEARCH_KEY = "search";
-	
+
+    @Inject
+	Configuration config;
+    
 	@Inject
 	MapIntegrationService mapIntegrationService;
 	
@@ -60,7 +63,7 @@ public class DownloadJob implements Job {
 		DownloadLog downloadLog = new DownloadLog(user, filterUrl, status, type, 0);
 		downloadLogService.save(downloadLog);
 		
-		String url = ObservationList.URL + "naksha/services/download/" + index + "/" + indexType; 
+		String url = config.getString("nakshaUrl") + "/services/download/" + index + "/" + indexType; 
 		MapHttpResponse httpResponse = mapIntegrationService.postRequest(url, mapSearchQuery);
 		
 		String filePath = null;
