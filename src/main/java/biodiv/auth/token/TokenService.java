@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.slf4j.Logger;
@@ -59,18 +60,16 @@ public class TokenService extends AbstractService<Token> {
 	public Map<String, Object> buildTokenResponse(CommonProfile profile, User user, boolean getNewRefreshToken) {
 		try {
 			log.debug("Building token response for " + user);
+		
 			String jwtToken = generateAccessToken(profile);
 
 			//tokenDao.openCurrentSessionWithTransaction();
 			// Return the access_token valid for 2 hrs and a new refreshToken on
 			// the response
 			Map<String, Object> result = new HashMap<String, Object>();
-			result.put("userId", user.getId());
 			result.put("access_token", jwtToken);
 			result.put("token_type", "bearer");
 			result.put("pic",user.getProfilePic());
-			result.put("expires_in", (AuthUtils.getAccessTokenExpiryDate().getTime() - (new Date()).getTime()));// Duration.ofDays(1).getSeconds()
-			// result.put("scope", "");
 
 			if (getNewRefreshToken) {
 				log.debug("Generating new refresh token for " + user);
@@ -110,6 +109,7 @@ public class TokenService extends AbstractService<Token> {
 		log.debug("generateAccessToken .... ");
 		JwtGenerator<CommonProfile> generator = new JwtGenerator<>(
 				new SecretSignatureConfiguration(Constants.JWT_SALT));
+		//jwt claims are added in AuthUtils.updateUserProfile
 		String jwtToken = generator.generate(profile);
 		return jwtToken;
 	}

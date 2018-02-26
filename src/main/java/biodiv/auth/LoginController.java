@@ -66,6 +66,7 @@ public class LoginController {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
+    @Path("/auth")
 	public Response auth(@FormParam("username") String username, @FormParam("password") String password) {
 
 		try {
@@ -190,11 +191,6 @@ public class LoginController {
 
 			log.debug("Auth Request : Refresh Token : " + refreshToken + "  grant_type : " + grantType);
 
-			// CustomJwtAuthenticator jwtAuthenticator = new
-			// CustomJwtAuthenticator(
-			// new
-			// org.pac4j.jwt.config.signature.SecretSignatureConfiguration(Constants.JWT_SALT));
-
 			// get user details from access token and validate if the refresh
 			// token was given to this user.
 			if (refreshToken != null) {
@@ -203,6 +199,7 @@ public class LoginController {
 				if (tokenService.isValidRefreshToken(refreshToken, user.getId())) {
 					Map<String, Object> result = tokenService.buildTokenResponse(profile, user,
 							grantType.equalsIgnoreCase(Token.TokenType.REFRESH.value()) ? true : false);
+					result.put(Token.TokenType.REFRESH.value(), refreshToken);
 					return Response.ok(result).build();
 				} else {
 					ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, "Invalid refresh token");

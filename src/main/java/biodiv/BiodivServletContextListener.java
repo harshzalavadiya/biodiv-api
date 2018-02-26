@@ -43,6 +43,7 @@ import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 
 import biodiv.activityFeed.ActivityFeedModule;
+import biodiv.admin.AdminModule;
 import biodiv.auth.AuthModule;
 import biodiv.comment.CommentModule;
 import biodiv.common.BiodivCommonModule;
@@ -172,7 +173,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 			}
 		}, new BiodivCommonModule(), new ActivityFeedModule(), new AuthModule(), new CommentModule(),
 				new CustomFieldModule(), new DatasetModule(), new FollowModule(), new MapModule(),
-				new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(), new UserGroupModule());
+				new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(), new UserGroupModule(), new AdminModule());
 	}
 
 	private static List<Class<?>> getEntityClassesFromPackage(String packageName)

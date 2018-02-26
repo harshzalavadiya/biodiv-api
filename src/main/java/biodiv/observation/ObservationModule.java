@@ -21,6 +21,8 @@ private final Logger log = LoggerFactory.getLogger(getClass());
 		bind(ObservationDao.class).in(Singleton.class);
 		bind(ObservationService.class).in(Singleton.class);
 		bind(ObservationController.class).in(Singleton.class);
+		bind(ObservationListService.class).in(Singleton.class);
+		bind(ObservationListController.class).in(Singleton.class);
 		
 		bind(Recommendation.class);
 		bind(RecommendationVote.class);

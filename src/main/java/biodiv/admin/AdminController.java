@@ -1,5 +1,6 @@
 package biodiv.admin;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -11,13 +12,16 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.observation.ObservationList;
+import biodiv.observation.ObservationListService;
 import biodiv.user.UserController;
 
 @Path("/admin")
 public class AdminController {
 	
 	private final Logger log = LoggerFactory.getLogger(UserController.class);
+	
+	@Inject
+	ObservationListService observationListService;
 	
 	/**
 	 * 
@@ -30,8 +34,7 @@ public class AdminController {
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public void uploadMapping(@PathParam("index") String index,String settingsAndMappings){
 		
-		ObservationList observationList=new ObservationList();
-		observationList.uploadSettingsAndMappings(index,settingsAndMappings);
+		observationListService.uploadSettingsAndMappings(index,settingsAndMappings);
 		
 		
 	}

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -36,15 +37,16 @@ import biodiv.maps.MapSearchQuery;
 @Path("/naksha")
 public class ObservationListController {
 
+	@Inject
+	private ObservationListService observationListService;
+	
 	@POST
 	@Path("/{index}/{type}/{documentId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public MapResponse list(@PathParam("index") String index, @PathParam("type") String type,
 			@PathParam("documentId") String documentId, String document) {
 
-		ObservationList observationList = new ObservationList();
-
-		MapResponse mapResponse = observationList.create(index, type, documentId, document);
+		MapResponse mapResponse = observationListService.create(index, type, documentId, document);
 
 		return mapResponse;
 	}
@@ -65,9 +67,7 @@ public class ObservationListController {
 	public MapResponse updateDocument(@PathParam("index") String index, @PathParam("type") String type,
 			@PathParam("documentId") String documentId, String document) {
 
-		ObservationList observationList = new ObservationList();
-
-		MapResponse mapResponse = observationList.update(index, type, documentId, document);
+		MapResponse mapResponse = observationListService.update(index, type, documentId, document);
 
 		return mapResponse;
 	}
@@ -77,10 +77,8 @@ public class ObservationListController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public MapHttpResponse list(@PathParam("index") String index, @PathParam("type") String type,
 			@PathParam("documentId") String documentId) {
-		System.out.println(index);
-		ObservationList observationList = new ObservationList();
 
-		MapHttpResponse content = observationList.fetch(index, type, documentId);
+		MapHttpResponse content = observationListService.fetch(index, type, documentId);
 		return content;
 	}
 
@@ -337,9 +335,7 @@ public class ObservationListController {
 		MapSearchQuery mapSearchQuery = new MapSearchQuery(boolAndLists, boolOrLists, rangeAndLists, rangeOrLists,
 				andMapExistQueries);
 
-		ObservationList observationList = new ObservationList();
-
-		MapBiodivResponse mapResponse = observationList.search(index, type, mapSearchQuery, max, offset, sortOn,
+		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery, max, offset, sortOn,
 				geoAggregationField, geoAggegationPrecision, left, right, top, bottom);
 
 		return mapResponse;
