@@ -122,6 +122,7 @@ dependencies {
     
 	compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.2'
 
+	compile group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
 
 }
 

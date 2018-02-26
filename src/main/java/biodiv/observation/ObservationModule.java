@@ -6,10 +6,9 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
 
-import biodiv.common.DataObject;
-
 public class ObservationModule extends ServletModule {
-private final Logger log = LoggerFactory.getLogger(getClass());
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	
 	@Override
 	protected void configureServlets() {

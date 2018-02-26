@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.maps.MapBiodivResponse;
-import biodiv.common.ResponseModel;
 import biodiv.maps.MapAndBoolQuery;
 import biodiv.maps.MapHttpResponse;
 import biodiv.maps.MapIntegrationService;
@@ -19,7 +18,6 @@ import biodiv.maps.MapSearchQuery;
 import biodiv.maps.MapService;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.Response;
 
 public class ObservationListService implements MapService {
 
