@@ -145,7 +145,9 @@ public class LoginController {
 					Iterator it = result.entrySet().iterator();
 					while (it.hasNext()) {
 						Map.Entry pair = (Map.Entry) it.next();
-						targetURIForRedirection.queryParam((String) pair.getKey(), pair.getValue());
+                        if(pair.getValue() != null) {
+						    targetURIForRedirection.queryParam((String) pair.getKey(), pair.getValue());
+                        }
 						it.remove(); // avoids a ConcurrentModificationException
 					}
 					return Response.temporaryRedirect(targetURIForRedirection.build()).build();

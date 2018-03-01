@@ -149,7 +149,9 @@ tomcat {
 
 tomcat {
     httpPort = 8090
-    //httpsPort = 8099
+    httpsPort = 8444
+    ajpPort = 8010
+    stopPort = 8082
     //enableSSL = true
     contextPath = 'biodiv-api'
 }
