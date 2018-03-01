@@ -113,6 +113,7 @@ public class TokenService extends AbstractService<Token> {
 		//jwt claims are added in AuthUtils.updateUserProfile
         Map jwtClaims = new HashMap<String, Object>();
 		jwtClaims.put("id", profile.getId());
+		jwtClaims.put(JwtClaims.SUBJECT, profile.getId()+"");
 		jwtClaims.put(Pac4jConstants.USERNAME, profile.getUsername());
 		jwtClaims.put(CommonProfileDefinition.EMAIL, profile.getEmail());
 		jwtClaims.put(JwtClaims.EXPIRATION_TIME, AuthUtils.getAccessTokenExpiryDate());
