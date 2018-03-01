@@ -7,7 +7,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.definition.CommonProfileDefinition;
 import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
@@ -109,7 +111,15 @@ public class TokenService extends AbstractService<Token> {
 		JwtGenerator<CommonProfile> generator = new JwtGenerator<>(
 				new SecretSignatureConfiguration(Constants.JWT_SALT));
 		//jwt claims are added in AuthUtils.updateUserProfile
-		String jwtToken = generator.generate(profile);
+        Map jwtClaims = new HashMap<String, Object>();
+		jwtClaims.put("id", profile.getId());
+		jwtClaims.put(Pac4jConstants.USERNAME, profile.getUsername());
+		jwtClaims.put(CommonProfileDefinition.EMAIL, profile.getEmail());
+		jwtClaims.put(JwtClaims.EXPIRATION_TIME, AuthUtils.getAccessTokenExpiryDate());
+		jwtClaims.put(JwtClaims.ISSUED_AT, new Date());
+		jwtClaims.put("roles", profile.getRoles());
+		jwtClaims.put("pic", profile.getPictureUrl());
+		String jwtToken = generator.generate(jwtClaims);
 		return jwtToken;
 	}
 
