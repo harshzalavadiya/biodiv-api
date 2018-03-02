@@ -1,4 +1,4 @@
-// Apply the java-library plugin to add support for Java Library
+	// Apply the java-library plugin to add support for Java Library
 apply plugin: 'java-library'
 
 
@@ -29,7 +29,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.bmuschko:gradle-tomcat-plugin:2.3'
+        classpath 'com.bmuschko:gradle-tomcat-plugin:2.4.2'
     }
 }
 
@@ -131,17 +131,27 @@ dependencies {
 
 
 dependencies {
-    def tomcatVersion = '8.0.42'
+//    def tomcatVersion = '8.0.42'
+//    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+//           "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+//           "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+    def tomcatVersion = '8.5.27'
     tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
-           "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+           "org.apache.tomcat.embed:tomcat-embed-logging-juli:8.5.2",
            "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
 }
 
+tomcat {
+        httpProtocol = 'org.apache.coyote.http11.Http11Nio2Protocol'
+            ajpProtocol  = 'org.apache.coyote.ajp.AjpNio2Protocol'
+}
 
 
 tomcat {
     httpPort = 8090
-    //httpsPort = 8099
+    httpsPort = 8444
+    ajpPort = 8010
+    stopPort = 8082
     //enableSSL = true
     contextPath = 'biodiv-api'
 }

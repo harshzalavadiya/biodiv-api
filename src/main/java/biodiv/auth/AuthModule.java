@@ -59,7 +59,8 @@ public class AuthModule extends ServletModule {
 		final String fbSecret = config.getString("fbSecret");
 		final FacebookClient facebookClient = new FacebookClient(fbId, fbSecret);
 		//facebookClient.setStateData("biodiv-api-state");
-		
+	    facebookClient.setScope("email,user_location,user_website");
+	    facebookClient.setFields("id,name,gender,email,location");
 		CustomOAuth20Authenticator customOAuth20Authenticator = new CustomOAuth20Authenticator(facebookClient.getConfiguration());
         CustomOAuth2ProfileCreator customOAuth2ProfileCreator = new CustomOAuth2ProfileCreator(facebookClient.getConfiguration());
         //used to inject userService

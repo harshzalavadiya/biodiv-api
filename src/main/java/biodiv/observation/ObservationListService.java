@@ -122,8 +122,7 @@ public class ObservationListService implements MapService {
 	
 
 	@Override
-	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision,Double left, Double right, Double top, Double bottom) {
-//		try {
+	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision,Double left, Double right, Double top, Double bottom, Boolean onlyFilteredAggregation) {
 		String newurl= config.getString("nakshaUrl")+"/services/search/" + index + "/" + type+"?from="+offset+"&limit="+max
 				+"&geoAggregationField="+geoAggregationField +"&geoAggegationPrecision="+geoAggegationPrecision+"&sortOn="+sortOn+"&sortType=DESC";
 		
@@ -132,7 +131,10 @@ public class ObservationListService implements MapService {
 		if(left!=null &&right!=null && top!=null && bottom!=null){
 			 newurl += "&top="+top+"&bottom="+bottom+"&left="+left+"&right="+right;
 		}
-		 
+		
+		if(onlyFilteredAggregation != null && onlyFilteredAggregation == true) {
+			newurl += "&onlyFilteredAggregation=true";
+		}
 		
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 		MapBiodivResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);

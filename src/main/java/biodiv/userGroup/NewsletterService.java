@@ -143,7 +143,6 @@ public class NewsletterService extends AbstractService<Newsletter>{
 			res.put("id", (Long) obj[0]);
 			res.put("version", (Long) obj[1]);
 			res.put("date", (Date) obj[2]);
-			res.put("newsitem", (String) obj[3]);
 			res.put("title", (String) obj[4]);
 			res.put("sticky", (Boolean) obj[5]);
 			res.put("userGroupId", (Long) obj[6]);
