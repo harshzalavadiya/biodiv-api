@@ -7,12 +7,14 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.definition.CommonProfileDefinition;
+import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.pac4j.core.profile.CommonProfile;
 
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
@@ -59,18 +61,16 @@ public class TokenService extends AbstractService<Token> {
 	public Map<String, Object> buildTokenResponse(CommonProfile profile, User user, boolean getNewRefreshToken) {
 		try {
 			log.debug("Building token response for " + user);
+		
 			String jwtToken = generateAccessToken(profile);
 
 			//tokenDao.openCurrentSessionWithTransaction();
 			// Return the access_token valid for 2 hrs and a new refreshToken on
 			// the response
 			Map<String, Object> result = new HashMap<String, Object>();
-			result.put("userId", user.getId());
 			result.put("access_token", jwtToken);
 			result.put("token_type", "bearer");
 			result.put("pic",user.getProfilePic());
-			result.put("expires_in", (AuthUtils.getAccessTokenExpiryDate().getTime() - (new Date()).getTime()));// Duration.ofDays(1).getSeconds()
-			// result.put("scope", "");
 
 			if (getNewRefreshToken) {
 				log.debug("Generating new refresh token for " + user);
@@ -110,7 +110,17 @@ public class TokenService extends AbstractService<Token> {
 		log.debug("generateAccessToken .... ");
 		JwtGenerator<CommonProfile> generator = new JwtGenerator<>(
 				new SecretSignatureConfiguration(Constants.JWT_SALT));
-		String jwtToken = generator.generate(profile);
+		//jwt claims are added in AuthUtils.updateUserProfile
+        Map jwtClaims = new HashMap<String, Object>();
+		jwtClaims.put("id", profile.getId());
+		jwtClaims.put(JwtClaims.SUBJECT, profile.getId()+"");
+		jwtClaims.put(Pac4jConstants.USERNAME, profile.getUsername());
+		jwtClaims.put(CommonProfileDefinition.EMAIL, profile.getEmail());
+		jwtClaims.put(JwtClaims.EXPIRATION_TIME, AuthUtils.getAccessTokenExpiryDate());
+		jwtClaims.put(JwtClaims.ISSUED_AT, new Date());
+		jwtClaims.put("roles", profile.getRoles());
+		jwtClaims.put("pic", profile.getPictureUrl());
+		String jwtToken = generator.generate(jwtClaims);
 		return jwtToken;
 	}
 

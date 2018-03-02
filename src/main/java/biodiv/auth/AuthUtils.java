@@ -21,8 +21,8 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 public class AuthUtils {
 
-	private static final int ACCESS_TOKEN_EXPIRY_TIME_IN_DAYS = 2;
-	private static final int EXPIRY_TIME_IN_DAYS = -30;
+	private static final int ACCESS_TOKEN_EXPIRY_TIME_IN_DAYS = 10;
+	private static final int EXPIRY_TIME_IN_DAYS = 30;
 	
 //	public static Config getConfig() {
 		//ProvidersHelper.getContext(providers, Config.class);
@@ -59,33 +59,27 @@ public class AuthUtils {
 	public static void updateUserProfile(CommonProfile profile, Long userId, String username, String email, List authorities) {
 		if(profile == null) return;
 		profile.setId(userId);
+		profile.addAttribute("id", userId);
 		profile.addAttribute(Pac4jConstants.USERNAME, username);
 		profile.addAttribute(CommonProfileDefinition.EMAIL, email);
-		profile.addAttribute(JwtClaims.EXPIRATION_TIME, getAccessTokenExpiryDate().getTime());
+		profile.addAttribute(JwtClaims.EXPIRATION_TIME, getAccessTokenExpiryDate());
+		profile.addAttribute(JwtClaims.ISSUED_AT, new Date());
 		for (Object authority: authorities) {
 			profile.addRole((String)authority);
 		}
 	}
 
 	public static Date getAccessTokenExpiryDate() {
-		Calendar cal = Calendar.getInstance();
-		Date dt = new Date();
-		cal.setTime(dt);
-		//cal.add(Calender.DATE, 7);
-		//cal.add(Calendar.SECOND, 120);
-		cal.add(Calendar.DATE, ACCESS_TOKEN_EXPIRY_TIME_IN_DAYS);
-		System.out.println("Setting access token expiry to  : "+cal.getTime());
-		return cal.getTime();
+		final Date now = new Date();
+		long expDate = now.getTime() + ACCESS_TOKEN_EXPIRY_TIME_IN_DAYS * (24 * 3600 * 1000);
+		return new Date(expDate);
+
 	}
-	
+
 	public static Date getRefreshTokenExpiryDate() {
-		Calendar cal = Calendar.getInstance();
-		Date dt = new Date();
-		cal.setTime(dt);
-		// cal.add(Calender.DATE, 7);
-		cal.add(Calendar.DATE, EXPIRY_TIME_IN_DAYS);
-		System.out.println("Setting refresh token expiry to  : "+cal.toString());
-		return cal.getTime();
+		final Date now = new Date();
+		long expDate = now.getTime() + EXPIRY_TIME_IN_DAYS * (24 * 3600 * 1000);
+		return new Date(expDate);
 	}
 
 	public static CommonProfile currentUser(HttpServletRequest request) {
