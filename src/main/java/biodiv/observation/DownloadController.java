@@ -1,15 +1,5 @@
 package biodiv.observation;
 
-import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -23,19 +13,13 @@ import javax.ws.rs.core.MediaType;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
-import com.google.common.util.concurrent.AbstractScheduledService.Scheduler;
 import com.google.inject.Inject;
 
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
-import biodiv.common.CommonMethod;
-import biodiv.maps.MapAndBoolQuery;
-import biodiv.maps.MapAndRangeQuery;
-import biodiv.maps.MapBiodivResponse;
-import biodiv.maps.MapExistQuery;
-import biodiv.maps.MapOrBoolQuery;
-import biodiv.maps.MapOrRangeQuery;
 import biodiv.maps.MapSearchQuery;
+import biodiv.scheduler.SchedulerService;
+import biodiv.scheduler.SchedulerStatus;
 import biodiv.user.User;
 import biodiv.user.UserService;
 
@@ -44,15 +28,15 @@ public class DownloadController {
 
 	@Inject
 	UserService userService;
-//	@Inject
-//	SchedulerService schedulerService;
+	@Inject
+	SchedulerService schedulerService;
 	
 	@GET
 	@Path("/{index}/{type}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	@Transactional
-	public MapBiodivResponse download(@PathParam("index") String index, @PathParam("type") String type,
+	public SchedulerStatus download(@PathParam("index") String index, @PathParam("type") String type,
 			@DefaultValue("") @QueryParam("sGroup") String sGroup, @DefaultValue("") @QueryParam("taxon") String taxon,
 			@DefaultValue("") @QueryParam("user") String user,
 			@DefaultValue("") @QueryParam("userGroupList") String userGroupList,
@@ -82,6 +66,7 @@ public class DownloadController {
 
 			@QueryParam("left") Double left, @QueryParam("right") Double right, @QueryParam("top") Double top,
 			@QueryParam("bottom") Double bottom,
+			@QueryParam("notes") String notes,
 			@Context HttpServletRequest request
 
 	) {
@@ -91,6 +76,6 @@ public class DownloadController {
 		
 		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, trait_8, trait_9, trait_10, trait_11, trait_12, trait_13, trait_15, classificationid, max, offset);
 
-		return null;
+		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes);
 	}
 }
