@@ -15,7 +15,7 @@ import biodiv.maps.MapService;
 
 public class ObservationList implements MapService {
 
-	private static final String URL = "http://localhost:8081/";
+	private static final String URL = "http://localhost:8080/";
 
 	@Override
 	public MapResponse create(String index, String type, String documentId, String document) {
@@ -113,7 +113,7 @@ public class ObservationList implements MapService {
 	
 
 	@Override
-	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision,Double left, Double right, Double top, Double bottom) {
+	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, Integer max, Integer offset, String sortOn, String geoAggregationField, Integer geoAggegationPrecision,Double left, Double right, Double top, Double bottom, Boolean onlyFilteredAggregation) {
 		// TODO Auto-generated method stub
 		String newurl= URL+"naksha/services/search/" + index + "/" + type+"?from="+offset+"&limit="+max
 				+"&geoAggregationField="+geoAggregationField +"&geoAggegationPrecision="+geoAggegationPrecision+"&sortOn="+sortOn+"&sortType=DESC";
@@ -121,7 +121,10 @@ public class ObservationList implements MapService {
 		if(left!=null &&right!=null && top!=null && bottom!=null){
 			 newurl += "&top="+top+"&bottom="+bottom+"&left="+left+"&right="+right;
 		}
-		 
+		
+		if(onlyFilteredAggregation != null && onlyFilteredAggregation == true) {
+			newurl += "&onlyFilteredAggregation=true";
+		}
 		
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 		MapBiodivResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);
