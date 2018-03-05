@@ -98,6 +98,8 @@ public class UserService extends AbstractService<User> {
 			author.put("id", user.getId());
 			author.put("icon", user.getIcon());
 			author.put("name",user.getName());
+			author.put("profilePic", user.getProfilePic());
+			author.put("fbProfilePic", user.getFbProfilePic());
 			return author;
 	}
 
