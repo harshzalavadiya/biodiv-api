@@ -37,5 +37,7 @@ public class BiodivCommonModule extends ServletModule {
 		
 		bind(MessageService.class).in(Singleton.class);
 		bind(MailService.class).in(Singleton.class);
+
+		bind(NakshaUrlService.class).in(Singleton.class);
 	}
 }

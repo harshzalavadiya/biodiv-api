@@ -57,7 +57,7 @@ public class ResourceInterceptor implements MethodInterceptor {
             } catch (Throwable rbEx) {  
                 log.error("Could not rollback transaction after exception!", rbEx);  
             }  
+    		throw e;
     	}
-     return result;
     }
 }

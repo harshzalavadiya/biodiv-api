@@ -57,10 +57,11 @@ public class DownloadLog implements java.io.Serializable {
 	public DownloadLog() {
 	}
 
-	public DownloadLog(User user, String filterUrl, SchedulerStatus status, DownloadType type, long offsetParam) {
+	public DownloadLog(User user, String filterUrl, String notes, SchedulerStatus status, DownloadType type, long offsetParam) {
 		this.user = user;
 		this.createdOn = new Date();
 		this.filterUrl = filterUrl;
+		this.notes = notes;
 		this.status = status;
 		this.type = type;
 		this.offsetParam = offsetParam;

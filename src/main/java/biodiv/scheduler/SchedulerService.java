@@ -34,12 +34,14 @@ public class SchedulerService {
 		return TriggerBuilder.newTrigger().withIdentity(Long.toString(counter.getAndIncrement())).usingJobData(jobDataMap);
 	}
 
-	public SchedulerStatus scheduleNow(String index, String type, User user, MapSearchQuery mapSearchQuery) {
+	public SchedulerStatus scheduleNow(String index, String type, User user, MapSearchQuery mapSearchQuery, String notes, String url) {
 		JobDataMap jobDataMap = new JobDataMap();
 		jobDataMap.put(DownloadJob.INDEX_KEY, index);
 		jobDataMap.put(DownloadJob.TYPE_KEY, type);
 		jobDataMap.put(DownloadJob.USER_KEY, user);
-		jobDataMap.put(DownloadJob.SEARCH_KEY, mapSearchQuery);
+		jobDataMap.put(DownloadJob.DATA_KEY, mapSearchQuery);
+		jobDataMap.put(DownloadJob.SEARCH_KEY, url);
+		jobDataMap.put(DownloadJob.NOTES_KEY, notes);
 		
 		Trigger trigger = newJobTrigger(jobDataMap).startNow().build();
 		try {
@@ -50,5 +52,4 @@ public class SchedulerService {
 			return SchedulerStatus.FAILED;
 		}
 	}
-
 }

@@ -12,25 +12,22 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.ws.rs.NotFoundException;
 
 import org.jvnet.hk2.annotations.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.auth.AuthUtils;
 import biodiv.comment.CommentService;
 import biodiv.common.AbstractService;
-import biodiv.common.CommonMethod;
 import biodiv.common.LanguageService;
 import biodiv.common.SpeciesGroup;
 import biodiv.common.SpeciesGroupService;
+import biodiv.customField.CustomFieldService;
 import biodiv.taxon.datamodel.dao.Taxon;
 import biodiv.user.User;
 import biodiv.user.UserService;
-import biodiv.customField.CustomFieldService;
-
 import biodiv.userGroup.UserGroup;
 
 @Service
@@ -55,7 +52,7 @@ public class ObservationService extends AbstractService<Observation> {
 
 	@Inject
 	private CommentService commentService;
-	
+
 	@Inject
 	private LanguageService languageService;
 
@@ -123,27 +120,37 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 	@Transactional
-	public Object updateGroup(Long objectid, Long newgroupid, Long oldGroupId, Long userId) {
-		// TODO Auto-generated method stub
+	public Object updateGroup(Long objectId, Long newGroupId, Long oldGroupId, Long userId) {
+		if (objectId == null || newGroupId == null || userId == null) {
+			throw new NotFoundException("Null is not a valid Id");
+		}
+
+		SpeciesGroup speciesGroup = speciesGroupService.findById(newGroupId);
+		Observation observation = show(objectId);
+
+		if (speciesGroup == null || observation == null) {
+			throw new NotFoundException("SpeciesGroup or observation is not found");
+		}
+
 		User user = userService.findById(userId);
-		Object obj;
-		SpeciesGroup speciesGroup = speciesGroupService.findById(newgroupid);
+
 		String newSpeciesGroupName = speciesGroup.getName();
 		SpeciesGroup oldSpeciesGroup = speciesGroupService.findById(oldGroupId);
 		String oldSpeciesGroupName = oldSpeciesGroup.getName();
-		Observation obseravtion=show(objectid);
-		obj =  observationDao.updateGroup(obseravtion,speciesGroup);
-		
-		//activityFeed
+
+		Object obj = observationDao.updateGroup(observation, speciesGroup);
+
+		// activityFeed
 		Date dateCreated = new java.util.Date();
 		Date lastUpdated = dateCreated;
-		String activityDescription = oldSpeciesGroupName+" to "+newSpeciesGroupName;
+		String activityDescription = oldSpeciesGroupName + " to " + newSpeciesGroupName;
 		System.out.println(activityDescription);
-		Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectid,obseravtion,
-				"species.participation.Observation","species.participation.Observation",objectid,"Observation species group updated",
-				"Species group updated",activityDescription,activityDescription,null,null,null,true,null,dateCreated,lastUpdated);
-		activityFeedService.addActivityFeed(user,afNew,obseravtion,(String)afNew.get("rootHolderType"));
-		//activityFeed
+		Map<String, Object> afNew = activityFeedService.createMapforAf("Object", objectId, observation,
+				"species.participation.Observation", "species.participation.Observation", objectId,
+				"Observation species group updated", "Species group updated", activityDescription, activityDescription,
+				null, null, null, true, null, dateCreated, lastUpdated);
+		activityFeedService.addActivityFeed(user, afNew, observation, (String) afNew.get("rootHolderType"));
+		// activityFeed
 		return obj;
 	}
 
@@ -190,8 +197,8 @@ public class ObservationService extends AbstractService<Observation> {
 				reco.put("recoId", ((java.math.BigInteger) obj[8]).longValue());
 				reco.put("name", obj[9]);
 				reco.put("isScientificName", obj[10]);
-				reco.put("languageId",  obj[11]);
-				reco.put("taxonConceptId",  obj[12]);
+				reco.put("languageId", obj[11]);
+				reco.put("taxonConceptId", obj[12]);
 				reco.put("normalizedForm", obj[13]);
 				reco.put("status", obj[14]);
 				reco.put("speciesId", obj[15]);
@@ -265,11 +272,11 @@ public class ObservationService extends AbstractService<Observation> {
 					// dont know
 
 				}
-				
+
 				System.out.println(map.get("recoId"));
 				if (!map.containsKey("authors")) {
 					System.out.println("no author found");
-					
+
 					map.put("authors", new ArrayList<List<Object>>());
 				}
 				Map<String, Object> author = userService
@@ -359,8 +366,9 @@ public class ObservationService extends AbstractService<Observation> {
 					}
 				}
 				obvRecoVotesResult.put("totalVotes", totalVotes);
-				obvRecoVotesResult.put("uniqueVotes",((List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes")).size());
-				
+				obvRecoVotesResult.put("uniqueVotes",
+						((List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes")).size());
+
 				List<Map<String, Object>> finalRecos = (List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes");
 				Collections.sort(finalRecos, new Comparator<Map<String, Object>>() {
 					@Override
@@ -377,14 +385,14 @@ public class ObservationService extends AbstractService<Observation> {
 				obvRecoVotesResult.put("recoVotes", finalRecos); // have to sort
 																	// later
 			}
-			for(Long obvId : obvIds){
-				if(obvListRecoVotesResult.get(obvId.toString()) == null){
+			for (Long obvId : obvIds) {
+				if (obvListRecoVotesResult.get(obvId.toString()) == null) {
 					System.out.println("id not found");
-					Map<String,Object> a =  new HashMap<String,Object>();
+					Map<String, Object> a = new HashMap<String, Object>();
 					a.put("recoVotes", new ArrayList());
 					a.put("totalVotes", 0);
 					a.put("uniqueVotes", 0);
-					obvListRecoVotesResult.put(obvId.toString(),a);
+					obvListRecoVotesResult.put(obvId.toString(), a);
 				}
 			}
 			return obvListRecoVotesResult;
@@ -400,59 +408,59 @@ public class ObservationService extends AbstractService<Observation> {
 				? recommendationService.findById(recoId).getTaxonConcept() : null;
 		return AuthUtils.isLoggedIn();
 	}
-	
+
 	private String getFormattedCommonNames(Map<String, Object> langToCommonName, Boolean addLanguage) {
-		if(langToCommonName.isEmpty()){
+		if (langToCommonName.isEmpty()) {
 			return "";
 		}
-		System.out.println("langToCommonName "+langToCommonName);
+		System.out.println("langToCommonName " + langToCommonName);
 		Long englishId = 205L; // dont know
-		//System.out.println("remove "+langToCommonName.remove(englishId.toString()));
+		// System.out.println("remove
+		// "+langToCommonName.remove(englishId.toString()));
 		Set<Recommendation> englishNames = (Set<Recommendation>) langToCommonName.remove(englishId.toString());
-		System.out.println("langToCommonName "+langToCommonName);
+		System.out.println("langToCommonName " + langToCommonName);
 		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-		System.out.println("englishNames "+englishNames);
-		
+		System.out.println("englishNames " + englishNames);
+
 		List<String> cnList = new ArrayList<String>();
-		
-		for(String key : langToCommonName.keySet()){
-			//System.out.println(langToCommonName.get(key));
+
+		for (String key : langToCommonName.keySet()) {
+			// System.out.println(langToCommonName.get(key));
 			String langSuffix = null;
 			Set<Recommendation> langInstance = (Set<Recommendation>) langToCommonName.get(key);
-			for(Recommendation reco : langInstance){
-				langSuffix = reco.getName()+",";
+			for (Recommendation reco : langInstance) {
+				langSuffix = reco.getName() + ",";
 			}
-			System.out.println("langSuffix "+langSuffix);
+			System.out.println("langSuffix " + langSuffix);
 			if (langSuffix.endsWith(",")) {
-				  langSuffix = langSuffix.substring(0, langSuffix.length() - 1);
+				langSuffix = langSuffix.substring(0, langSuffix.length() - 1);
 			}
-			System.out.println("langSuffix "+langSuffix);
-			if(addLanguage == true){
-				langSuffix = languageService.findById(Long.parseLong(key)).getName() + ": "+langSuffix;
+			System.out.println("langSuffix " + langSuffix);
+			if (addLanguage == true) {
+				langSuffix = languageService.findById(Long.parseLong(key)).getName() + ": " + langSuffix;
 			}
 			cnList.add(langSuffix);
 		}
-		
+
 		String engNamesString = null;
-		
-		if(englishNames != null){
-			if(!englishNames.isEmpty()){
-				for(Recommendation reco : englishNames){
-					engNamesString = reco.getName()+",";
+
+		if (englishNames != null) {
+			if (!englishNames.isEmpty()) {
+				for (Recommendation reco : englishNames) {
+					engNamesString = reco.getName() + ",";
 				}
-				System.out.println("engNamesString "+engNamesString);
+				System.out.println("engNamesString " + engNamesString);
 				if (engNamesString.endsWith(",")) {
-					  engNamesString = engNamesString.substring(0, engNamesString.length() - 1);
+					engNamesString = engNamesString.substring(0, engNamesString.length() - 1);
 				}
-				if(addLanguage == true){
-					engNamesString = languageService.findById(205L).getName() + ": "+engNamesString;
+				if (addLanguage == true) {
+					engNamesString = languageService.findById(205L).getName() + ": " + engNamesString;
 				}
 			}
 		}
-		
-		
-		if(engNamesString != null){
-			cnList.add(0,engNamesString);
+
+		if (engNamesString != null) {
+			cnList.add(0, engNamesString);
 		}
 		String cNames = String.join(",", cnList);
 		return cNames;

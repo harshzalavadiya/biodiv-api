@@ -220,11 +220,11 @@ public class MapIntegrationService {
 			HttpEntity httpEntity = response.getEntity();
 
 			if (httpEntity != null) {
-				return new MapHttpResponse(response.getStatusLine(), httpEntity);
+				message = EntityUtils.toString(httpEntity);
+				return new MapHttpResponse(response.getStatusLine(), message);
 			}
-			// TODO:return new MapHttpResponse(response.,null);
 		}
-		// TODO:return new MapHttpResponse(StatusLine,null);
+		
 		return null;
 	}
 
