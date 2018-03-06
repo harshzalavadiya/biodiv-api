@@ -4,6 +4,8 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -18,6 +20,7 @@ import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
 import biodiv.maps.MapBiodivResponse;
 import biodiv.maps.MapHttpResponse;
+import biodiv.maps.MapResponse;
 import biodiv.maps.MapSearchQuery;
 import biodiv.scheduler.SchedulerService;
 import biodiv.scheduler.SchedulerStatus;
@@ -33,6 +36,24 @@ public class ObservationListController {
 	UserService userService;
 	@Inject
 	SchedulerService schedulerService;
+
+	@POST
+	@Path("/{index}/{type}/{documentId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public MapResponse create(@PathParam("index") String index, @PathParam("type") String type,
+			@PathParam("documentId") String documentId, String document) {
+
+		return observationListService.create(index, type, documentId, document);
+	}
+
+	@PUT
+	@Path("/{index}/{type}/{documentId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public MapResponse update(@PathParam("index") String index, @PathParam("type") String type,
+			@PathParam("documentId") String documentId, String document) {
+
+		return observationListService.update(index, type, documentId, document);
+	}
 
 	@GET
 	@Path("/search/{index}/{type}/{documentId}")
