@@ -38,7 +38,7 @@ public class ObservationListMapper {
 	private String sourceid;
 	private String todate;
 	private String topology;
-	private String checklistannotations;
+	private Object checklistannotations;
 	private String featurecount;
 	private String islocked;
 	private String licenseid;
@@ -359,11 +359,11 @@ public class ObservationListMapper {
 		this.topology = topology;
 	}
 
-	public String getChecklistannotations() {
+	public Object getChecklistannotations() {
 		return checklistannotations;
 	}
 
-	public void setChecklistannotations(String checklistannotations) {
+	public void setChecklistannotations(Object checklistannotations) {
 		this.checklistannotations = checklistannotations;
 	}
 
