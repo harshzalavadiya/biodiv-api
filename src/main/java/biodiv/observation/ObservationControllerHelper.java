@@ -212,23 +212,10 @@ public class ObservationControllerHelper {
 		Set<String> mediaFilters = commonMethod.cSTSOT(mediaFilter);
 		if (!mediaFilters.isEmpty()) {
 			// remove no media value
-			String nomedia = null;
-			for (Iterator<String> iterator = mediaFilters.iterator(); iterator.hasNext();) {
-				String s = iterator.next();
-				if (s.equalsIgnoreCase("nomedia")) {
-					nomedia = iterator.toString();
-					iterator.remove();
-				}
-			}
 			for (String filter : mediaFilters) {
 				rangeOrLists.add(new MapOrRangeQuery(filter, 1, Long.MAX_VALUE));
 			}
 
-			if (nomedia != null) {
-				rangeOrLists.add(new MapOrRangeQuery("noofimages", 0, 0));
-				rangeOrLists.add(new MapOrRangeQuery("noofvideos", 0, 0));
-				rangeOrLists.add(new MapOrRangeQuery("noofaudio", 0, 0));
-			}
 		}
 
 		Set<String> flagged = commonMethod.cSTSOT(isFlagged);

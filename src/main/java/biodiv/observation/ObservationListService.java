@@ -21,10 +21,13 @@ import javax.inject.Inject;
 
 public class ObservationListService implements MapService {
 
+
+	public static final String URL = "http://localhost:8081/";
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
 	Configuration config;
+
 
 	@Override
 	public MapResponse create(String index, String type, String documentId, String document) {

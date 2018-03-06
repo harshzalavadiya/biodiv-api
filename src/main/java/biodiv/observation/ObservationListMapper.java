@@ -38,7 +38,7 @@ public class ObservationListMapper {
 	private String sourceid;
 	private String todate;
 	private String topology;
-	private String checklistannotations;
+	private Object checklistannotations;
 	private String featurecount;
 	private String islocked;
 	private String licenseid;
@@ -82,6 +82,7 @@ public class ObservationListMapper {
 	private List<String> usergroupid;
 	private List<String> usergroupname;
 	private List<String> tag_id;
+	private String nomedia;
 	private List<String> tag_name;
 	private List<Double> location;
 	private List<Double> trait_8;
@@ -92,12 +93,15 @@ public class ObservationListMapper {
 	private List<Double> trait_13;
 	private List<Double> trait_15;
 	private List<String> imageresource;
+	private List<String> urlresource;
 	private List<Double> traits;
+	
 	
 	
 	public ObservationListMapper() {
 		super();
 	}
+	
 
 	public String getId() {
 		return id;
@@ -355,11 +359,11 @@ public class ObservationListMapper {
 		this.topology = topology;
 	}
 
-	public String getChecklistannotations() {
+	public Object getChecklistannotations() {
 		return checklistannotations;
 	}
 
-	public void setChecklistannotations(String checklistannotations) {
+	public void setChecklistannotations(Object checklistannotations) {
 		this.checklistannotations = checklistannotations;
 	}
 
@@ -793,6 +797,26 @@ public class ObservationListMapper {
 
 	public void setAll(String all) {
 		this.all = all;
+	}
+
+
+	public String getNomedia() {
+		return nomedia;
+	}
+
+
+	public void setNomedia(String nomedia) {
+		this.nomedia = nomedia;
+	}
+
+
+	public List<String> getUrlresource() {
+		return urlresource;
+	}
+
+
+	public void setUrlresource(List<String> urlresource) {
+		this.urlresource = urlresource;
 	}
 	
 	

@@ -76,6 +76,6 @@ public class DownloadController {
 		
 		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, trait_8, trait_9, trait_10, trait_11, trait_12, trait_13, trait_15, classificationid, max, offset);
 
-		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes);
+		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes, request.getQueryString());
 	}
 }
