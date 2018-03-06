@@ -15,6 +15,7 @@ import biodiv.maps.MapHttpResponse;
 import biodiv.maps.MapIntegrationService;
 import biodiv.maps.MapSearchQuery;
 import biodiv.scheduler.DownloadLog.DownloadType;
+import biodiv.scheduler.DownloadLog.SourceType;
 import biodiv.user.User;
 
 public class DownloadJob implements Job {
@@ -55,23 +56,30 @@ public class DownloadJob implements Job {
 		String notes = data.getString(NOTES_KEY);
 		SchedulerStatus status = SchedulerStatus.SCHEDULED;
 		DownloadType type = DownloadType.CSV;
+		SourceType sourceType = SourceType.Observations;
 		
-		DownloadLog downloadLog = new DownloadLog(user, filterUrl, notes, status, type, 0);
+		DownloadLog downloadLog = new DownloadLog(user, filterUrl, notes, status, type, sourceType, 0);
 		downloadLogService.save(downloadLog);
 		
 		String url = nakshaUrlService.getDownloadUrl(index, indexType);
 		MapHttpResponse httpResponse = mapIntegrationService.postRequest(url, mapSearchQuery);
 		
 		String filePath = null;
-		try {
-			filePath = (String) httpResponse.getDocument();
-		} catch (ParseException e) {
-			e.printStackTrace();
-			log.error("Error while reading the csv file path response from naksha");
+		status = SchedulerStatus.FAILED;
+
+		if(httpResponse != null) {
+			try {
+				filePath = (String) httpResponse.getDocument();
+				status = SchedulerStatus.SUCCESS;
+			} catch (ParseException e) {
+				e.printStackTrace();
+				log.error("Error while reading the csv file path response from naksha");
+			}
 		}
 		
-		log.debug("Download file generated at {}", filePath);
+		log.info("Download file generated with status {} at {}", status.name(), filePath);
 		downloadLog.setFilePath(filePath);
+		downloadLog.setStatus(status);
 		downloadLogService.update(downloadLog);
 	}
 

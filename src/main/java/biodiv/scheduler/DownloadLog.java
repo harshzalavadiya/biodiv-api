@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -41,6 +43,19 @@ public class DownloadLog implements java.io.Serializable {
 		}
 	}
 
+	public enum SourceType {
+		Observations("Observations");
+		private String value;
+
+		SourceType(String value) {
+			this.value = value;
+		}
+
+		String value() {
+			return this.value;
+		}
+	}
+
 	private long id;
 	private long version;
 	private User user;
@@ -51,24 +66,26 @@ public class DownloadLog implements java.io.Serializable {
 	private String paramsMapAsText;
 	private SchedulerStatus status;
 	private DownloadType type;
-	private String sourceType;
+	private SourceType sourceType;
 	private long offsetParam;
 
 	public DownloadLog() {
 	}
 
-	public DownloadLog(User user, String filterUrl, String notes, SchedulerStatus status, DownloadType type, long offsetParam) {
+	public DownloadLog(User user, String filterUrl, String notes, SchedulerStatus status, DownloadType type,
+			SourceType sourceType, long offsetParam) {
 		this.user = user;
 		this.createdOn = new Date();
 		this.filterUrl = filterUrl;
 		this.notes = notes;
 		this.status = status;
 		this.type = type;
+		this.sourceType = sourceType;
 		this.offsetParam = offsetParam;
 	}
 
 	public DownloadLog(User user, String filePath, String filterUrl, String notes, String paramsMapAsText,
-			SchedulerStatus status, DownloadType type, String sourceType, long offsetParam) {
+			SchedulerStatus status, DownloadType type, SourceType sourceType, long offsetParam) {
 		this.user = user;
 		this.createdOn = new Date();
 		this.filePath = filePath;
@@ -162,6 +179,7 @@ public class DownloadLog implements java.io.Serializable {
 	}
 
 	@Column(name = "status", nullable = false)
+	@Enumerated(EnumType.STRING)
 	public SchedulerStatus getStatus() {
 		return this.status;
 	}
@@ -171,6 +189,7 @@ public class DownloadLog implements java.io.Serializable {
 	}
 
 	@Column(name = "type", nullable = false)
+	@Enumerated(EnumType.STRING)
 	public DownloadType getType() {
 		return this.type;
 	}
@@ -180,11 +199,12 @@ public class DownloadLog implements java.io.Serializable {
 	}
 
 	@Column(name = "source_type")
-	public String getSourceType() {
+	@Enumerated(EnumType.STRING)
+	public SourceType getSourceType() {
 		return this.sourceType;
 	}
 
-	public void setSourceType(String sourceType) {
+	public void setSourceType(SourceType sourceType) {
 		this.sourceType = sourceType;
 	}
 

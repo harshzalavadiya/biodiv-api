@@ -28,7 +28,5 @@ public class ObservationModule extends ServletModule {
 		bind(RecommendationDao.class).in(Singleton.class);
 		bind(RecommendationService.class).in(Singleton.class);
 		//bind(RecommendationController.class).in(Singleton.class);
-		
-		bind(DownloadController.class).in(Singleton.class);
 	}
 }
