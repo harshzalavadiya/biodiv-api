@@ -19,11 +19,13 @@ import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.DataObject;
 import biodiv.observation.Observation;
+import biodiv.observation.ObservationListService;
 import biodiv.observation.ObservationService;
 import biodiv.user.Role;
 import biodiv.user.RoleService;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import net.minidev.json.JSONObject;
 
 public class UserGroupService extends AbstractService<UserGroup> {
 
@@ -43,6 +45,9 @@ public class UserGroupService extends AbstractService<UserGroup> {
 
 	@Inject
 	private SessionFactory sessionFactory;
+	
+	@Inject
+	private ObservationListService observationListService;
 	
 	private UserGroupDao userGroupDao;
 
@@ -175,7 +180,16 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				//TODO: HACH HACK HACK CHANGE
 				//TODO: HACH HACK HACK CHANGE
 				//TODO: HACH HACK HACK CHANGE
+				dataObj.setLastRevised(lastUpdated);
 				observationService.save(dataObj);
+				
+				//elastic elastic
+				JSONObject obj = new JSONObject();
+
+				obj.put("lastrevised", dataObj.getLastRevised());
+				observationListService.update("observation", "observation", dataObj.getId().toString(), obj.toString());
+				
+				//elastic elastic
 
 				// activityFeed addition starts here for Object Entry
 

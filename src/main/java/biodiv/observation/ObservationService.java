@@ -29,6 +29,7 @@ import biodiv.taxon.datamodel.dao.Taxon;
 import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.userGroup.UserGroup;
+import net.minidev.json.JSONObject;
 
 @Service
 public class ObservationService extends AbstractService<Observation> {
@@ -55,6 +56,9 @@ public class ObservationService extends AbstractService<Observation> {
 
 	@Inject
 	private LanguageService languageService;
+	
+	@Inject
+	private ObservationListService observationListService;
 
 	@Inject
 	ObservationService(ObservationDao observationDao) {
@@ -88,6 +92,19 @@ public class ObservationService extends AbstractService<Observation> {
 			Observation obv = findById(obvId);
 			Set<UserGroup> obvUserGrps = obv.getUserGroups();
 			msg = customFieldService.updateInlineCf(fieldValue, cfId, obvId, userId, obvUserGrps);
+			
+			
+			Date lastrevised = new Date();
+			obv.setLastRevised(lastrevised);
+			save(obv);
+			
+			//elastic elastic
+			JSONObject obj = new JSONObject();
+
+			obj.put("lastrevised", obv.getLastRevised());
+			observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
+			
+			//elastic elastic
 			return msg;
 		} catch (Exception e) {
 			throw e;
