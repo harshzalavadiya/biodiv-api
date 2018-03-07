@@ -66,10 +66,9 @@ public class CommentController {
 			observationService.save(obv);
 			JSONObject obj = new JSONObject();
 			SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
-
-			
-
-			obj.put("lastrevised", out.parse(obv.getLastRevised().toString()));
+			SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
+			String newDate=out.format(obv.getLastRevised());
+			obj.put("lastrevised",newDate);
 			observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
 			//HACK HACK HACK for elastic
 			//HACK HACK HACK for elastic

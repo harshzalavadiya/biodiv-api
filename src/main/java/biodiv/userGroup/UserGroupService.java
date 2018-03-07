@@ -187,7 +187,9 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				//elastic elastic
 				JSONObject obj = new JSONObject();
 				SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
-				obj.put("lastrevised", out.parse(dataObj.getLastRevised().toString()));
+				SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
+				String newDate=out.format(dataObj.getLastRevised());
+				obj.put("lastrevised",newDate);
 				observationListService.update("observation", "observation", dataObj.getId().toString(), obj.toString());
 				
 				//elastic elastic
