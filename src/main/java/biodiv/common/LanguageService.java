@@ -16,7 +16,7 @@ public class LanguageService extends AbstractService<Language> {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private static final Random NUMBER_GENERATOR = new Random();
-	
+
 	private Language defaultLanguage;
 
 	private LanguageDao languageDao;
@@ -27,58 +27,49 @@ public class LanguageService extends AbstractService<Language> {
 		this.languageDao = languageDao;
 	}
 
+	@Transactional
 	public Language findByName(String languageName) {
-		try {
-			languageDao.openCurrentSession();
-			if (languageName == null || languageName.trim() == "") {
-				if (defaultLanguage == null)
-					defaultLanguage = findByName(Language.DEFAULT_LANGUAGE);
-				return defaultLanguage;
-			} else {
-				Language language = languageDao.findByPropertyWithCondition("name", languageName, "like");
-				return language;
-			}
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			languageDao.closeCurrentSession();
+		if (languageName == null || languageName.trim() == "") {
+			if (defaultLanguage == null)
+				defaultLanguage = findByName(Language.DEFAULT_LANGUAGE);
+			return defaultLanguage;
+		} else {
+			Language language = languageDao.findByPropertyWithCondition("name", languageName, "like");
+			return language;
 		}
 	}
 
+	@Transactional
 	public Language findByThreeLetterCode(String code) {
-		try {
-			languageDao.openCurrentSession();
-			Language language = languageDao.findByPropertyWithCondition("threeLetterCode", code, "=");
-			return language;
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			languageDao.closeCurrentSession();
-		}
+		Language language = languageDao.findByPropertyWithCondition("threeLetterCode", code, "=");
+		return language;
 	}
-	
+
+	@Transactional
 	public Language getOrCreateLanguage(String languageName) {
 		Language lang = findByName(languageName);
-	    if(lang == null){
-	    	lang = new Language(languageName.trim(), _getThreeLetterCode(languageName), true);
-	    	languageDao.save(lang);
-	    }
-	    return lang;
+		if (lang == null) {
+			lang = new Language(languageName.trim(), _getThreeLetterCode(languageName), true);
+			languageDao.save(lang);
+		}
+		return lang;
 	}
 
-	public Language getCurrentLanguage(HttpServletRequest request){
-		//if(!defaultLanguage) defaultLanguage = findByName(Language.DEFAULT_LANGUAGE);
+	@Transactional
+	public Language getCurrentLanguage(HttpServletRequest request) {
+		// if(!defaultLanguage) defaultLanguage =
+		// findByName(Language.DEFAULT_LANGUAGE);
 		Locale locale = request.getLocale();
-		//String langStr = (cuRLocale)? cuRLocale : LCH.getLocale();
+		// String langStr = (cuRLocale)? cuRLocale : LCH.getLocale();
 		String lang = locale.getLanguage();
-		System.out.println(lang);
 		Language languageInstance = languageDao.findByPropertyWithCondition("twoLetterCode", lang, "=");
-		if(languageInstance != null) 
+		if (languageInstance != null)
 			return languageInstance;
-		else 
+		else
 			return defaultLanguage;
 	}
 
+	@Transactional
 	private String _getThreeLetterCode(String languageName) {
 		// TODO fix this
 		int i = 0;
@@ -95,16 +86,15 @@ public class LanguageService extends AbstractService<Language> {
 
 	@Transactional
 	public Language findByTwoLetterCode(String code) {
-		Language lang ;
-		try{
+		Language lang;
+		try {
 			lang = languageDao.findByTwoLetterCode(code);
 			return lang;
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw e;
-		}finally{
-			
+		} finally {
+
 		}
 	}
-
 
 }

@@ -17,12 +17,12 @@ public abstract class AbstractDao<T, K extends Serializable> {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractDao.class);
 
-	private Session currentSession;
+	//private Session currentSession;
 	
 	@Inject
 	private SessionFactory sessionFactory;
 	
-	private Transaction currentTransaction;
+	//private Transaction currentTransaction;
 
 	protected Class<? extends T> daoType;
 
@@ -32,44 +32,44 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	}
 
 
-	public Session openCurrentSession() {		
-		currentSession = sessionFactory.openSession();
-		return currentSession;
-	}
-
-	public Session openCurrentSessionWithTransaction() {
-		currentSession = sessionFactory.openSession();
-		currentTransaction = currentSession.beginTransaction();
-		return currentSession;
-	}
-
-	public void closeCurrentSession() {
-		//sessionFactory.getCurrentSession().close();
-	}
-
-	public void closeCurrentSessionWithTransaction() {
-		currentTransaction.commit();
-		currentSession.close();
-		log.debug("committing current transaction and closing current session");
-	}
+//	public Session openCurrentSession() {		
+//		currentSession = sessionFactory.openSession();
+//		return currentSession;
+//	}
+//
+//	public Session openCurrentSessionWithTransaction() {
+//		currentSession = sessionFactory.openSession();
+//		currentTransaction = currentSession.beginTransaction();
+//		return currentSession;
+//	}
+//
+//	public void closeCurrentSession() {
+//		//sessionFactory.getCurrentSession().close();
+//	}
+//
+//	public void closeCurrentSessionWithTransaction() {
+//		currentTransaction.commit();
+//		currentSession.close();
+//		log.debug("committing current transaction and closing current session");
+//	}
 
 	public Session getCurrentSession() {
 		//System.out.println(System.identityHashCode(sessionFactory.getCurrentSession()));
 		return sessionFactory.getCurrentSession();
 	}
 
-	public void setCurrentSession(Session currentSession) {
-		this.currentSession = currentSession;
-	}
-
-	public Transaction getCurrentTransaction() {
-		return currentTransaction;
-	}
-
-	public void setCurrentTransaction(Transaction currentTransaction) {
-		this.currentTransaction = currentTransaction;
-	}
-
+//	public void setCurrentSession(Session currentSession) {
+//		this.currentSession = currentSession;
+//	}
+//
+//	public Transaction getCurrentTransaction() {
+//		return currentTransaction;
+//	}
+//
+//	public void setCurrentTransaction(Transaction currentTransaction) {
+//		this.currentTransaction = currentTransaction;
+//	}
+//
 	public void save(T entity) {
 		getCurrentSession().save(entity);
 	}
