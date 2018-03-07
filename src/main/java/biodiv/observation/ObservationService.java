@@ -1,5 +1,6 @@
 package biodiv.observation;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,7 +86,7 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 	@Transactional
-	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId) {
+	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId) throws Exception {
 
 		String msg;
 		try {
@@ -100,8 +101,8 @@ public class ObservationService extends AbstractService<Observation> {
 			
 			//elastic elastic
 			JSONObject obj = new JSONObject();
-
-			obj.put("lastrevised", obv.getLastRevised());
+			SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
+			obj.put("lastrevised", out.parse(obv.getLastRevised().toString()));
 			observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
 			
 			//elastic elastic

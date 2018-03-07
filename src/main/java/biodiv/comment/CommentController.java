@@ -1,5 +1,6 @@
 package biodiv.comment;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -64,8 +65,11 @@ public class CommentController {
 			obv.setLastRevised(lastrevised);
 			observationService.save(obv);
 			JSONObject obj = new JSONObject();
+			SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
 
-			obj.put("lastrevised", obv.getLastRevised());
+			
+
+			obj.put("lastrevised", out.parse(obv.getLastRevised().toString()));
 			observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
 			//HACK HACK HACK for elastic
 			//HACK HACK HACK for elastic

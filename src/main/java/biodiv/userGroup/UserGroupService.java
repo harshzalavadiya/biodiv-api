@@ -1,5 +1,6 @@
 package biodiv.userGroup;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -185,8 +186,8 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				
 				//elastic elastic
 				JSONObject obj = new JSONObject();
-
-				obj.put("lastrevised", dataObj.getLastRevised());
+				SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
+				obj.put("lastrevised", out.parse(dataObj.getLastRevised().toString()));
 				observationListService.update("observation", "observation", dataObj.getId().toString(), obj.toString());
 				
 				//elastic elastic

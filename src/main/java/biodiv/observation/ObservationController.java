@@ -67,7 +67,7 @@ public class ObservationController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public String updateCustomField(@QueryParam("fieldValue") String fieldValue, @QueryParam("cfId") Long cfId,
-			@QueryParam("obvId") Long obvId, @Context HttpServletRequest request) {
+			@QueryParam("obvId") Long obvId, @Context HttpServletRequest request) throws NumberFormatException, Exception {
 
 		CommonProfile profile = AuthUtils.currentUser(request);
 		String msg = observationService.updateInlineCf(fieldValue, cfId, obvId, Long.parseLong(profile.getId()));
