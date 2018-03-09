@@ -95,6 +95,8 @@ public class ObservationListMapper {
 	private List<String> imageresource;
 	private List<String> urlresource;
 	private List<Double> traits;
+	private List<String> featuredgroups;
+	private List<String> featurednotes;
 	
 	
 	
@@ -817,6 +819,26 @@ public class ObservationListMapper {
 
 	public void setUrlresource(List<String> urlresource) {
 		this.urlresource = urlresource;
+	}
+
+
+	public List<String> getFeaturedgroups() {
+		return featuredgroups;
+	}
+
+
+	public void setFeaturedgroups(List<String> featuredgroups) {
+		this.featuredgroups = featuredgroups;
+	}
+
+
+	public List<String> getFeaturednotes() {
+		return featurednotes;
+	}
+
+
+	public void setFeaturednotes(List<String> featurednotes) {
+		this.featurednotes = featurednotes;
 	}
 	
 	
