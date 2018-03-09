@@ -1,5 +1,6 @@
 package biodiv.userGroup;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,11 +20,13 @@ import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.DataObject;
 import biodiv.observation.Observation;
+import biodiv.observation.ObservationListService;
 import biodiv.observation.ObservationService;
 import biodiv.user.Role;
 import biodiv.user.RoleService;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import net.minidev.json.JSONObject;
 
 public class UserGroupService extends AbstractService<UserGroup> {
 
@@ -43,6 +46,9 @@ public class UserGroupService extends AbstractService<UserGroup> {
 
 	@Inject
 	private SessionFactory sessionFactory;
+	
+	@Inject
+	private ObservationListService observationListService;
 	
 	private UserGroupDao userGroupDao;
 
@@ -175,7 +181,18 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				//TODO: HACH HACK HACK CHANGE
 				//TODO: HACH HACK HACK CHANGE
 				//TODO: HACH HACK HACK CHANGE
+				dataObj.setLastRevised(lastUpdated);
 				observationService.save(dataObj);
+				
+				//elastic elastic
+				JSONObject obj = new JSONObject();
+				SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
+				SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
+				String newDate=out.format(dataObj.getLastRevised());
+				obj.put("lastrevised",newDate);
+				observationListService.update("observation", "observation", dataObj.getId().toString(), obj.toString());
+				
+				//elastic elastic
 
 				// activityFeed addition starts here for Object Entry
 

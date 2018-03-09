@@ -1,5 +1,8 @@
 package biodiv.comment;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -16,12 +19,22 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
+import biodiv.observation.Observation;
+import biodiv.observation.ObservationListService;
+import biodiv.observation.ObservationService;
+import net.minidev.json.JSONObject;
 
 @Path("/comment")
 public class CommentController {
 
 	@Inject
 	CommentService commentService;
+	
+	@Inject
+	ObservationService observationService;
+	
+	@Inject
+	ObservationListService observationListService;
 
 	@POST
 	@Path("/addComment")
@@ -43,6 +56,23 @@ public class CommentController {
 			msg = commentService.addComment(commentId, commentBody, tagUserId, commentHolderId, commentHolderType,
 					rootHolderId, rootHolderType, mainParentId, parentId, subject, commentType, newerTimeRef,
 					commentPostUrl, userLang, Long.parseLong(profile.getId()));
+			
+			//HACK HACK HACK for elastic
+			//HACK HACK HACK for elastic
+			//HACK HACK HACK for elastic
+			Observation obv = observationService.findById(rootHolderId);
+			Date lastrevised = new java.util.Date(newerTimeRef);;
+			obv.setLastRevised(lastrevised);
+			observationService.save(obv);
+			JSONObject obj = new JSONObject();
+			SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
+			SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
+			String newDate=out.format(obv.getLastRevised());
+			obj.put("lastrevised",newDate);
+			observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
+			//HACK HACK HACK for elastic
+			//HACK HACK HACK for elastic
+			//HACK HACK HACK for elastic
 
 		} else {
 			msg = "error in comment body";

@@ -1,5 +1,7 @@
 package biodiv.observation;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +31,7 @@ import biodiv.taxon.datamodel.dao.Taxon;
 import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.userGroup.UserGroup;
+import net.minidev.json.JSONObject;
 
 @Service
 public class ObservationService extends AbstractService<Observation> {
@@ -55,6 +58,9 @@ public class ObservationService extends AbstractService<Observation> {
 
 	@Inject
 	private LanguageService languageService;
+	
+	@Inject
+	private ObservationListService observationListService;
 
 	@Inject
 	ObservationService(ObservationDao observationDao) {
@@ -81,13 +87,28 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 	@Transactional
-	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId) {
+	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId) throws Exception {
 
 		String msg;
 		try {
 			Observation obv = findById(obvId);
 			Set<UserGroup> obvUserGrps = obv.getUserGroups();
 			msg = customFieldService.updateInlineCf(fieldValue, cfId, obvId, userId, obvUserGrps);
+			
+			
+			Date lastrevised = new Date();
+			obv.setLastRevised(lastrevised);
+			save(obv);
+			
+			//elastic elastic
+			JSONObject obj = new JSONObject();
+			SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
+			SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
+			String newDate=out.format(obv.getLastRevised());
+			obj.put("lastrevised",newDate);
+			observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
+			
+			//elastic elastic
 			return msg;
 		} catch (Exception e) {
 			throw e;
@@ -139,6 +160,7 @@ public class ObservationService extends AbstractService<Observation> {
 		String oldSpeciesGroupName = oldSpeciesGroup.getName();
 
 		Object obj = observationDao.updateGroup(observation, speciesGroup);
+		
 
 		// activityFeed
 		Date dateCreated = new java.util.Date();

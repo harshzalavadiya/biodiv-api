@@ -103,7 +103,8 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty("hibernate.c3p0.min_size", "5");
 					dbProps.setProperty("hibernate.c3p0.max_size", "20");
 					dbProps.setProperty("hibernate.c3p0.timeout", "300");
-					dbProps.setProperty("hibernate.c3p0.max_statements", "50");
+                    //disabling statement pooling
+					//dbProps.setProperty("hibernate.c3p0.max_statements", "50");
 					dbProps.setProperty("hibernate.c3p0.idle_test_period", "3000");
 					dbProps.setProperty("hibernate.c3p0.testConnectionOnCheckout", "true");
 					dbProps.setProperty("hibernate.c3p0.preferredTestQuery", "SELECT 1");

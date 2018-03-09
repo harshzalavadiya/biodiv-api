@@ -9,7 +9,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.elasticsearch.search.suggest.Suggest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,7 @@ import biodiv.taxon.datamodel.ui.TaxonRelation;
 import biodiv.taxon.search.SearchTaxon;
 
 public class TaxonService extends AbstractService<Taxon> {
-	
+
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private static final String ID = "id";
@@ -34,25 +33,23 @@ public class TaxonService extends AbstractService<Taxon> {
 	private static final String parent = "parent";
 	private static final String position = "position";
 	private static final String speciesId = "speciesId";
-	
+
 	private TaxonDao taxonDao;
-	
+
 	@Inject
 	public TaxonService(TaxonDao taxonDao) {
 		super(taxonDao);
 		this.taxonDao = taxonDao;
 		log.trace("TaxonService constructor");
 	}
-	
 
 	/**
 	 * 
 	 * @param parent
-	 * dummy
+	 *            dummy
 	 * @param classificationId
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	public List<TaxonRelation> list(Long parent, Long classificationId) {
 		return list(parent, classificationId, null, true);
@@ -61,33 +58,30 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param taxonIds
-	 * dummy
+	 *            dummy
 	 * @param classificationId
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	public List<TaxonRelation> list(Set<String> taxonIds, Long classificationId) {
 		return list(null, classificationId, taxonIds, true);
 	}
-	
+
 	public List<TaxonRelation> list(Long classificationId) {
-		return list(null, classificationId,null, false);
+		return list(null, classificationId, null, false);
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param parent
-	 * dummy
+	 *            dummy
 	 * @param classificationId
-	 * dummy
+	 *            dummy
 	 * @param taxonIds
-	 * dummy
+	 *            dummy
 	 * @param expand_taxon
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	private List<TaxonRelation> list(Long parent, Long classificationId, Set<String> taxonIds, Boolean expand_taxon) {
 
@@ -113,7 +107,7 @@ public class TaxonService extends AbstractService<Taxon> {
 				m.put(totalPath, data);
 
 				Long parentId = 0L;
-				Long speciesId=0L;
+				Long speciesId = 0L;
 				if (t[5] != null) {
 					m.put("parent", t[5]);
 				} else {
@@ -139,18 +133,18 @@ public class TaxonService extends AbstractService<Taxon> {
 
 		} catch (Exception e) {
 			throw e;
-		} finally {
-			taxonDao.closeCurrentSession();
 		}
+		// finally {
+		// taxonDao.closeCurrentSession();
+		// }
 
 	}
 
 	/**
 	 * 
 	 * @param items
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	private List<TaxonRelation> buildHierarchy(List<TaxonRelation> items) {
 		List<TaxonRelation> result = new ArrayList<TaxonRelation>();
@@ -171,9 +165,8 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param items
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	private Map<Long, TaxonRelation> prepareIdItemMap(List<TaxonRelation> items) {
 		HashMap<Long, TaxonRelation> result = new HashMap<>();
@@ -188,16 +181,16 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param res
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	private List<TaxonRelation> createInputItems(List<Map<String, Object>> res) {
 		List<TaxonRelation> result = new ArrayList<>();
 		for (Map<String, Object> data : res) {
-			result.add(new TaxonRelation((Long) data.get(taxonid), (String) data.get(path),
-					(Long) data.get(parent), (String) data.get(text), (Long) data.get(classification),
-					(Long) data.get(ID), (Integer) data.get(rank),(String)data.get(position),(Long)data.get(speciesId), (Set<String>) data.get(totalPath)));
+			result.add(new TaxonRelation((Long) data.get(taxonid), (String) data.get(path), (Long) data.get(parent),
+					(String) data.get(text), (Long) data.get(classification), (Long) data.get(ID),
+					(Integer) data.get(rank), (String) data.get(position), (Long) data.get(speciesId),
+					(Set<String>) data.get(totalPath)));
 		}
 		return result;
 	}
@@ -205,97 +198,87 @@ public class TaxonService extends AbstractService<Taxon> {
 	/**
 	 * 
 	 * @param term
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	public Object search(String term) {
-		
-		SearchTaxon searchTaxon=new SearchTaxon();
-		Object name= searchTaxon.search(term);
+
+		SearchTaxon searchTaxon = new SearchTaxon();
+		Object name = searchTaxon.search(term);
 		return name;
-		
-		
-		
+
 	}
 
 	/**
 	 * 
 	 * @param classification
-	 * dummy
+	 *            dummy
 	 * @param term
-	 * dummy
+	 *            dummy
 	 * @param taxonids
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
-	public Set<String> specificSearch(Long classification, String term,Long taxonids) {
-		//TODO:NULL check , FINALLY close connection, string constant
-	
+	public Set<String> specificSearch(Long classification, String term, Long taxonids) {
+		// TODO:NULL check , FINALLY close connection, string constant
+
 		List<Object[]> results = new ArrayList<Object[]>();
-		if(taxonid==null){
-			results = taxonDao.specificSearch(classification, term,null);
+		if (taxonid == null) {
+			results = taxonDao.specificSearch(classification, term, null);
+		} else {
+			results = taxonDao.specificSearch(classification, term, taxonids);
 		}
-		else{
-			results = taxonDao.specificSearch(classification, term,taxonids);
-		}
-		
+
 		Set<String> taxonIds = new HashSet<String>();
 		boolean expand_taxon = true;
 		for (Object[] result : results) {
-			
+
 			String status = (String) result[1];
 			if (status.equalsIgnoreCase("ACCEPTED")) {
 				taxonIds.add(String.valueOf(result[0]));
-				
+
 			} else {
 				taxonIds.add(String.valueOf(result[0]));
 				taxonIds = taxonDao.findAcceptedIds(classification, taxonIds);
-				
+
 			}
 		}
 		return taxonIds;
-		
+
 	}
+
 	/**
 	 * 
-	 * @return
-	 * dummy
+	 * @return dummy
 	 */
 	public List<Classification> classification() {
-		// TODO Auto-ge
-		taxonDao.openCurrentSession();
-		List<Classification> results=taxonDao.classification();
+		List<Classification> results = taxonDao.classification();
 		return results;
 	}
+
 	/**
 	 * 
 	 * @param name
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	public Long classificationIdByName(String name) {
-		List<Classification> results=taxonDao.classificationIdByName(name);
-		Long id=results.get(0).getId();
+		List<Classification> results = taxonDao.classificationIdByName(name);
+		Long id = results.get(0).getId();
 		return id;
 	}
+
 	/**
 	 * 
 	 * @param offset
-	 * dummy
+	 *            dummy
 	 * @param limit
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
-
 	public List<Object[]> getTaxonData(Integer offset, Integer limit) {
-		// TODO Auto-generated method stub
-	
-		List<Object[]> result=taxonDao.getTaxonData(offset,limit);
-		
+		List<Object[]> result = taxonDao.getTaxonData(offset, limit);
+
 		return result;
 	}
 
