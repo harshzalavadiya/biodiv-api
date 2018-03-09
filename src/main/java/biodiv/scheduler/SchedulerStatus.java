@@ -1,7 +1,7 @@
 package biodiv.scheduler;
 
 public enum SchedulerStatus {
-	SCHEDULED("SCHEDULED"), RUNNING("RUNNING"), ABORTED("ABORTED"), FAILED("FAILED"), SUCCESS("SUCCESS");
+	Scheduled("Scheduled"), Running("Running"), Aborted("Aborted"), Failed("Failed"), Success("Success");
 
 	private String value;
 
