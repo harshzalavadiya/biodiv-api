@@ -54,23 +54,23 @@ public class DownloadJob implements Job {
 		User user = (User) data.get(USER_KEY);
 		String filterUrl = data.getString(SEARCH_KEY);
 		String notes = data.getString(NOTES_KEY);
-		SchedulerStatus status = SchedulerStatus.SCHEDULED;
+		SchedulerStatus status = SchedulerStatus.Scheduled;
 		DownloadType type = DownloadType.CSV;
 		SourceType sourceType = SourceType.Observations;
 		
 		DownloadLog downloadLog = new DownloadLog(user, filterUrl, notes, status, type, sourceType, 0);
 		downloadLogService.save(downloadLog);
-		
+
 		String url = nakshaUrlService.getDownloadUrl(index, indexType);
 		MapHttpResponse httpResponse = mapIntegrationService.postRequest(url, mapSearchQuery);
 		
 		String filePath = null;
-		status = SchedulerStatus.FAILED;
+		status = SchedulerStatus.Failed;
 
 		if(httpResponse != null) {
 			try {
 				filePath = (String) httpResponse.getDocument();
-				status = SchedulerStatus.SUCCESS;
+				status = SchedulerStatus.Success;
 			} catch (ParseException e) {
 				e.printStackTrace();
 				log.error("Error while reading the csv file path response from naksha");

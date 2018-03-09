@@ -46,10 +46,10 @@ public class SchedulerService {
 		Trigger trigger = newJobTrigger(jobDataMap).startNow().build();
 		try {
 			scheduleJob(trigger);
-			return SchedulerStatus.SCHEDULED;
+			return SchedulerStatus.Scheduled;
 		} catch (SchedulerException e) {
 			e.printStackTrace();
-			return SchedulerStatus.FAILED;
+			return SchedulerStatus.Failed;
 		}
 	}
 }

@@ -10,6 +10,7 @@ public class NakshaUrlService {
 	Configuration config;
 	
 	public String getDownloadUrl(String index, String type) {
-		return config.getString("naksha.url") + "/services/download/" + index + "/" + type;
+		String url = config.getString("naksha.url") + "/services/download/" + index + "/" + type + "?filePath=" + config.getString("download.filePath");
+		return url;
 	}
 }
