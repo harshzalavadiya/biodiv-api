@@ -1,5 +1,7 @@
 package biodiv.observation;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -59,8 +61,18 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 	public Object updateGroup(Observation observation, SpeciesGroup speciesGroup) {
 		if (speciesGroup != null && observation != null) {
 			observation.setGroup(speciesGroup);
+			Date date=new Date();
+			observation.setLastRevised(date);
+			
 			JSONObject obj = new JSONObject();
-
+			SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
+			SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
+			
+			String newDate=out.format(observation.getLastRevised());
+			System.out.println("************************************");
+			System.out.println(observation.getLastRevised());
+			System.out.println("************************************");
+			obj.put("lastrevised",newDate);
 			obj.put("speciesgroupid", observation.getGroup().getId());
 			obj.put("speciesgroupname", observation.getGroup().getName());
 			observationListService.update("observation", "observation", observation.getId().toString(), obj.toString());

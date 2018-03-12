@@ -168,6 +168,7 @@ public class ObservationService extends AbstractService<Observation> {
 		String oldSpeciesGroupName = oldSpeciesGroup.getName();
 
 		Object obj = observationDao.updateGroup(observation, speciesGroup);
+		
 
 		// activityFeed
 		Date dateCreated = new java.util.Date();
