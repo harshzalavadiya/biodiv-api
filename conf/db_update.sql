@@ -2,7 +2,7 @@
 #2ndFeb2017
 
 
-alter table activity_feed add column description_json jsonb;
+alter table activity_feed add column description_json json;
 update activity_feed set description_json=row_to_json(row) from (select id as aid, activity_descrption as description from activity_feed af) row where row.description is not null and row.aid=id;
 
 

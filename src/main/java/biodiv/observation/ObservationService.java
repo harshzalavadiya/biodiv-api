@@ -17,6 +17,8 @@ import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 
 import org.jvnet.hk2.annotations.Service;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 
 import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
@@ -27,6 +29,9 @@ import biodiv.common.LanguageService;
 import biodiv.common.SpeciesGroup;
 import biodiv.common.SpeciesGroupService;
 import biodiv.customField.CustomFieldService;
+import biodiv.speciesPermission.SpeciesPermission;
+import biodiv.speciesPermission.SpeciesPermission.PermissionType;
+import biodiv.speciesPermission.SpeciesPermissionService;
 import biodiv.taxon.datamodel.dao.Taxon;
 import biodiv.user.User;
 import biodiv.user.UserService;
@@ -61,6 +66,9 @@ public class ObservationService extends AbstractService<Observation> {
 	
 	@Inject
 	private ObservationListService observationListService;
+	
+	@Inject
+	private SpeciesPermissionService speciesPermissionService;
 
 	@Inject
 	ObservationService(ObservationDao observationDao) {
@@ -225,6 +233,10 @@ public class ObservationService extends AbstractService<Observation> {
 				reco.put("speciesId", obj[15]);
 				reco.put("observationId", ((java.math.BigInteger) obj[16]).longValue());
 				reco.put("isLocked", obj[17]);
+				System.out.println("testing reco under unidentified "+((java.math.BigInteger) obj[18]).longValue());
+				System.out.println("testing reco under unidentified "+((java.math.BigInteger) obj[18]).longValue());
+				System.out.println("testing reco under unidentified "+((java.math.BigInteger) obj[18]).longValue());
+				System.out.println("testing reco under unidentified "+((java.math.BigInteger) obj[18]).longValue());
 				reco.put("maxVotedRecoId", ((java.math.BigInteger) obj[18]).longValue());
 				recoVotes.add(reco);
 			}
@@ -427,7 +439,17 @@ public class ObservationService extends AbstractService<Observation> {
 	private Boolean hasObvLockPerm(Long obvId, Long recoId) {
 		Taxon taxon = (recommendationService.findById(recoId) != null)
 				? recommendationService.findById(recoId).getTaxonConcept() : null;
-		return AuthUtils.isLoggedIn();
+		//User currentUser = null;
+		//PermissionType[] allPerm = {SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR, SpeciesPermission.PermissionType.ROLE_CURATOR,
+		//		 SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR};
+		//Boolean isTaxonContributor = speciesPermissionService.isTaxonContributor(taxon,currentUser,Arrays.asList(allPerm));
+		//return (isAuthenticated && 
+		//		(		AuthUtils.currentUserHasRole("ROLE_ADMIN") 
+		//				|| AuthUtils.currentUserHasRole("ROLE_SPECIES_ADMIN") 
+		//				|| (taxon != null && isTaxonContributor)
+		//		)
+		//		);
+				 return false;
 	}
 
 	private String getFormattedCommonNames(Map<String, Object> langToCommonName, Boolean addLanguage) {

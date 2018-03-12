@@ -1,6 +1,7 @@
 package biodiv.comment;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -15,8 +16,12 @@ import biodiv.common.AbstractService;
 import biodiv.common.Language;
 import biodiv.common.LanguageService;
 import biodiv.follow.FollowService;
+import biodiv.observation.Observation;
+import biodiv.observation.ObservationListService;
+import biodiv.observation.ObservationService;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import net.minidev.json.JSONObject;
 
 public class CommentService extends AbstractService<Comment>{
 
@@ -30,6 +35,10 @@ public class CommentService extends AbstractService<Comment>{
 	private ActivityFeedService activityFeedService ;
 	@Inject
 	private FollowService followService;
+	@Inject
+	private ObservationService observationService;
+	@Inject
+	private ObservationListService observationListService;
 	
 	@Inject
 	CommentService(CommentDao commentDao){
@@ -148,6 +157,8 @@ public class CommentService extends AbstractService<Comment>{
 		
 		try{
 			Comment comment = findById(commentId);
+			Observation obv = observationService.findById(comment.getRootHolderId());
+			Date lastRevised = new Date();
 			if(comment != null){
 				User author = comment.getUser();
 				if(author.getId() == userId){
@@ -157,6 +168,14 @@ public class CommentService extends AbstractService<Comment>{
 					if(isMainThread(comment)){
 						deleteChildren(commentId);
 					}
+					obv.setLastRevised(lastRevised);
+					observationService.save(obv);
+					JSONObject obj = new JSONObject();
+					SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
+					SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
+					String newDate=out.format(obv.getLastRevised());
+					obj.put("lastrevised",newDate);
+					observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
 					return true;
 				}
 				System.out.println("not your comment ****************************");
