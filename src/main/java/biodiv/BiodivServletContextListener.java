@@ -95,8 +95,8 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty("hibernate.connection.password", config.getString("db.password"));
 					dbProps.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
 					
-					dbProps.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-					dbProps.setProperty("hibernate.dialect", "biodiv.common.MyPostgreSQL93Dialect");
+					dbProps.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL93Dialect");
+					//dbProps.setProperty("hibernate.dialect", "biodiv.common.MyPostgreSQL93Dialect");
 					dbProps.setProperty("hibernate.dialect", "org.hibernate.spatial.dialect.postgis.PostgisDialect");
 					
 					dbProps.setProperty("hibernate.cache.provider_class", "org.hibernate.cache.EhCacheProvider");

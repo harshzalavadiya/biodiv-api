@@ -282,4 +282,10 @@ public class TaxonService extends AbstractService<Taxon> {
 		return result;
 	}
 
+	public List<Taxon> getAllByTaxonDefinition(long id) {
+		// TODO Auto-generated method stub
+		List<Taxon> results=taxonDao.getAllByTaxonDefinitionId(id);
+		return results;
+	}
+
 }

@@ -1,6 +1,8 @@
 
 package biodiv.taxon.datamodel.dao;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -379,7 +381,7 @@ public class Taxon implements java.io.Serializable {
 		return "Taxon [id=" + id + ", name=" + name + ", rank=" + rank+"]";
 	}
 
-
+	
 	
 
 }

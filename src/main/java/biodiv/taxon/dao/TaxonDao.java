@@ -1,6 +1,7 @@
 package biodiv.taxon.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -86,11 +87,10 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 	/**
 	 * 
 	 * @param classificationId
-	 * dummy
+	 *            dummy
 	 * @param taxonIds
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 
 	public Set<String> getPathToRoot(Long classificationId, Set<String> taxonIds) {
@@ -194,11 +194,28 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 	public List<Object[]> getTaxonData(Integer offset, Integer limit) {
 		// TODO Auto-generated method stub
 		Query q;
-
 		q = getCurrentSession().createQuery("select name,id,status,position,rank from Taxon order by id")
 				.setFirstResult(offset).setMaxResults(limit);
 		List<Object[]> results = q.getResultList();
 		return results;
+	}
+
+	public List<Taxon> getAllByTaxonDefinitionId(long id) {
+		// TODO Auto-generated method stub
+		Query q;
+		q = getCurrentSession().createQuery("select path From TaxonomyRegistry where taxonDefinitionId=:id");
+			List<String> paths=q.getResultList();
+			Set<String> idsa = new HashSet<String>();
+		for(String s : paths){
+			List<String> ids = Arrays.asList(s.split("_"));
+			for(String i :ids){
+				idsa.add(i) ;
+			}
+		}
+		q=getCurrentSession().createQuery("from Taxon where id in :(idsa)").setParameter("idsa",idsa);
+				
+		List<Taxon> result=q.getResultList();
+		return result;
 	}
 
 }
