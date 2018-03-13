@@ -8,7 +8,6 @@ public class MailModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(MailProvider.class).in(Scopes.SINGLETON);
-		bind(MailingService.class).in(Scopes.SINGLETON);
 		bind(DownloadMailingService.class).in(Scopes.SINGLETON);
 	}
 }
