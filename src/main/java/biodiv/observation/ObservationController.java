@@ -101,7 +101,8 @@ public class ObservationController {
 	@GET
 	@Path("/recommendationVotes")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs) {
+	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs,@QueryParam("loggedInUserId") Long loggedInUserId,
+			@QueryParam("isAdmin") Boolean isAdmin ,@QueryParam("isSpeciesAdmin") Boolean isSpeciesAdmin) {
 		//CommonProfile profile = AuthUtils.currentUser(request);
 		//System.out.println("testing lock permission");
 		//System.out.println("testing lock permission");
@@ -110,7 +111,7 @@ public class ObservationController {
 		//final CommonProfile profile = profileM.get(true).get();
 		//System.out.println("testing lock permission "+profile.get().getId());
 		//System.out.println("testing lock permission "+profileM);
-		Map<String, Object> recoVotes = observationService.getRecommendationVotes(obvs);
+		Map<String, Object> recoVotes = observationService.getRecommendationVotes(obvs,loggedInUserId,isAdmin,isSpeciesAdmin);
 		return recoVotes;
 
 	}

@@ -191,7 +191,7 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 	@Transactional
-	public Map<String, Object> getRecommendationVotes(String obvs) {
+	public Map<String, Object> getRecommendationVotes(String obvs,Long loggedInUserId,Boolean isAdmin,Boolean isSpeciesAdmin) {
 
 		try {
 			long[] obvIds = Arrays.asList(obvs.split(",")).stream().map(String::trim).mapToLong(Long::parseLong)
@@ -364,7 +364,7 @@ public class ObservationService extends AbstractService<Observation> {
 				}
 
 				map.put("hasObvLockPerm",
-						hasObvLockPerm((Long) recoVote.get("observationId"), (Long) recoVote.get("recoId")));
+						hasObvLockPerm((Long) recoVote.get("observationId"), (Long) recoVote.get("recoId"),loggedInUserId,isAdmin,isSpeciesAdmin));
 				Long totalCommentCount = commentService.getTotalRecoCommentCount((Long) map.get("recoId"),
 						(Long) recoVote.get("observationId"));
 				System.out.println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
@@ -390,13 +390,11 @@ public class ObservationService extends AbstractService<Observation> {
 					}
 
 					for (List<Object> authors_1 : (List<List<Object>>) map.get("authors")) {
-						// if(currentUser){ // what is currentUser
-						// if(((User)authors_1.get(0)).getId() ==
-						// currentUser.id){
-						// map.put("disAgree", true);
-						// }
-						// }
-
+//						 if(loggedInUserId != null){ // what is currentUser
+//						 if((Map)authors_1.get(0).get("id") == loggedInUserId){
+//						 map.put("disAgree", true);
+//						 }
+//						 }
 					}
 				}
 				obvRecoVotesResult.put("totalVotes", totalVotes);
@@ -437,20 +435,24 @@ public class ObservationService extends AbstractService<Observation> {
 		}
 	}
 
-	private Boolean hasObvLockPerm(Long obvId, Long recoId) {
-		Taxon taxon = (recommendationService.findById(recoId) != null)
-				? recommendationService.findById(recoId).getTaxonConcept() : null;
-		//User currentUser = null;
-		//PermissionType[] allPerm = {SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR, SpeciesPermission.PermissionType.ROLE_CURATOR,
-		//		 SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR};
-		//Boolean isTaxonContributor = speciesPermissionService.isTaxonContributor(taxon,currentUser,Arrays.asList(allPerm));
-		//return (isAuthenticated && 
-		//		(		AuthUtils.currentUserHasRole("ROLE_ADMIN") 
-		//				|| AuthUtils.currentUserHasRole("ROLE_SPECIES_ADMIN") 
-		//				|| (taxon != null && isTaxonContributor)
-		//		)
-		//		);
-				 return false;
+	private Boolean hasObvLockPerm(Long obvId, Long recoId,Long loggedInUserId,Boolean isAdmin,Boolean isSpeciesAdmin) {
+		if(loggedInUserId != null){
+			Taxon taxon = (recommendationService.findById(recoId) != null)
+					? recommendationService.findById(recoId).getTaxonConcept() : null;
+			User currentUser = userService.findById(loggedInUserId);
+			PermissionType[] allPerm = {SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR, SpeciesPermission.PermissionType.ROLE_CURATOR,
+					 SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR};
+			return (loggedInUserId != null && 
+					(		isAdmin
+							|| isSpeciesAdmin 
+							|| (taxon != null && speciesPermissionService.isTaxonContributor(taxon,currentUser,Arrays.asList(allPerm)) )
+					)
+					);
+		}else{
+			 return false;
+		}
+		
+				
 	}
 
 	private String getFormattedCommonNames(Map<String, Object> langToCommonName, Boolean addLanguage) {

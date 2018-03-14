@@ -51,9 +51,9 @@ public class SpeciesPermissionService extends AbstractService<SpeciesPermission>
 	private Boolean isTaxonContributor(List<Taxon> parentTaxons, User currentUser,List<PermissionType> permissionTypes) {
 		
 		if(parentTaxons == null || currentUser == null || permissionTypes == null) return false;
-		List<String> parentTaxonIds = new ArrayList<String>();
+		List<Long> parentTaxonIds = new ArrayList<Long>();
 		for(Taxon t : parentTaxons){
-			parentTaxonIds.add(((Long)t.getId()).toString());
+			parentTaxonIds.add(t.getId());
 		}
 		List<String> permissions = new ArrayList<String>();
 		for(PermissionType pt: permissionTypes){

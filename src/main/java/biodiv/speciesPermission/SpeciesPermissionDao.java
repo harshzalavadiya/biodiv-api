@@ -28,12 +28,16 @@ public class SpeciesPermissionDao extends AbstractDao<SpeciesPermission, Long> i
 		return entity;
 	}
 
-	public List<SpeciesPermission> getAllSpeciesPermission(User currentUser, List<String> permissions,List<String> parentTaxonIds) {
+	public List<SpeciesPermission> getAllSpeciesPermission(User currentUser, List<String> permissions,List<Long> parentTaxonIds) {
 		
-		String hql = "from species_permission sp where sp.author_id =:user and sp.permission_type in ("+ String.join(",",permissions)+") "
-				+ "and sp.taxon_concept_id in ("+String.join(",",parentTaxonIds)+")";
-		Query query = getCurrentSession().createSQLQuery(hql);
-		query.setParameter("user", currentUser.getId());
+		String hql = "from SpeciesPermission sp where sp.user =:user and sp.permissionType in (:permissions) "
+				+ "and sp.taxon.id in (:parentTaxonIds)";
+		System.out.println("************************************ "+hql);
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("user", currentUser);
+		query.setParameter("permissions", permissions);
+		query.setParameter("parentTaxonIds", parentTaxonIds);
+		System.out.println("************************************ "+query);
 		List<SpeciesPermission> listResult = query.getResultList();
 		return listResult;
 	}
