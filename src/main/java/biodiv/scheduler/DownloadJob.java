@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 
 import biodiv.common.NakshaUrlService;
+import biodiv.mail.DownloadMailingService;
 import biodiv.maps.MapHttpResponse;
 import biodiv.maps.MapIntegrationService;
 import biodiv.maps.MapSearchQuery;
@@ -37,6 +38,9 @@ public class DownloadJob implements Job {
 
 	@Inject
 	NakshaUrlService nakshaUrlService;
+
+	@Inject
+	DownloadMailingService downloadMailingService;
 
 	public DownloadJob() {
 		// Instances of Job must have a public no-argument constructor.
@@ -71,6 +75,7 @@ public class DownloadJob implements Job {
 			try {
 				filePath = (String) httpResponse.getDocument();
 				status = SchedulerStatus.Success;
+				downloadMailingService.send(user.getEmail());
 			} catch (ParseException e) {
 				e.printStackTrace();
 				log.error("Error while reading the csv file path response from naksha");

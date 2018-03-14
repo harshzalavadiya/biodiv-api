@@ -46,6 +46,7 @@ import biodiv.common.BiodivCommonModule;
 import biodiv.customField.CustomFieldModule;
 import biodiv.dataset.DatasetModule;
 import biodiv.follow.FollowModule;
+import biodiv.mail.MailModule;
 import biodiv.maps.MapModule;
 import biodiv.observation.ObservationModule;
 import biodiv.scheduler.SchedulerModule;
@@ -172,7 +173,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 		}, new BiodivCommonModule(), new ActivityFeedModule(), new AuthModule(), new CommentModule(),
 				new CustomFieldModule(), new DatasetModule(), new FollowModule(), new MapModule(),
 				new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(), 
-				new UserGroupModule(), new AdminModule(), new SchedulerModule());
+				new UserGroupModule(), new AdminModule(), new SchedulerModule(), new MailModule());
 	}
 
 	private static List<Class<?>> getEntityClassesFromPackage(String packageName)
