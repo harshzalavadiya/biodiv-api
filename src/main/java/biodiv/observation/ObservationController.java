@@ -56,7 +56,7 @@ public class ObservationController {
 		List<UserGroup> usrGrps = observationService.obvUserGroups(id);
 		return usrGrps;
 	}
-
+	
 	@GET
 	@Path("/customFields")
 	@Produces(MediaType.APPLICATION_JSON)
