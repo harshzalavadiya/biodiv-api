@@ -1,12 +1,12 @@
 package biodiv.observation;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -15,24 +15,27 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
 
+import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
-import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfileManager;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
-import biodiv.common.DataObject;
 import biodiv.userGroup.UserGroup;
 
 @Path("/observation")
 public class ObservationController {
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	@Inject
 	ObservationService observationService;
-
+ 
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -101,15 +104,30 @@ public class ObservationController {
 	@GET
 	@Path("/recommendationVotes")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs) {
-		//CommonProfile profile = AuthUtils.currentUser(request);
-		//System.out.println("testing lock permission");
-		//System.out.println("testing lock permission");
-		//System.out.println("testing lock permission"+profile.isPresent());
-		//System.out.println("testing lock permission"+profileM.get(true));
-		//final CommonProfile profile = profileM.get(true).get();
-		//System.out.println("testing lock permission "+profile.get().getId());
-		//System.out.println("testing lock permission "+profileM);
+	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs,
+			@Pac4JProfileManager ProfileManager<CommonProfile> profileM, @Context SecurityContext securityContext,
+			@Context HttpServletRequest request, @Context HttpServletResponse response) {
+		log.debug("####### {}", profileM);
+		log.debug("####### {}", profileM.getClass());
+		log.debug("####### {}", profileM.get(true));
+		log.debug("####### {}", profileM.get(false));
+		// ProfileManager manager = new ProfileManager(new J2EContext(request,
+		// null));
+		// Optional<CommonProfile> profile = manager.get(false);
+		//
+		// log.debug("(((((((((({}", requestContext.getSecurityContext());
+		// log.debug("(((((((((({}",
+		// ((Pac4JSecurityContext)securityContext).getUserPrincipal());
+		// SecurityContext securityContext =
+		// profileM.getJaxRsContext().getRequestContext().getSecurityContext();
+
+		// Principal profile = securityContext.getUserPrincipal();
+		J2EContext context = new J2EContext(request, response);
+		final ProfileManager<CommonProfile> manager = new ProfileManager(context);
+		final Optional<CommonProfile> profile = manager.get(true);
+
+		log.debug("^^^^^^^^^^^^^^^^^^^^^^ {} ", profile);
+		// log.debug("^^^^^^^^^^^^^^^^^^^^^^ {} ", getProfile());
 		Map<String, Object> recoVotes = observationService.getRecommendationVotes(obvs);
 		return recoVotes;
 

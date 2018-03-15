@@ -1,6 +1,7 @@
 package biodiv.auth;
 
 import org.apache.commons.configuration2.Configuration;
+import org.elasticsearch.common.inject.assistedinject.FactoryProvider;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
@@ -16,9 +17,11 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.servlet.ServletModule;
 
 import biodiv.auth.register.RegisterController;
+import biodiv.auth.register.RegistrationCodeFactory;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenDao;
 import biodiv.auth.token.TokenService;
@@ -48,6 +51,11 @@ public class AuthModule extends ServletModule {
 		//bind(Binder.class).asEagerSingleton();	
 		
 		//bind(ProfileManager.class).toProvider((Class<? extends Provider<? extends ProfileManager>>) BiodivProviderManagerFactory.class);
+		//bind(RegistrationCodeFactory.class).toProvider(
+		//	    FactoryProvider<F>.newFactory(RegistrationCodeFactory.class, RegistrationCode.class));
+		install(new FactoryModuleBuilder()
+			     //.implement(Payment.class, RealPayment.class)
+			     .build(RegistrationCodeFactory.class));
 	}
 
 	
@@ -132,8 +140,8 @@ public class AuthModule extends ServletModule {
 //        config.getClients().setAjaxRequestResolver(new JaxRsAjaxRequestResolver());
 
 		log.trace("Setting LogoutLogic in pac4jConfig");
-        config.setLogoutLogic(biodivLogoutLogic);
-        config.setProfileManagerFactory(BiodivJaxRsProfileManager::new);
+//        config.setLogoutLogic(biodivLogoutLogic);
+//        config.setProfileManagerFactory(BiodivJaxRsProfileManager::new);
 		return config;
 	}
 	

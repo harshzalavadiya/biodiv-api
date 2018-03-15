@@ -15,10 +15,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.auth.LoginController;
+import biodiv.Transactional;
 import biodiv.common.Language;
 import biodiv.common.LanguageService;
 import biodiv.common.MailService;
@@ -31,7 +32,7 @@ import biodiv.util.Utils;
 @Path("/register")
 public class RegisterController {
 
-	private final Logger log = LoggerFactory.getLogger(LoginController.class);
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Inject
 	private UserService userService;
@@ -44,7 +45,10 @@ public class RegisterController {
 	
 	@Inject
 	private MailService mailService;
-
+	
+	@Inject
+	Configuration config;
+	
 	/**
 	 * 
 	 * @param registerCommand
@@ -56,6 +60,8 @@ public class RegisterController {
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+    @Path("/user")
 	public Response register(@BeanParam RegisterCommand registerCommand, @Context HttpServletRequest request) {
 		log.debug("Registering user " + registerCommand.toString());
 
@@ -63,8 +69,6 @@ public class RegisterController {
 			Language userLanguage = languageService.getCurrentLanguage(request);
 
 			User user = create(registerCommand, userLanguage);
-
-			// user.email=((registerCommand.email)?.toLowerCase()).trim();
 
 			if (registerCommand.openId != null) {
 				log.debug("Is an openId registration");
@@ -131,37 +135,59 @@ public class RegisterController {
 	 */
 	private User create(RegisterCommand registerCommand, Language userLanguage) {
 		User user = new User();
-		try {
-			BeanUtils.copyProperties(user, registerCommand);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
+		user.setEmail(registerCommand.email.toLowerCase().trim());
+		user.setName(registerCommand.name);
+		user.setUsername(registerCommand.name);
+		user.setPassword(registerCommand.password);
+		user.setLocation(registerCommand.location);
+		user.setLatitude(registerCommand.latitude);
+		user.setLongitude(registerCommand.longitude);
+		user.setSexType(registerCommand.sexType);
+		user.setOccupationType(registerCommand.occupationType);
+		user.setInstitutionType(registerCommand.institutionType);
+		user.setProfilePic(registerCommand.profilePic);
+		user.setLanguage(userLanguage);
+		user.setEnabled(true);
+//		try {
+//			BeanUtils.copyProperties(user, registerCommand);
+//		} catch (IllegalAccessException | InvocationTargetException e) {
+//			e.printStackTrace();
+//		}
 		return user;
 	}
 
 	protected RegistrationCode registerAndEmail(User user, HttpServletRequest request) {
 		RegistrationCode registrationCode = userService.register(user.getEmail());
+		log.debug("Got {} ", registrationCode);
 		if (registrationCode != null) {
 			Map<String, String> linkParams = new HashMap<String, String>();
 			linkParams.put("t", registrationCode.getToken());
-			String url = Utils.generateLink("register", "verifyRegistration", linkParams, request);
-			sendVerificationMail(user.getUsername(), user.getEmail(), url, request);
+			String url;
+			try {
+				url = Utils.generateLink("register", "verifyRegistration", linkParams, request);
+				log.debug("Sending verification email with registrationCode : {} ", url);
+				sendVerificationMail(user.getUsername(), user.getEmail(), url, request);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return registrationCode;
 		}
 		return null;
 	}
 
 	protected void sendVerificationMail(String username, String email, String url, HttpServletRequest request) {
-		String domain = Utils.getDomainName(request);
+		String domain = config.getString("siteName");
 
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("username", Utils.capitalize(username));
 		params.put("url", url);
 		params.put("domain", domain);
-
-		String body = messageService.getMessage("register.emailBody", params);
-
+		
 		String sub = messageService.getMessage("register.emailSubject", params);
+		log.debug(sub);
+		String body = messageService.getMessage("register.emailBody", params);
+		log.debug(body);
+		
 		try {
 			mailService.sendMail(email, sub, body);
 		} catch (Exception e) {
@@ -170,58 +196,4 @@ public class RegisterController {
 		}
 	}
 
-	private class RegisterCommand {
-		public String username;
-		public String email;
-		public String password;
-		public String password2;
-		public String name;
-		public String website;
-		public float timezone = 0;
-		public String aboutMe;
-		public String location;
-		public String profilePic;
-		public String openId;
-		public boolean facebookUser;
-		public String sexType;
-		public String occupationType;
-		public String institutionType;
-		public double latitude;
-		public double longitude;
-		// String g_recaptcha_response;
-		// String recaptcha_response_field;
-		// String recaptcha_challenge_field;
-		/*
-		 * String captcha_response;
-		 * 
-		 * def jcaptchaService; // def recaptchaService;
-		 * 
-		 * static constraints= { email email: true, blank: false, nullable:
-		 * false, validator: { value, command -> if (value) { def User =
-		 * command.grailsApplication.getDomainClass(
-		 * SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).
-		 * clazz if (User.findByEmail((value.toLowerCase()).trim())) { return
-		 * 'registerCommand.email.unique' } } } password blank: false, nullable:
-		 * false, validator: RegisterController.myPasswordValidator location
-		 * blank:false, nullable:false, validator :
-		 * RegisterController.locationValidator latitude blank:false,
-		 * nullable:false, validator : RegisterController.latitudeValidator
-		 * longitude blank:false, nullable:false, validator :
-		 * RegisterController.longitudeValidator password2 validator:
-		 * RegisterController.password2Validator captcha_response blank:false,
-		 * nullable:false, validator: { value, command -> def session =
-		 * RCH.requestAttributes.session def request =
-		 * RCH.requestAttributes.request try{ if
-		 * (!command.jcaptchaService.validateResponse("imageCaptcha",
-		 * session.id, command.captcha_response)) {
-		 * //if(!command.recaptchaService.verifyAnswer(session,
-		 * request.getRemoteAddr(),
-		 * ['g-recaptcha-response':command.g_recaptcha_response])) { return
-		 * 'reCaptcha.invalid.message' } }catch (Exception e) { // TODO: handle
-		 * exception e.printStackTrace() return 'reCaptcha.invalid.message' } }
-		 * }
-		 * 
-		 */
-
-	}
 }
