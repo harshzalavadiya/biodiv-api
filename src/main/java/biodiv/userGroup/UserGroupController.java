@@ -34,6 +34,7 @@ public class UserGroupController {
 	@GET
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public List<UserGroup> list(@QueryParam("max") int max, @QueryParam("offset") int offset) {
 		List<UserGroup> usrGrp = null;
 		if (max == 0 && offset == 0) {

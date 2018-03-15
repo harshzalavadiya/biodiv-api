@@ -2,6 +2,7 @@ package biodiv.observation;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -45,6 +46,15 @@ public class ObservationListController {
 
 		return observationListService.create(index, type, documentId, document);
 	}
+	
+	@DELETE
+	@Path("/{index}/{type}/{documentId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public MapResponse delete(@PathParam("index") String index, @PathParam("type") String type,
+			@PathParam("documentId") String documentId){
+		return observationListService.delete(index, type, documentId);
+	}
+	
 
 	@PUT
 	@Path("/{index}/{type}/{documentId}")

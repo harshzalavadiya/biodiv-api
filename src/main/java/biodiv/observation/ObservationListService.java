@@ -78,6 +78,9 @@ public class ObservationListService implements MapService {
 
 	@Override
 	public MapResponse delete(String index, String type, String documentId) {
+		String newurl = config.getString("nakshaUrl")+"/services/data/"+index + "/" + type+"/"+documentId;
+		MapIntegrationService mapIntegrationService = new MapIntegrationService();
+		MapResponse mapResponse=mapIntegrationService.deleteSingleDocument(newurl);
 		// TODO Auto-generated method stub
 		return null;
 	}
