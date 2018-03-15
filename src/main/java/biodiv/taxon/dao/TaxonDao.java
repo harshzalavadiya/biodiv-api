@@ -204,15 +204,19 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 		// TODO Auto-generated method stub
 		Query q;
 		q = getCurrentSession().createQuery("select path From TaxonomyRegistry where taxonDefinitionId=:id");
+		q.setParameter("id", id);
 			List<String> paths=q.getResultList();
-			Set<String> idsa = new HashSet<String>();
+			Set<Long> idsa = new HashSet<Long>();
 		for(String s : paths){
 			List<String> ids = Arrays.asList(s.split("_"));
 			for(String i :ids){
-				idsa.add(i) ;
+				idsa.add(Long.valueOf(i)) ;
 			}
 		}
-		q=getCurrentSession().createQuery("from Taxon where id in :(idsa)").setParameter("idsa",idsa);
+		for(Long idsad:idsa){
+			System.out.println(idsad);
+		}
+		q=getCurrentSession().createQuery("from Taxon where id in (:idsa)").setParameter("idsa",idsa);
 				
 		List<Taxon> result=q.getResultList();
 		return result;

@@ -30,7 +30,7 @@ public class Taxon implements java.io.Serializable {
 	private SpeciesGroup speciesGroup;
 	private String italicisedForm;
 	private Date uploadTime;
-	private long speciesId;
+	private Long speciesId;
 	
 	private String defaultHierarchy1;
 	
@@ -366,13 +366,13 @@ public class Taxon implements java.io.Serializable {
 //	public void setTaxonomyRegistries(Set<TaxonomyRegistry> taxonomyRegistries) {
 //		this.taxonomyRegistries = taxonomyRegistries;
 //	}
-	@Column(name = "species_id")
-	public long getSpeciesId() {
+	@Column(name = "species_id",nullable=true)
+	public Long getSpeciesId() {
 		return speciesId;
 	}
 
 
-	public void setSpeciesId(long speciesId) {
+	public void setSpeciesId(Long speciesId) {
 		this.speciesId = speciesId;
 	}
 
