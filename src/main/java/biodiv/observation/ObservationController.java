@@ -1,7 +1,9 @@
 package biodiv.observation;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +17,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
+import org.pac4j.jax.rs.annotations.Pac4JProfileManager;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Transactional;
@@ -97,9 +101,17 @@ public class ObservationController {
 	@GET
 	@Path("/recommendationVotes")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs) {
-
-		Map<String, Object> recoVotes = observationService.getRecommendationVotes(obvs);
+	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs,@QueryParam("loggedInUserId") Long loggedInUserId,
+			@QueryParam("isAdmin") Boolean isAdmin ,@QueryParam("isSpeciesAdmin") Boolean isSpeciesAdmin) {
+		//CommonProfile profile = AuthUtils.currentUser(request);
+		//System.out.println("testing lock permission");
+		//System.out.println("testing lock permission");
+		//System.out.println("testing lock permission"+profile.isPresent());
+		//System.out.println("testing lock permission"+profileM.get(true));
+		//final CommonProfile profile = profileM.get(true).get();
+		//System.out.println("testing lock permission "+profile.get().getId());
+		//System.out.println("testing lock permission "+profileM);
+		Map<String, Object> recoVotes = observationService.getRecommendationVotes(obvs,loggedInUserId,isAdmin,isSpeciesAdmin);
 		return recoVotes;
 
 	}
