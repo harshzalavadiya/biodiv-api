@@ -453,7 +453,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 			@JoinColumn(name = "observation_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "resource_id", nullable = false, updatable = false) })
 	public Set<Resource> getResources() {
-		return null;// this.resources;x
+		return this.resources;
 	}
 
 	public void setResources(Set<Resource> resources) {
@@ -462,7 +462,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "observation")
 	public Set<RecommendationVote> getRecommendationVotes() {
-		return null;// this.recommendationVotes;
+		return this.recommendationVotes;
 	}
 
 	public void setRecommendationVotes(Set<RecommendationVote> recommendationVotes) {
@@ -484,7 +484,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "observation")
 	public Set<Annotation> getAnnotations() {
-		return null;// this.annotations;
+		return this.annotations;
 	}
 
 	public void setAnnotations(Set<Annotation> annotations) {
