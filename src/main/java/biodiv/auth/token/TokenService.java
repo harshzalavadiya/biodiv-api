@@ -62,7 +62,7 @@ public class TokenService extends AbstractService<Token> {
 		try {
 			log.debug("Building token response for " + user);
 		
-			String jwtToken = generateAccessToken(profile);
+			String jwtToken = generateAccessToken(profile, user);
 
 			//tokenDao.openCurrentSessionWithTransaction();
 			// Return the access_token valid for 2 hrs and a new refreshToken on
@@ -70,7 +70,7 @@ public class TokenService extends AbstractService<Token> {
 			Map<String, Object> result = new HashMap<String, Object>();
 			result.put("access_token", jwtToken);
 			result.put("token_type", "bearer");
-			result.put("pic",user.getProfilePic());
+			//result.put("pic",user.getProfilePic());
 
 			if (getNewRefreshToken) {
 				log.debug("Generating new refresh token for " + user);
@@ -106,7 +106,7 @@ public class TokenService extends AbstractService<Token> {
 	 *            dummy
 	 * @return TODO : use bcrypt encryption for token
 	 */
-	public String generateAccessToken(CommonProfile profile) {
+	private String generateAccessToken(CommonProfile profile, User user) {
 		log.debug("generateAccessToken .... ");
 		JwtGenerator<CommonProfile> generator = new JwtGenerator<>(
 				new SecretSignatureConfiguration(Constants.JWT_SALT));
@@ -119,7 +119,11 @@ public class TokenService extends AbstractService<Token> {
 		jwtClaims.put(JwtClaims.EXPIRATION_TIME, AuthUtils.getAccessTokenExpiryDate());
 		jwtClaims.put(JwtClaims.ISSUED_AT, new Date());
 		jwtClaims.put("roles", profile.getRoles());
-		jwtClaims.put("pic", profile.getPictureUrl());
+		log.debug("++++++++++++++++++++++++++++++++++");
+		log.debug("++++++++++++++++++++++++++++++++++ {} ",profile);
+		log.debug("++++++++++++++++++++++++++++++++++ {} ",profile.getPictureUrl());
+		log.debug("++++++++++++++++++++++++++++++++++ {} ", user.getProfilePic());
+		jwtClaims.put("pic", user.getProfilePic());
 		String jwtToken = generator.generate(jwtClaims);
 		return jwtToken;
 	}
@@ -129,7 +133,7 @@ public class TokenService extends AbstractService<Token> {
 	 * 
 	 * @return dummy
 	 */
-	public String generateRefreshToken() {
+	private String generateRefreshToken() {
 		// Random random = new SecureRandom();
 		// String token = new BigInteger(130, random).toString(32);
 
