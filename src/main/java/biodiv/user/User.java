@@ -227,7 +227,19 @@ public class User extends CommonMethod implements Principal {
 
 	@Column(name = "profile_pic")
 	public String getProfilePic() {
-		return this.profilePic;
+		
+		
+		  //boolean iconPresent = this.getIcon()!= null;
+			        if(this.getIcon() !=  null) {
+			           // def thumbnailUrl =  grailsApplication.config.speciesPortal.users.serverURL + "/" + ImageUtils.getFileName(this.icon, type, null)
+			            return this.getIcon();
+			        }
+
+
+			        else{
+			            return profilePic;
+			        }
+
 	}
 
 	public void setProfilePic(String profilePic) {

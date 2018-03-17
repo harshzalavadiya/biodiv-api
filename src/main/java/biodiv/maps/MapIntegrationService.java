@@ -9,6 +9,7 @@ import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -340,6 +341,31 @@ public class MapIntegrationService {
 
 			try {
 				response = httpclient.execute(put, context);
+			} catch (IOException e) {
+				logger.error("Error while trying to send request at URL {}", url);
+			} finally {
+				if (response != null)
+					HttpClientUtils.closeQuietly(response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Error while trying to send request at URL {}", url);
+		}
+
+		return null;
+	}
+
+	public MapResponse deleteSingleDocument(String url) {
+		// TODO Auto-generated method stub
+		CloseableHttpResponse response = null;
+		try {
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+
+			 HttpDelete httpDelete = new HttpDelete(url);	
+			
+
+			try {
+				response = httpclient.execute(httpDelete);
 			} catch (IOException e) {
 				logger.error("Error while trying to send request at URL {}", url);
 			} finally {

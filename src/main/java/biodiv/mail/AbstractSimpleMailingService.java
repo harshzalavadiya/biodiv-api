@@ -10,22 +10,22 @@ public abstract class AbstractSimpleMailingService extends AbstractMailingServic
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	protected final MailProvider mailProvider;
+	protected final SimpleEmail email;
 
-	protected AbstractSimpleMailingService(MailProvider mailProvider, Configuration config, String subject, String message) {
+	protected AbstractSimpleMailingService(MailProvider mailProvider, Configuration config, String subject, String message) throws EmailException {
 		super(config, subject, message);
-		this.mailProvider = mailProvider;
+		this.email = mailProvider.getSimpleEmail();
+		this.email.setSubject(super.subject);
+		this.email.setMsg(super.message);
+		this.email.buildMimeMessage();
 	}
 
 	@Override
 	public void send(String toEmail) {
 		log.info("Trying to send mail to: {}", toEmail);
 		try {
-			SimpleEmail email = mailProvider.getSimpleEmail();
-			email.setSubject(subject);
-			email.setMsg(message);
 			email.addTo(toEmail);
-			email.send();
+			email.sendMimeMessage();
 			log.info("Mail sent to: {}", toEmail);
 		} catch (EmailException e) {
 			log.info("Failed in sending mail to: {}", toEmail);
