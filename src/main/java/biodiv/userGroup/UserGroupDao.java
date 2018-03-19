@@ -99,6 +99,7 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 		} else if (submitType.equalsIgnoreCase("unpost")) {
 			Set<UserGroup> diff = new HashSet<>(obvUsrGrps);
 			diff.removeAll(intersect);
+			diff.addAll(userGroupsContainingObv);
 			updated = new HashSet<>(diff);
 		}
 
