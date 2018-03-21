@@ -108,8 +108,9 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 					
 					if (fbProfile.getGender() != null)
 						p.put("sexType", fbProfile.getGender().toString());
-					
-					p.put("link", fbProfile.getProfileUrl().toString());
+						
+					if (fbProfile.getProfileUrl() != null)
+						p.put("link", fbProfile.getProfileUrl().toString());
 					
 					if (fbProfile.getTimezone() != null)
 						p.put("timezone", fbProfile.getTimezone().floatValue() + "");
