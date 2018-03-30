@@ -153,6 +153,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 
 					bind(SessionFactory.class).toInstance(sessionFactory);
 					bind(ServiceRegistry.class).toInstance(serviceRegistry);
+					bind(BiodivResponseFilter.class);
 
 				} catch (Exception e) {
 					e.printStackTrace();

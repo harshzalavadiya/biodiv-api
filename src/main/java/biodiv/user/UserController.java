@@ -27,7 +27,7 @@ import biodiv.userGroup.UserGroupService;
 @Path("/user")
 public class UserController {
 
-	private final Logger log = LoggerFactory.getLogger(UserController.class);
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Inject
 	UserService userService;

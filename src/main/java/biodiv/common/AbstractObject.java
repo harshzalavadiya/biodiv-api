@@ -2,14 +2,15 @@ package biodiv.common;
 
 import java.io.Serializable;
 
-import javax.inject.Inject;
-
 import org.hibernate.SessionFactory;
 
 public class AbstractObject {
 
-	@Inject
 	private SessionFactory sessionFactory;
+	
+	protected AbstractObject(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;		
+	}
 	
 	/**
 	 * returns generated id. It can be long or string in serializable format 

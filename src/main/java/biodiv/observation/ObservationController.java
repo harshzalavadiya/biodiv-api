@@ -1,12 +1,12 @@
 package biodiv.observation;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -15,24 +15,27 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
 
+import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
-import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfileManager;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
-import biodiv.common.DataObject;
 import biodiv.userGroup.UserGroup;
 
 @Path("/observation")
 public class ObservationController {
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	@Inject
 	ObservationService observationService;
-
+ 
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -98,7 +101,7 @@ public class ObservationController {
 		return observation;
 	}
 
-	@GET
+		@GET
 	@Path("/recommendationVotes")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs,@QueryParam("loggedInUserId") Long loggedInUserId,
@@ -115,5 +118,4 @@ public class ObservationController {
 		return recoVotes;
 
 	}
-
 }
