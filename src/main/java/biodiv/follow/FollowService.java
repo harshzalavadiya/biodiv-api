@@ -1,6 +1,7 @@
 package biodiv.follow;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -62,6 +63,17 @@ public class FollowService extends AbstractService<Follow>{
 		Boolean whetherFollowing = followDao.isFollowing(objectToFollowType,objectToFollowId,userId);
 		System.out.println("follow************* "+whetherFollowing);
 		return whetherFollowing;
+	}
+	
+	@Transactional
+	public List<User> findAllFollowersOfObject(Long objectId,String objectToFollowType){
+		try{
+			List<User> followers = followDao.findAllFollowersOfObject(objectId,objectToFollowType);
+			return followers;
+		}catch(Exception e){
+			throw e;
+		}
+		
 	}
 
 	

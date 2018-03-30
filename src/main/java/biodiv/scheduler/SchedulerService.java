@@ -2,6 +2,8 @@ package biodiv.scheduler;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.inject.Inject;
+
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -10,7 +12,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
-import com.google.inject.Inject;
+
 
 import biodiv.maps.MapSearchQuery;
 import biodiv.user.User;

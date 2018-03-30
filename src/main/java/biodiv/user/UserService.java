@@ -35,6 +35,7 @@ public class UserService extends AbstractService<User> {
 		log.trace("UserService constructor");
 	}
 	
+	@Transactional
 	public User findByEmail(String email)  throws NotFoundException {
 	    return userDao.findByEmail(email);
 	}
@@ -102,5 +103,6 @@ public class UserService extends AbstractService<User> {
 			author.put("fbProfilePic", user.getFbProfilePic());
 			return author;
 	}
+
 
 }

@@ -1,5 +1,12 @@
 package biodiv.scheduler;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
+import org.apache.commons.mail.SimpleEmail;
 import org.apache.http.ParseException;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -8,7 +15,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+
 
 import biodiv.common.NakshaUrlService;
 import biodiv.mail.DownloadMailingService;
@@ -75,10 +82,15 @@ public class DownloadJob implements Job {
 			try {
 				filePath = (String) httpResponse.getDocument();
 				status = SchedulerStatus.Success;
-				downloadMailingService.send(user.getEmail());
+				
+				addDownloadMail(user);
+				
 			} catch (ParseException e) {
 				e.printStackTrace();
 				log.error("Error while reading the csv file path response from naksha");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
@@ -86,6 +98,33 @@ public class DownloadJob implements Job {
 		downloadLog.setFilePath(filePath);
 		downloadLog.setStatus(status);
 		downloadLogService.update(downloadLog);
+	}
+	
+	public void addDownloadMail(User user) throws Exception{
+		
+		try{
+			//System.out.println("emailid of the the user,whom mail is tobe sent "+user.getEmail());
+			//System.out.println("emailid of the the user,whom mail is tobe sent "+user.getEmail());
+			
+			List<User> allBccs = downloadMailingService.getAllBccPeople();
+			for(User bcc : allBccs){
+				HtmlEmail emailToBcc = downloadMailingService.buildDownloadMailMessage(bcc.getEmail(),user.getId(),user.getName());
+			}
+			
+			if(user.getSendNotification()){
+				HtmlEmail email = downloadMailingService.buildDownloadMailMessage(user.getEmail(),user.getId(),user.getName());
+			}
+		
+			if(!downloadMailingService.isAnyThreadActive()){
+				System.out.println("no thread is active currently");
+				Thread th = new Thread(downloadMailingService);
+				th.start();
+			}
+			//downloadMailingService.send(email);
+		}catch(Exception e){
+			throw e;
+		}
+		
 	}
 
 }

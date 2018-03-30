@@ -11,6 +11,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.mail.HtmlEmail;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.DataObject;
+import biodiv.follow.FollowService;
 import biodiv.observation.Observation;
 import biodiv.observation.ObservationListService;
 import biodiv.observation.ObservationService;
@@ -49,6 +52,15 @@ public class UserGroupService extends AbstractService<UserGroup> {
 	
 	@Inject
 	private ObservationListService observationListService;
+	
+	@Inject
+	private UserGroupMailingService userGroupMailingService;
+	
+	@Inject
+	private FollowService followService;
+	
+	@Inject
+	Configuration config;
 	
 	private UserGroupDao userGroupDao;
 
@@ -165,9 +177,10 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				Observation dataObj = ((Observation)_obj).get(object, observationService);
 				System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 				typeOfObject = dataObj;
+				System.out.println("all userGroups of observation "+dataObj);
 				Set<UserGroup> obvUsrGrps = dataObj.getUserGroups();
 
-				Set<UserGroup> userGroupsContainingObv = UserGroup.findAllContainingObj(objectType, (Object) dataObj,
+				Set<UserGroup> userGroupsContainingObv =  UserGroup.findAllContainingObj(objectType, (Object) dataObj,
 						userGroupsWithFilterRule);
 
 				Set<UserGroup> updatedObjUsrGrps = userGroupDao.posttoGroups(objectType, dataObj, allowed,
@@ -195,7 +208,11 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				//elastic elastic
 
 				// activityFeed addition starts here for Object Entry
-
+				
+				//allFollowers
+				List<User> allFollowersOfTheObject = findFollowersOfObject(object,"species.participation.Observation");
+				
+				
 				String activityDescription = UserGroup.getActivityObjectType((Object) dataObj, submitType, "Object",
 						(long) 0);
 				Set<UserGroup> newAddedOrRemovedUsrGrps = new HashSet<>(updatedObjUsrGrps);
@@ -219,6 +236,13 @@ public class UserGroupService extends AbstractService<UserGroup> {
 						}
 
 					}
+					
+					//mailing
+					
+					
+					addToMail(newAddedUsrGrpsByUsr,allFollowersOfTheObject,user,dataObj,submitType);
+					
+					//mailing
 
 					for (UserGroup ug : newAddedUsrGrpsByAdmin) {
 						long ugId = ug.getId();
@@ -231,6 +255,15 @@ public class UserGroupService extends AbstractService<UserGroup> {
 							groupFeed_ByAdmin.merge(ugId, (long) 1, Long::sum);
 						}
 					}
+					
+					//mailing
+					
+					addToMail(newAddedUsrGrpsByAdmin,allFollowersOfTheObject,user,dataObj,submitType);
+					
+					//mailing
+					
+					
+					
 				} else {
 					Set<UserGroup> previousUsrGrps = new HashSet<>(obvUsrGrps);
 					previousUsrGrps.removeAll(newAddedOrRemovedUsrGrps);
@@ -245,6 +278,11 @@ public class UserGroupService extends AbstractService<UserGroup> {
 							groupFeed_ByUser.merge(ugId, (long) 1, Long::sum);
 						}
 					}
+					
+					//mailing
+					
+					addToMail(previousUsrGrps,allFollowersOfTheObject,user,dataObj,submitType);
+					//mailing
 				}
 				// activityFeed addition ends here for Object Entry
 
@@ -309,6 +347,57 @@ public class UserGroupService extends AbstractService<UserGroup> {
 			// session.close();
 		}
 
+	}
+
+	@Transactional
+	public void addToMail(Set<UserGroup> userGroupsPosted, List<User> allFollowersOfTheObject ,User user,Observation dataObj,
+			String submitType) throws Exception {
+		if(userGroupsPosted.size() > 0){
+			List<User> allBccs = userGroupMailingService.getAllBccPeople();
+			for(User bcc : allBccs){
+				HtmlEmail emailToBcc = userGroupMailingService.buildUserGroupPostMailMessage(bcc.getEmail(),
+						bcc,user,dataObj,userGroupsPosted,submitType);
+			}
+			
+			if(user.getSendNotification()){
+			HtmlEmail emailToPostingUser = userGroupMailingService.buildUserGroupPostMailMessage(user.getEmail(),
+					user,user,dataObj,userGroupsPosted,submitType);
+			}
+			
+			//System.out.println("reading config " +config.getString("mail.sendToFollowers"));
+			if(config.getString("mail.sendToFollowers").equalsIgnoreCase("true")){
+				
+				//System.out.println("send to followers");
+				for(User follower : allFollowersOfTheObject){
+					if(!userGroupMailingService.isTheFollowerInBccList(follower.getEmail())){
+						if(follower.getSendNotification()){
+							HtmlEmail emailToFollowers = userGroupMailingService.buildUserGroupPostMailMessage(follower.getEmail(),
+									follower,user,dataObj,userGroupsPosted,submitType);
+						}
+					}	
+				}
+			}
+			
+				
+			if(!userGroupMailingService.isAnyThreadActive()){
+				System.out.println("no thread is active currently");
+				Thread th = new Thread(userGroupMailingService);
+				th.start();
+			}
+		}
+		
+	}
+
+	
+
+	private List<User> findFollowersOfObject(Long objectId,String objectToFollowType) {
+		
+		try{
+			List<User> followers = followService.findAllFollowersOfObject(objectId,objectToFollowType);
+			return followers;
+		}catch(Exception e){
+			throw e;
+		}
 	}
 
 	public Set<UserGroup> findAllByFilterRuleIsNotNull() throws Exception {

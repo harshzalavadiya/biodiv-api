@@ -507,7 +507,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 		boolean belongs = false;
 		try {
 			belongs = boundary.covers(topology);
-			System.out.println("belongs or not " + belongs);
+			System.out.println("belongs or not within boundary of filterRule" + belongs);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;

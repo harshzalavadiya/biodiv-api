@@ -213,6 +213,12 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 				idsa.add(Long.valueOf(i)) ;
 			}
 		}
+		//when first query results in empty list
+		if(idsa.size() <= 0){
+			List<Taxon> result = new ArrayList<Taxon>();
+			return result;
+		}
+		////when first query results in empty list
 		for(Long idsad:idsa){
 			System.out.println(idsad);
 		}

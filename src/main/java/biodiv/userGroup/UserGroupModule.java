@@ -20,5 +20,7 @@ public class UserGroupModule extends ServletModule {
 		bind(Newsletter.class);
 		bind(NewsletterDao.class).in(Singleton.class);
 		bind(NewsletterService.class).in(Singleton.class);
+		
+		bind(UserGroupMailingService.class).in(Singleton.class);
 	}
 }
