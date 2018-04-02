@@ -91,37 +91,22 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					
 					Properties dbProps = new Properties();
 					
-					dbProps.setProperty("hibernate.connection.url", config.getString("db.url"));
-					dbProps.setProperty("hibernate.connection.username", config.getString("db.username"));
-					dbProps.setProperty("hibernate.connection.password", config.getString("db.password"));
-					dbProps.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
-					
-					//dbProps.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL93Dialect");
-					//dbProps.setProperty("hibernate.dialect", "biodiv.common.MyPostgreSQL93Dialect");
-					//dbProps.setProperty("hibernate.dialect", "org.hibernate.spatial.dialect.postgis.PostgisDialect");
-					dbProps.setProperty("hibernate.dialect", "org.hibernate.spatial.dialect.postgis.PostgisPG93Dialect");
-					
+					dbProps.setProperty("hibernate.hikari.dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
+					dbProps.setProperty("hibernate.hikari.dataSource.url", config.getString("db.url"));
+					dbProps.setProperty("hibernate.hikari.dataSource.user", config.getString("db.username"));
+					dbProps.setProperty("hibernate.hikari.dataSource.password", config.getString("db.password"));
+
+					dbProps.setProperty("hibernate.dialect", "org.hibernate.spatial.dialect.postgis.PostgisPG93Dialect");					
 					
 					dbProps.setProperty("hibernate.cache.provider_class", "org.hibernate.cache.EhCacheProvider");
+
+					// Hikari configurations
+					dbProps.setProperty("hibernate.connection.provider_class", "com.zaxxer.hikari.hibernate.HikariConnectionProvider");
+					dbProps.setProperty("hibernate.hikari.maximumPoolSize" ,"20");
+					dbProps.setProperty("hibernate.hikari.idleTimeout", "30000");
 					
-					dbProps.setProperty("hibernate.c3p0.min_size", "5");
-					dbProps.setProperty("hibernate.c3p0.max_size", "20");
-					dbProps.setProperty("hibernate.c3p0.timeout", "300");
-                    //disabling statement pooling
-					//dbProps.setProperty("hibernate.c3p0.max_statements", "50");
-					dbProps.setProperty("hibernate.c3p0.idle_test_period", "3000");
-					dbProps.setProperty("hibernate.c3p0.testConnectionOnCheckout", "true");
-					dbProps.setProperty("hibernate.c3p0.preferredTestQuery", "SELECT 1");
-					dbProps.setProperty("hibernate.c3p0.numHelperThreads", "5");
-					dbProps.setProperty("hibernate.c3p0.unreturnedConnectionTimeout", "90");
-					dbProps.setProperty("hibernate.c3p0.maxConnectionAge", "1800");
-					dbProps.setProperty("hibernate.c3p0.debugUnreturnedConnectionStackTraces", "true");
-					dbProps.setProperty("hibernate.c3p0.contextClassLoaderSource", "library");
-					dbProps.setProperty("hibernate.c3p0.privilegeSpawnedThreads", "true");
 					dbProps.setProperty("hibernate.jdbc.lob.non_contextual_creation", "true");
-							
 					dbProps.setProperty("hbm2ddl.auto", "update");
-					
 					dbProps.setProperty("hibernate.id.new_generator_mappings", "false");
 					dbProps.setProperty("hibernate.transaction.coordinator_class", "jdbc");
 					dbProps.setProperty("hibernate.current_session_context_class", "thread");
@@ -130,7 +115,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty("show_sql", "true");
 		
 					hibConf.addProperties(dbProps);
-					for (Class cls : getEntityClassesFromPackage("biodiv")) {
+					for (Class<?> cls : getEntityClassesFromPackage("biodiv")) {
 						log.trace("Adding annotated class : {}", cls);
 						hibConf.addAnnotatedClass(cls);
 					}
