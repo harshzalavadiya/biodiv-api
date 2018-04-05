@@ -7,24 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
+import javax.inject.Inject;
 
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import biodiv.esclient.ESClientProvider;
-import biodiv.esclient.ElasticSearchClient;
-
 
 public class SearchTaxon {
 
-
-	private final ElasticSearchClient client = ESClientProvider.getClient();
+	@Inject
+	RestHighLevelClient client;
 
 	public Object search(String data) {
 
