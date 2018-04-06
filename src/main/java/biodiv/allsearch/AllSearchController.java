@@ -3,6 +3,7 @@ package biodiv.allsearch;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,7 +22,9 @@ import biodiv.Transactional;
 public class AllSearchController {
 
 private final Logger log = LoggerFactory.getLogger(AllSearchController.class);
-private final AllSearchService allSearchService=new AllSearchService();
+
+@Inject
+private AllSearchService allSearchService;
 	
 	/**
 	 * 
