@@ -2,7 +2,6 @@ package biodiv.scheduler;
 
 import org.quartz.Scheduler;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 
 public class SchedulerModule extends ServletModule  {
