@@ -37,7 +37,7 @@ import javax.inject.Inject;
 @Path("/login")
 public class LoginController {
 
-	private final Logger log = LoggerFactory.getLogger(LoginController.class);
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Inject
 	private TokenService tokenService;

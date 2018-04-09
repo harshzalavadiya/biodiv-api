@@ -23,6 +23,9 @@ import javax.servlet.ServletContextEvent;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -40,17 +43,21 @@ import com.google.inject.servlet.ServletModule;
 
 import biodiv.activityFeed.ActivityFeedModule;
 import biodiv.admin.AdminModule;
+import biodiv.allsearch.AllSearchModule;
 import biodiv.auth.AuthModule;
 import biodiv.comment.CommentModule;
 import biodiv.common.BiodivCommonModule;
 import biodiv.customField.CustomFieldModule;
 import biodiv.dataset.DatasetModule;
+import biodiv.esclient.ElasticSearchClient;
 import biodiv.follow.FollowModule;
 import biodiv.mail.MailModule;
 import biodiv.maps.MapModule;
 import biodiv.observation.ObservationModule;
 import biodiv.scheduler.SchedulerModule;
+import biodiv.speciesPermission.SpeciesPermissionModule;
 import biodiv.taxon.TaxonModule;
+import biodiv.taxon.search.SearchTaxonModule;
 import biodiv.traits.TraitModule;
 import biodiv.user.UserModule;
 import biodiv.userGroup.UserGroupModule;
@@ -90,35 +97,22 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					
 					Properties dbProps = new Properties();
 					
-					dbProps.setProperty("hibernate.connection.url", config.getString("db.url"));
-					dbProps.setProperty("hibernate.connection.username", config.getString("db.username"));
-					dbProps.setProperty("hibernate.connection.password", config.getString("db.password"));
-					dbProps.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
-					
-					dbProps.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL93Dialect");
-					//dbProps.setProperty("hibernate.dialect", "biodiv.common.MyPostgreSQL93Dialect");
-					dbProps.setProperty("hibernate.dialect", "org.hibernate.spatial.dialect.postgis.PostgisDialect");
+					dbProps.setProperty("hibernate.hikari.dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
+					dbProps.setProperty("hibernate.hikari.dataSource.url", config.getString("db.url"));
+					dbProps.setProperty("hibernate.hikari.dataSource.user", config.getString("db.username"));
+					dbProps.setProperty("hibernate.hikari.dataSource.password", config.getString("db.password"));
+
+					dbProps.setProperty("hibernate.dialect", "org.hibernate.spatial.dialect.postgis.PostgisPG93Dialect");					
 					
 					dbProps.setProperty("hibernate.cache.provider_class", "org.hibernate.cache.EhCacheProvider");
+
+					// Hikari configurations
+					dbProps.setProperty("hibernate.connection.provider_class", "com.zaxxer.hikari.hibernate.HikariConnectionProvider");
+					dbProps.setProperty("hibernate.hikari.maximumPoolSize" ,"20");
+					dbProps.setProperty("hibernate.hikari.idleTimeout", "30000");
 					
-					dbProps.setProperty("hibernate.c3p0.min_size", "5");
-					dbProps.setProperty("hibernate.c3p0.max_size", "20");
-					dbProps.setProperty("hibernate.c3p0.timeout", "300");
-                    //disabling statement pooling
-					//dbProps.setProperty("hibernate.c3p0.max_statements", "50");
-					dbProps.setProperty("hibernate.c3p0.idle_test_period", "3000");
-					dbProps.setProperty("hibernate.c3p0.testConnectionOnCheckout", "true");
-					dbProps.setProperty("hibernate.c3p0.preferredTestQuery", "SELECT 1");
-					dbProps.setProperty("hibernate.c3p0.numHelperThreads", "5");
-					dbProps.setProperty("hibernate.c3p0.unreturnedConnectionTimeout", "90");
-					dbProps.setProperty("hibernate.c3p0.maxConnectionAge", "1800");
-					dbProps.setProperty("hibernate.c3p0.debugUnreturnedConnectionStackTraces", "true");
-					dbProps.setProperty("hibernate.c3p0.contextClassLoaderSource", "library");
-					dbProps.setProperty("hibernate.c3p0.privilegeSpawnedThreads", "true");
 					dbProps.setProperty("hibernate.jdbc.lob.non_contextual_creation", "true");
-							
 					dbProps.setProperty("hbm2ddl.auto", "update");
-					
 					dbProps.setProperty("hibernate.id.new_generator_mappings", "false");
 					dbProps.setProperty("hibernate.transaction.coordinator_class", "jdbc");
 					dbProps.setProperty("hibernate.current_session_context_class", "thread");
@@ -127,7 +121,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty("show_sql", "true");
 		
 					hibConf.addProperties(dbProps);
-					for (Class cls : getEntityClassesFromPackage("biodiv")) {
+					for (Class<?> cls : getEntityClassesFromPackage("biodiv")) {
 						log.trace("Adding annotated class : {}", cls);
 						hibConf.addAnnotatedClass(cls);
 					}
@@ -150,12 +144,16 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 
 					bind(SessionFactory.class).toInstance(sessionFactory);
 					bind(ServiceRegistry.class).toInstance(serviceRegistry);
+					bind(BiodivResponseFilter.class);
 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
 				//rest("/*").packages("biodiv");
+
+				RestHighLevelClient restHighLevelClient = new RestHighLevelClient(RestClient.builder(HttpHost.create(config.getString("es.url"))));
+				bind(RestHighLevelClient.class).toInstance(restHighLevelClient);
 
 				// INTERCEPTOR
 				ResourceInterceptor interceptor = new ResourceInterceptor();
@@ -173,7 +171,8 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 		}, new BiodivCommonModule(), new ActivityFeedModule(), new AuthModule(), new CommentModule(),
 				new CustomFieldModule(), new DatasetModule(), new FollowModule(), new MapModule(),
 				new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(), 
-				new UserGroupModule(), new AdminModule(), new SchedulerModule(), new MailModule());
+				new UserGroupModule(), new AdminModule(), new SchedulerModule(), new MailModule(),
+				new SpeciesPermissionModule(), new AllSearchModule(), new SearchTaxonModule());
 	}
 
 	private static List<Class<?>> getEntityClassesFromPackage(String packageName)
@@ -221,7 +220,17 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		Injector injector = (Injector) sce.getServletContext()
                  .getAttribute(Injector.class.getName());
-	
+
+		ElasticSearchClient elasticSearchClient = injector.getInstance(ElasticSearchClient.class);
+		if(elasticSearchClient != null) {
+			try {
+				elasticSearchClient.close();
+			} catch (IOException e) {
+				log.error("Error closing elasticsearch client");
+				e.printStackTrace();
+			}
+		}
+
 		ServiceRegistry serviceRegistry = injector.getInstance(ServiceRegistry.class);
 		if (serviceRegistry != null) {
 			StandardServiceRegistryBuilder.destroy(serviceRegistry);

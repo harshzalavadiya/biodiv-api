@@ -2,12 +2,12 @@ package biodiv.scheduler;
 
 import org.quartz.Scheduler;
 
-import com.google.inject.AbstractModule;
+import com.google.inject.servlet.ServletModule;
 
-public class SchedulerModule extends AbstractModule {
+public class SchedulerModule extends ServletModule  {
 	
 	@Override
-	protected void configure() {
+	protected void configureServlets() {
 		
 		bind(DownloadJob.class);
 		

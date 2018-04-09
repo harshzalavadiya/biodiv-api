@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -19,14 +22,12 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.filter.Filters;
 import org.elasticsearch.search.aggregations.bucket.filter.Filters.Bucket;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder.IndexBoost;
-
-import biodiv.esclient.ESClientProvider;
-import biodiv.esclient.ElasticSearchClient;
 
 public class AllSearchService {
 
-	private final ElasticSearchClient client = ESClientProvider.getClient();
+	@Inject
+	private RestHighLevelClient client;
+
 	private static final String observation="observation";
 	private static final String species="species";
 	private static final String document="document";

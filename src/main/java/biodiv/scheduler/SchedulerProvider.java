@@ -1,10 +1,11 @@
 package biodiv.scheduler;
 
+import javax.inject.Inject;
+
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 

@@ -23,6 +23,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
@@ -38,88 +39,44 @@ import biodiv.common.Language;
 public class User extends CommonMethod implements Principal {
 
 	private long id;
-	private Language language;
-	private boolean accountExpired;
-	private boolean accountLocked;
-	private boolean enabled;
-	@JsonIgnore
-	private String password;
-	private boolean passwordExpired;
-	private String username;
-	private String aboutMe;
-	private Date dateCreated = new Date();
-	private Date lastLoginDate = new Date();
-	private String email;
-	private Boolean hideEmailId = true;
-	private String location;
 	private String name;
+	private String username;
+	private String email;
+	@JsonIgnore
+	private String password;	
 	private String profilePic;
-	private Boolean sendNotification = true;
+	private String institutionType;
+	private String occupationType;
+	private String sexType;
+	private String location;
+	private Double latitude;
+	private Double longitude;	
+	private Language language;
 	private Float timezone;
 	private String website;
+	private String aboutMe;
+	
+	private Date dateCreated = new Date();
+	private Date lastLoginDate = new Date();
+	
+	private boolean accountExpired;
+	private boolean accountLocked;
+	private boolean enabled;	
+	private boolean passwordExpired;
+	private Boolean hideEmailId = true;	
+	private Boolean sendNotification = true;
 	private Boolean allowIdentifactionMail = true;
 	private String icon;
 	private String fbProfilePic;
 	private Boolean sendDigest = true;
-	private String institutionType;
-	private String occupationType;
-	private String sexType;
-	private Double latitude;
-	private Double longitude;
+	
+	private Integer version;
 
 	private Set<Role> roles = new HashSet<Role>(0);
 	@JsonIgnore
 	private Set<Token> tokens;
 
 	public User() {
-	}
-
-	public User(long id, Language language, boolean accountExpired, boolean accountLocked, boolean enabled,
-			String password, boolean passwordExpired, String username) {
-		this.id = id;
-		this.language = language;
-		this.accountExpired = accountExpired;
-		this.accountLocked = accountLocked;
-		this.enabled = enabled;
-		this.password = password;
-		this.passwordExpired = passwordExpired;
-		this.username = username;
-	}
-
-	public User(long id, Language language, boolean accountExpired, boolean accountLocked, boolean enabled,
-			String password, boolean passwordExpired, String username, String aboutMe, Date dateCreated, String email,
-			Boolean hideEmailId, Date lastLoginDate, String location, String name, String profilePic,
-			Boolean sendNotification, Float timezone, String website, Boolean allowIdentifactionMail, String icon,
-			String fbProfilePic, Boolean sendDigest, String institutionType, String occupationType, String sexType,
-			Double latitude, Double longitude) {
-		this.id = id;
-		this.language = language;
-		this.accountExpired = accountExpired;
-		this.accountLocked = accountLocked;
-		this.enabled = enabled;
-		this.password = password;
-		this.passwordExpired = passwordExpired;
-		this.username = username;
-		this.aboutMe = aboutMe;
-		this.dateCreated = dateCreated;
-		this.email = email;
-		this.hideEmailId = hideEmailId;
-		this.lastLoginDate = lastLoginDate;
-		this.location = location;
-		this.name = name;
-		this.profilePic = profilePic;
-		this.sendNotification = sendNotification;
-		this.timezone = timezone;
-		this.website = website;
-		this.allowIdentifactionMail = allowIdentifactionMail;
-		this.icon = icon;
-		this.fbProfilePic = fbProfilePic;
-		this.sendDigest = sendDigest;
-		this.institutionType = institutionType;
-		this.occupationType = occupationType;
-		this.sexType = sexType;
-		this.latitude = latitude;
-		this.longitude = longitude;
 	}
 
 	@Id
@@ -270,7 +227,19 @@ public class User extends CommonMethod implements Principal {
 
 	@Column(name = "profile_pic")
 	public String getProfilePic() {
-		return this.profilePic;
+		
+		
+		  //boolean iconPresent = this.getIcon()!= null;
+			        if(this.getIcon() !=  null) {
+			           // def thumbnailUrl =  grailsApplication.config.speciesPortal.users.serverURL + "/" + ImageUtils.getFileName(this.icon, type, null)
+			            return this.getIcon();
+			        }
+
+
+			        else{
+			            return profilePic;
+			        }
+
 	}
 
 	public void setProfilePic(String profilePic) {
@@ -415,6 +384,16 @@ public class User extends CommonMethod implements Principal {
 		this.tokens = tokens;
 	}
 
+	@Version
+    @Column(name="version")
+    public Integer getVersion() { 
+		return version;
+	}
+	
+	public void setVersion(int version) { 
+		this.version = version;
+	}
+	
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", email=" + email + "]";

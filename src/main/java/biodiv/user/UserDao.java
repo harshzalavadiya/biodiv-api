@@ -27,9 +27,9 @@ public class UserDao extends AbstractDao<User, Long> implements DaoInterface<Use
 	public User findByEmail(String email) throws NotFoundException {
 		Query q = getCurrentSession().createQuery("from User where email=:email");
 		q.setParameter("email", email);
-		List<User> users = q.getResultList();
-		if(users.size() == 1) return  users.get(0);
-		else throw new NotFoundException("No user found with email : "+email);
+		User user = (User) q.getSingleResult();
+		if(user != null) return  user;
+		else return null;
 	}
 	
 	public User findByEmailAndPassword(String email, String password)  throws NotFoundException {

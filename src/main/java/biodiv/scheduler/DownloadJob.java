@@ -1,5 +1,9 @@
 package biodiv.scheduler;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.apache.http.ParseException;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -7,8 +11,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
 
 import biodiv.common.NakshaUrlService;
 import biodiv.mail.DownloadMailingService;
@@ -75,10 +77,14 @@ public class DownloadJob implements Job {
 			try {
 				filePath = (String) httpResponse.getDocument();
 				status = SchedulerStatus.Success;
-				downloadMailingService.send(user.getEmail());
+				
+				addDownloadMail(user);
+				
 			} catch (ParseException e) {
 				e.printStackTrace();
 				log.error("Error while reading the csv file path response from naksha");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		
@@ -86,6 +92,30 @@ public class DownloadJob implements Job {
 		downloadLog.setFilePath(filePath);
 		downloadLog.setStatus(status);
 		downloadLogService.update(downloadLog);
+	}
+	
+	public void addDownloadMail(User user) throws Exception{
+		
+		try{
+			
+			List<User> allBccs = downloadMailingService.getAllBccPeople();
+			for(User bcc : allBccs){
+				downloadMailingService.buildDownloadMailMessage(bcc.getEmail(),user.getId(),user.getName());
+			}
+			
+			if(user.getSendNotification()){
+				downloadMailingService.buildDownloadMailMessage(user.getEmail(),user.getId(),user.getName());
+			}
+		
+			if(!downloadMailingService.isAnyThreadActive()){
+				log.info("no thread is active currently");
+				Thread th = new Thread(downloadMailingService);
+				th.start();
+			}
+		}catch(Exception e){
+			throw e;
+		}
+		
 	}
 
 }

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.pac4j.core.profile.CommonProfile;
 
 import biodiv.auth.register.RegistrationCode;
+import biodiv.auth.register.RegistrationCodeFactory;
 import biodiv.common.AbstractService;
 import biodiv.common.Language;
 import biodiv.Transactional;
@@ -28,6 +29,9 @@ public class UserService extends AbstractService<User> {
 
 	private UserDao userDao;
 
+	@Inject 
+	private RegistrationCodeFactory registrationCodeFactory;
+	 
 	@Inject
 	public UserService(UserDao userDao) {
 		super(userDao);
@@ -35,6 +39,7 @@ public class UserService extends AbstractService<User> {
 		log.trace("UserService constructor");
 	}
 	
+	@Transactional
 	public User findByEmail(String email)  throws NotFoundException {
 	    return userDao.findByEmail(email);
 	}
@@ -47,17 +52,17 @@ public class UserService extends AbstractService<User> {
 		if (email == null)
 			return null;
 		try {
-			RegistrationCode registrationCode = new RegistrationCode(email);
-			//userDao.openCurrentSessionWithTransaction();
+			log.info("Generating registration code for the user {} ", email);
+			RegistrationCode registrationCode = registrationCodeFactory.create(email);
 			if (registrationCode.save() == null) {
 				log.error("Coudn't save registrationCode");
+			} else {
+				return registrationCode;
 			}
-			return registrationCode;
 		} catch (Exception e) {
 			throw e;
-		} finally {
-			//userDao.closeCurrentSessionWithTransaction();
-		}
+		} 
+		return null;
 	}
 
     public CommonProfile createUserProfile(User user) {
@@ -102,5 +107,6 @@ public class UserService extends AbstractService<User> {
 			author.put("fbProfilePic", user.getFbProfilePic());
 			return author;
 	}
+
 
 }

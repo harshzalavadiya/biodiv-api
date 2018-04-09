@@ -8,14 +8,16 @@ import org.stringtemplate.v4.ST;
 
 public class MessageService {
 
+	private static final String FILENAME = "i18n/messages";
+
 	private ResourceBundle messageBundle;
 
 	public MessageService() {
-		messageBundle = ResourceBundle.getBundle("MessagesBundle", Locale.getDefault());
+		messageBundle = ResourceBundle.getBundle(FILENAME, Locale.getDefault());
 	}
 
 	public MessageService(Locale locale) {
-		messageBundle = ResourceBundle.getBundle("MessagesBundle", locale);
+		messageBundle = ResourceBundle.getBundle(FILENAME, locale);
 	}
 
 	public String getMessage(String code) {
