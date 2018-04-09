@@ -140,8 +140,8 @@ public class AuthModule extends ServletModule {
 //        config.getClients().setAjaxRequestResolver(new JaxRsAjaxRequestResolver());
 
 		log.trace("Setting LogoutLogic in pac4jConfig");
-//        config.setLogoutLogic(biodivLogoutLogic);
-//        config.setProfileManagerFactory(BiodivJaxRsProfileManager::new);
+        config.setLogoutLogic(biodivLogoutLogic);
+        config.setProfileManagerFactory(BiodivJaxRsProfileManager::new);
 		return config;
 	}
 	
