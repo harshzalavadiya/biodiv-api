@@ -1,9 +1,12 @@
 package biodiv.follow;
 
+import java.util.List;
+
 import javax.persistence.Query;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import biodiv.user.User;
 
 
 public class FollowDao extends AbstractDao<Follow, Long> implements DaoInterface<Follow, Long>{
@@ -27,6 +30,16 @@ public class FollowDao extends AbstractDao<Follow, Long> implements DaoInterface
 		}
 		else return false;
 	
+	}
+
+	public List<User> findAllFollowersOfObject(Long objectId, String objectToFollowType) {
+		
+		String hql = "select fo.user from Follow fo where fo.objectType =:objectType and fo.objectId =:id";
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("objectType", objectToFollowType );
+		query.setParameter("id", objectId );	
+		List<User> followers = (List<User>) query.getResultList();
+		return followers;
 	}
 
 }

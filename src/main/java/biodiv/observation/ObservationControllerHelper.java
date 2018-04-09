@@ -8,7 +8,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
@@ -25,7 +27,8 @@ import biodiv.maps.MapSearchQuery;
 public class ObservationControllerHelper {
 
 	public static MapSearchQuery getMapSearchQuery(
-			String sGroup, String taxon,
+			String sGroup,
+			String taxon,
 			String user,
 			String userGroupList,
 			String webaddress,
@@ -36,14 +39,10 @@ public class ObservationControllerHelper {
 
 			String sortOn,
 
-			String minDate, String maxDate,
+			String minDate,
+			String maxDate,
 			String validate,
-
-			String trait_8, String trait_9,
-			String trait_10, String trait_11,
-			String trait_12, String trait_13,
-			String trait_15,
-
+			Map<String, List<String>> traitParams,
 			String classificationid,
 			Integer max, Integer offset
 ) {
@@ -72,7 +71,7 @@ public class ObservationControllerHelper {
 		if (!groupId.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("speciesgroupid", groupId));
 		}
-
+		
 		Set<String> taxonId = commonMethod.cSTSOT(taxon);
 		if (!taxonId.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("path", taxonId));
@@ -209,6 +208,7 @@ public class ObservationControllerHelper {
 		 * ##########################################################################
 		 * Range Querues
 		 */
+		
 		Set<String> mediaFilters = commonMethod.cSTSOT(mediaFilter);
 		if (!mediaFilters.isEmpty()) {
 			// remove no media value
@@ -232,40 +232,97 @@ public class ObservationControllerHelper {
 
 			}
 		}
+		
+		
 		/**
 		 * Filter to implements the traits the traits filter is boolAndQuertype
 		 * filters
 		 */
-		Set<String> traits_8 = commonMethod.cSTSOT(trait_8);
-		if (!traits_8.isEmpty()) {
-			System.out.print(traits_8);
-			boolAndLists.add(new MapAndBoolQuery("trait_8", traits_8));
+		if(!traitParams.isEmpty()){
+			for(Map.Entry<String, List<String>>entry:traitParams.entrySet()){
+				try{
+					String value=entry.getKey().split("\\.")[1];
+					
+					if(value.equalsIgnoreCase("string")){
+						String key=entry.getKey().split("\\.")[0];
+						String Ids=entry.getValue().get(0);
+						Set<String> listOfIds = commonMethod.cSTSOT(Ids);
+						boolAndLists.add(new MapAndBoolQuery("traits."+key, listOfIds));
+					}
+					
+					if(value.equalsIgnoreCase("color_hsl")){
+						
+						String key=entry.getKey().split("\\.")[0];
+						
+						String Ids=entry.getValue().get(0);
+						List<Long> listOfIds = commonMethod.getListOfIds(Ids);
+						Long h;
+						Long s;
+						Long l;
+						Long hMax;
+						Long hMin;
+						Long sMax;
+						Long sMin;
+						Long lMax;
+						Long lMin;
+						
+						if(listOfIds.size()>=3){
+							
+							h=listOfIds.get(0);
+							hMax=h+5L;
+							if(h-5L<0){
+								hMin=h-5L+360L;
+							}
+							else{
+								hMin=h-5L;
+							}
+							
+							s=listOfIds.get(1);
+							
+							sMax=s+5L;
+							if(s-5L<0){
+								sMin=0L;
+							}
+							else{
+								sMin=s-5L;
+							}
+							
+							l=listOfIds.get(2);
+							lMax=l+5L;
+							if(l-5L<0){
+								lMin=0L;
+							}
+							else{
+								lMin=l-5L;
+							}
+							System.out.println(hMax+""+hMin+" "+ sMin+ " "+ sMax+ " " +lMin+ " "+lMax);
+							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".h",hMin,hMax));
+							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".s",sMin,sMax));
+							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".l",lMin,lMax));
+						}
+					}
+					if(value.equalsIgnoreCase("range")){
+						String key=entry.getKey().split("\\.")[0];
+						String Ids=entry.getValue().get(0);
+						List<Long> listOfIds = commonMethod.getListOfIds(Ids);
+						Long rMin;
+						Long rMax;
+						if(listOfIds.size()>=2){
+							rMin=listOfIds.get(0);
+							rMax=listOfIds.get(1);
+							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key,rMin,rMax));
+						}
+						
+					}
+					
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					e.printStackTrace();
+				}
+				
+			}
 		}
-
-		Set<String> traits_9 = commonMethod.cSTSOT(trait_9);
-		if (!traits_9.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("trait_9", traits_9));
-		}
-		Set<String> traits_10 = commonMethod.cSTSOT(trait_10);
-		if (!traits_10.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("trait_10", traits_10));
-		}
-		Set<String> traits_11 = commonMethod.cSTSOT(trait_11);
-		if (!traits_11.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("trait_11", traits_11));
-		}
-		Set<String> traits_12 = commonMethod.cSTSOT(trait_12);
-		if (!traits_12.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("trait_12", traits_12));
-		}
-		Set<String> traits_13 = commonMethod.cSTSOT(trait_13);
-		if (!traits_13.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("trait_13", traits_13));
-		}
-		Set<String> traits_15 = commonMethod.cSTSOT(trait_15);
-		if (!traits_15.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("trait_15", traits_15));
-		}
+		
 		/**
 		 * lft, right, top bottom
 		 */

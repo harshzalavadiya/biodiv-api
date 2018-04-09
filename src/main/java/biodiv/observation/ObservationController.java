@@ -101,36 +101,21 @@ public class ObservationController {
 		return observation;
 	}
 
-	@GET
+		@GET
 	@Path("/recommendationVotes")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs,
-			@Pac4JProfileManager ProfileManager<CommonProfile> profileM, @Context SecurityContext securityContext,
-			@Context HttpServletRequest request, @Context HttpServletResponse response) {
-		log.debug("####### {}", profileM);
-		log.debug("####### {}", profileM.getClass());
-		log.debug("####### {}", profileM.get(true));
-		log.debug("####### {}", profileM.get(false));
-		// ProfileManager manager = new ProfileManager(new J2EContext(request,
-		// null));
-		// Optional<CommonProfile> profile = manager.get(false);
-		//
-		// log.debug("(((((((((({}", requestContext.getSecurityContext());
-		// log.debug("(((((((((({}",
-		// ((Pac4JSecurityContext)securityContext).getUserPrincipal());
-		// SecurityContext securityContext =
-		// profileM.getJaxRsContext().getRequestContext().getSecurityContext();
-
-		// Principal profile = securityContext.getUserPrincipal();
-		J2EContext context = new J2EContext(request, response);
-		final ProfileManager<CommonProfile> manager = new ProfileManager(context);
-		final Optional<CommonProfile> profile = manager.get(true);
-
-		log.debug("^^^^^^^^^^^^^^^^^^^^^^ {} ", profile);
-		// log.debug("^^^^^^^^^^^^^^^^^^^^^^ {} ", getProfile());
-		Map<String, Object> recoVotes = observationService.getRecommendationVotes(obvs);
+	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs,@QueryParam("loggedInUserId") Long loggedInUserId,
+			@QueryParam("isAdmin") Boolean isAdmin ,@QueryParam("isSpeciesAdmin") Boolean isSpeciesAdmin) {
+		//CommonProfile profile = AuthUtils.currentUser(request);
+		//System.out.println("testing lock permission");
+		//System.out.println("testing lock permission");
+		//System.out.println("testing lock permission"+profile.isPresent());
+		//System.out.println("testing lock permission"+profileM.get(true));
+		//final CommonProfile profile = profileM.get(true).get();
+		//System.out.println("testing lock permission "+profile.get().getId());
+		//System.out.println("testing lock permission "+profileM);
+		Map<String, Object> recoVotes = observationService.getRecommendationVotes(obvs,loggedInUserId,isAdmin,isSpeciesAdmin);
 		return recoVotes;
 
 	}
-
 }
