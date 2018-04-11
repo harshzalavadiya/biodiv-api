@@ -1,8 +1,11 @@
 package biodiv.observation;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class ObservationListMapper {
 	
@@ -85,16 +88,11 @@ public class ObservationListMapper {
 	private String nomedia;
 	private List<String> tag_name;
 	private List<Double> location;
-	private List<Double> trait_8;
-	private List<Double> trait_9;
-	private List<Double> trait_10;
-	private List<Double> trait_11;
-	private List<Double> trait_12;
-	private List<Double> trait_13;
-	private List<Double> trait_15;
+	private Map<String,Object> traits;
+	private Map<String,Object> traits_json;
+	
 	private List<String> imageresource;
 	private List<String> urlresource;
-	private List<Double> traits;
 	private List<String> featuredgroups;
 	private List<String> featurednotes;
 	
@@ -721,61 +719,7 @@ public class ObservationListMapper {
 		this.location = location;
 	}
 
-	public List<Double> getTrait_8() {
-		return trait_8;
-	}
-
-	public void setTrait_8(List<Double> trait_8) {
-		this.trait_8 = trait_8;
-	}
-
-	public List<Double> getTrait_9() {
-		return trait_9;
-	}
-
-	public void setTrait_9(List<Double> trait_9) {
-		this.trait_9 = trait_9;
-	}
-
-	public List<Double> getTrait_10() {
-		return trait_10;
-	}
-
-	public void setTrait_10(List<Double> trait_10) {
-		this.trait_10 = trait_10;
-	}
-
-	public List<Double> getTrait_11() {
-		return trait_11;
-	}
-
-	public void setTrait_11(List<Double> trait_11) {
-		this.trait_11 = trait_11;
-	}
-
-	public List<Double> getTrait_12() {
-		return trait_12;
-	}
-
-	public void setTrait_12(List<Double> trait_12) {
-		this.trait_12 = trait_12;
-	}
-
-	public List<Double> getTrait_13() {
-		return trait_13;
-	}
-
-	public void setTrait_13(List<Double> trait_13) {
-		this.trait_13 = trait_13;
-	}
-
-	public List<Double> getTrait_15() {
-		return trait_15;
-	}
-
-	public void setTrait_15(List<Double> trait_15) {
-		this.trait_15 = trait_15;
-	}
+	
 
 	public List<String> getImageresource() {
 		return imageresource;
@@ -785,13 +729,7 @@ public class ObservationListMapper {
 		this.imageresource = imageresource;
 	}
 
-	public List<Double> getTraits() {
-		return traits;
-	}
 
-	public void setTraits(List<Double> traits) {
-		this.traits = traits;
-	}
 
 	public String getAll() {
 		return all;
@@ -840,6 +778,32 @@ public class ObservationListMapper {
 	public void setFeaturednotes(List<String> featurednotes) {
 		this.featurednotes = featurednotes;
 	}
+
+
+	public Map<String, Object> getTraits() {
+		return traits;
+	}
+
+
+	public void setTraits(Map<String,Object> traits) {
+		this.traits = traits;
+	}
+
+
+	public Map<String, Object> getTraits_json() {
+		return traits_json;
+	}
+
+
+	public void setTraits_json(Map<String, Object> traits_json) {
+		this.traits_json = traits_json;
+	}
+
+
+	
+
+
+	
 	
 	
 }

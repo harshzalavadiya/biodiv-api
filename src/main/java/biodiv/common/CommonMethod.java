@@ -1,7 +1,9 @@
 package biodiv.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -91,11 +93,40 @@ public class CommonMethod<T> implements GenericModel<T> {
 		return strSet1;
 		
 	}
+	public  boolean isParsableAsLong(final String s) {
+	    try {
+	        Long.valueOf(s);
+	        return true;
+	    } catch (NumberFormatException numberFormatException) {
+	        return false;
+	    }
+	}
+
 
 	@Override
 	public T get(long id, AbstractService<T> abstractService) {
 		// TODO Auto-generated method stub
+		
 		return null;
+	}
+
+	public List<Long> getListOfIds(String str) {
+		// TODO Auto-generated method stub
+		if(str == null|| str== "" || str.isEmpty())
+			return new ArrayList<Long>();
+		String [] y = str.split(",");
+		List<Long> LongIds=new ArrayList<>();
+		for(String z:y){
+			if(isParsableAsLong(z)){
+				LongIds.add(Long.parseLong(z));
+			}
+			else{
+				LongIds.add(0L);
+			}
+		}
+		
+		
+		return LongIds;
 	}
 
 }
