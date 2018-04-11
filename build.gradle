@@ -6,6 +6,8 @@ apply plugin: 'java-library'
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
+	jcenter()
+	//TODO jcenter should be enough. Can remove dependency on mavenCentral
     mavenLocal()
   	mavenCentral()
   	maven { 
@@ -13,7 +15,6 @@ repositories {
   	    url "https://repo.spring.io/libs-milestone"
   	    url "https://mvnrepository.com/artifact"
   	}
-  	
 }
 
 
@@ -127,6 +128,10 @@ dependencies {
 	compile group: 'org.apache.commons', name: 'commons-email', version: '1.5'
 	compile group: 'org.freemarker', name: 'freemarker', version: '2.3.27-incubating'
 	compile group: 'com.zaxxer', name: 'HikariCP', version: '3.0.0'
+	compile group: 'com.github.debop', name: 'hibernate-redis', version: '2.4.0'
+	compile group: 'org.redisson', name: 'redisson', version: '3.6.4'
+	compile group: 'de.ruedigermoeller', name: 'fst', version: '2.57'
+	compile group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.7.1'
 }
 
 

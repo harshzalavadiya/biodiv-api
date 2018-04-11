@@ -30,6 +30,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Environment;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.ServiceRegistry;
 import org.slf4j.Logger;
@@ -119,7 +120,18 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty("hibernate.jdbc.batch_size", "50");
 					
 					dbProps.setProperty("show_sql", "true");
-		
+
+					dbProps.setProperty(Environment.USE_SECOND_LEVEL_CACHE, "true");
+					dbProps.setProperty(Environment.USE_QUERY_CACHE, "true");
+					dbProps.setProperty(Environment.CACHE_REGION_FACTORY, org.hibernate.cache.redis.hibernate52.SingletonRedisRegionFactory.class.getName());
+					dbProps.setProperty(Environment.CACHE_REGION_PREFIX, "hibernate");
+
+					// Optional setting for second level cache statistics
+					dbProps.setProperty(Environment.GENERATE_STATISTICS, "true");
+					dbProps.setProperty(Environment.USE_STRUCTURED_CACHE, "true");
+
+					dbProps.setProperty(Environment.CACHE_PROVIDER_CONFIG, "hibernate-redis.properties");
+
 					hibConf.addProperties(dbProps);
 					for (Class<?> cls : getEntityClassesFromPackage("biodiv")) {
 						log.trace("Adding annotated class : {}", cls);
