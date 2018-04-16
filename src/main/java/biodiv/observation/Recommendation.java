@@ -13,11 +13,15 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import biodiv.taxon.datamodel.dao.Taxon;
 
 @Entity
 @Table(name = "recommendation", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = {
 		"taxon_concept_id", "accepted_name_id", "name", "language_id" }))
+@Cache(region="common", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Recommendation implements java.io.Serializable {
 
 	private long id;

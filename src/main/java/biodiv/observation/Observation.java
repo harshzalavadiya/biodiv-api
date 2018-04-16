@@ -28,6 +28,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -46,6 +49,7 @@ import biodiv.userGroup.UserGroup;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Cache(region="common", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Observation extends DataObject implements java.io.Serializable{
 	
 	public static final String QUERY_SELECT_BY_ID = "Observation.findById";
