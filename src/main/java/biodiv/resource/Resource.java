@@ -14,6 +14,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import biodiv.common.Language;
 import biodiv.common.License;
 import biodiv.user.User;
@@ -23,6 +26,7 @@ import biodiv.user.User;
  */
 @Entity
 @Table(name = "resource", schema = "public")
+@Cache(region="common", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Resource implements java.io.Serializable {
 
 	private long id;
