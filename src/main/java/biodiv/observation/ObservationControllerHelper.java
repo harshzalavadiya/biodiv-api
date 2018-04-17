@@ -246,11 +246,15 @@ public class ObservationControllerHelper {
 					if(value.equalsIgnoreCase("string")){
 						String key=entry.getKey().split("\\.")[0];
 						String Ids=entry.getValue().get(0);
+						System.out.println(Ids);
 						Set<String> listOfIds = commonMethod.cSTSOT(Ids);
-						boolAndLists.add(new MapAndBoolQuery("traits."+key, listOfIds));
+						listOfIds=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
+						key="traits."+key;
+						boolAndLists.add(new MapAndBoolQuery(key,listOfIds));
 					}
 					
 					if(value.equalsIgnoreCase("color_hsl")){
+						System.out.println("here.......................");
 						
 						String key=entry.getKey().split("\\.")[0];
 						
@@ -310,7 +314,8 @@ public class ObservationControllerHelper {
 						if(listOfIds.size()>=2){
 							rMin=listOfIds.get(0);
 							rMax=listOfIds.get(1);
-							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key,rMin,rMax));
+							
+							rangeAndLists.add(new MapAndRangeQuery("traits."+key,rMin,rMax));
 						}
 						
 					}
