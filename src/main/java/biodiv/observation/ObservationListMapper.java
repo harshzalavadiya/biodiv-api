@@ -90,7 +90,7 @@ public class ObservationListMapper {
 	private List<Double> location;
 	private Map<String,Object> traits;
 	private Map<String,Object> traits_json;
-	
+	private Map<String,Object> traits_season;
 	private List<String> imageresource;
 	private List<String> urlresource;
 	private List<String> featuredgroups;
@@ -797,6 +797,16 @@ public class ObservationListMapper {
 
 	public void setTraits_json(Map<String, Object> traits_json) {
 		this.traits_json = traits_json;
+	}
+
+
+	public Map<String, Object> getTraits_season() {
+		return traits_season;
+	}
+
+
+	public void setTraits_season(Map<String, Object> traits_season) {
+		this.traits_season = traits_season;
 	}
 
 

@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -253,8 +254,43 @@ public class ObservationControllerHelper {
 						boolAndLists.add(new MapAndBoolQuery(key,listOfIds));
 					}
 					
+					
+					if(value.equalsIgnoreCase("season")){
+						String key=entry.getKey().split("\\.")[0];
+						String Ids=entry.getValue().get(0);
+						System.out.println(Ids);
+						String [] y = Ids.split(",");
+						
+				
+						try {
+							Date minSeasonDate=new SimpleDateFormat("yyyy-MM-dd").parse(y[0]);
+							Date maxSeasonDate=new SimpleDateFormat("yyyy-MM-dd").parse(y[1]);
+							Calendar cal = Calendar.getInstance();
+							cal.setTime(minSeasonDate);
+							int minMonth=cal.get(Calendar.MONTH);
+							int minDay=cal.get(Calendar.DATE);
+							cal.setTime(maxSeasonDate);
+							int maxMonth=cal.get(Calendar.MONTH);
+							int maxDay=cal.get(Calendar.DATE);
+							if(minMonth==0 && minDay==1 && maxMonth==11 && maxDay==31){
+								
+							}
+							else{
+							
+								rangeAndLists.add(new MapAndRangeQuery("traits_season."+key,y[0].replace('Z',' '),y[1].replace('Z',' ')));
+							}
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						
+						key="traits."+key;
+						
+					}
+					
+					
 					if(value.equalsIgnoreCase("color_hsl")){
-						System.out.println("here.......................");
 						
 						String key=entry.getKey().split("\\.")[0];
 						
