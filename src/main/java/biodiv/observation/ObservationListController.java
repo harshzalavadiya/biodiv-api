@@ -119,7 +119,7 @@ public class ObservationListController {
 		
 		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, traitParams, classificationid, max, offset);
 		
-		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery , max, offset, sortOn,
+		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery , max, offset, sortOn.toLowerCase(),
 				geoAggregationField, geoAggegationPrecision, left, right, top, bottom, onlyFilteredAggregation);
 
 		return mapResponse;
@@ -160,7 +160,7 @@ public class ObservationListController {
 							.filter(entry -> entry.getKey().startsWith("trait"))
 							.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	System.out.println(traitParams);
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, traitParams, classificationid, max, offset);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn.toLowerCase(), minDate, maxDate, validate, traitParams, classificationid, max, offset);
 
 		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes, getFullURL(request));
 	}
