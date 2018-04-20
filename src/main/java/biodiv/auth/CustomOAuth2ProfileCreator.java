@@ -1,10 +1,15 @@
 package biodiv.auth;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.HttpAction;
@@ -27,6 +32,7 @@ import com.github.scribejava.core.exceptions.OAuthException;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.Token;
 
+import biodiv.auth.token.TokenService;
 import biodiv.user.User;
 import biodiv.user.UserService;
 
@@ -39,6 +45,9 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 	private UserService userService;
 
 	@Inject
+	private TokenService tokenService;
+	
+	@Inject
 	private SessionFactory sessionFactory;
 
 	@Inject
@@ -49,7 +58,7 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 	}
 
 	@Override
-	public OAuth20Profile create(final OAuth20Credentials credentials, final WebContext context) {
+	public OAuth20Profile create(final OAuth20Credentials credentials, final WebContext context) throws HttpAction {
 
 		boolean isActive = (sessionFactory.getCurrentSession().getTransaction() != null)
 				? sessionFactory.getCurrentSession().getTransaction().isActive() : false;
@@ -77,13 +86,34 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 				if (user != null) {
 					userService.updateUserProfile(oAuthProfile, user);
 				}
+                
+            	Map<String, Object> result = tokenService.buildTokenResponse(oAuthProfile, user, true);
+
+				log.debug(result.toString());
+				UriBuilder targetURIForRedirection = UriBuilder.fromPath(config.getString("checkAuthUrl"));
+				Iterator it = result.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry pair = (Map.Entry) it.next();
+                    if(pair.getValue() != null) {
+					    targetURIForRedirection.queryParam((String) pair.getKey(), pair.getValue());
+                    }
+					it.remove(); // avoids a ConcurrentModificationException
+				}
+				
+				if (!isActive) {
+                    log.debug("Committing the database transaction");
+                    sessionFactory.getCurrentSession().getTransaction().commit();
+                }
+				
+				throw HttpAction.redirect("Redirecting user to login to biodiv system", context, targetURIForRedirection.toString());
+
 			} catch (NotFoundException e) {
 				Map<String, String> p = new HashMap<String, String>();
 
 				if (oAuthProfile instanceof FacebookProfile) {
 					FacebookProfile fbProfile = (FacebookProfile) oAuthProfile;
 
-					p.put("username", fbProfile.getEmail());
+					p.put("username", fbProfile.getEmail().split("@")[0]);
 					p.put("name", fbProfile.getDisplayName());
 					p.put("email", fbProfile.getEmail());
 					
@@ -119,7 +149,7 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 
 					Google2Profile gProfile = (Google2Profile) oAuthProfile;
 
-					p.put("username", gProfile.getEmail());
+					p.put("username", gProfile.getEmail().split("@")[0]);
 					p.put("email", gProfile.getEmail());
 
 					if (gProfile.getDisplayName() != null)
@@ -150,37 +180,50 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 					// p.put("timezone",
 					// gProfile.getTimezone());
 				}
-				p.put("redirect_url", config.getString("createSocialAccountFromProfile"));
+				p.put("redirect_url", config.getString("createSocialAccountUrl"));
 
-				if (!isActive) {
-					log.debug("Committing the database transaction");
-					sessionFactory.getCurrentSession().getTransaction().commit();
-				}
-
-				throwsException(e.getMessage(), p);
+				log.error("Could not find a user with email : {}", p.get("email"));
+				log.error("Trying to register...");
+				UriBuilder uriBuilder = null;
+				URI targetURIForRedirection =  null;
+				try {
+					uriBuilder = UriBuilder
+							.fromUri(new URI(config.getString("createSocialAccountUrl")));
+					for (Map.Entry<String,String> entry : p.entrySet()) { 
+			            uriBuilder.queryParam(entry.getKey(), entry.getValue());
+					}
+					targetURIForRedirection = uriBuilder.build();
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}				
+				
+				//throwsException(e.getMessage(), p);
+				throw HttpAction.redirect("Could not find a user with email", context, targetURIForRedirection.toString());
 			}
 
-			return oAuthProfile;
+			//return oAuthProfile;
 
 		} catch (final OAuthException e) {
 			throw new TechnicalException(e);
-		} catch (HttpAction e) {
-			throw new TechnicalException(e);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			try {
-				log.warn("Trying to rollback database transaction after exception");
-				sessionFactory.getCurrentSession().getTransaction().rollback();
-			} catch (Throwable rbEx) {
-				log.error("Could not rollback transaction after exception!", rbEx);
-				throw new TechnicalException(rbEx);
-			}
-
-			throw new TechnicalException(e);
-			// throw e;
-		} finally {
-
 		}
+//		catch (HttpAction e) {
+//			throw new TechnicalException(e);
+//		} catch (Throwable e) {
+//			e.printStackTrace();
+//			try {
+//				log.warn("Trying to rollback database transaction after exception");
+//				sessionFactory.getCurrentSession().getTransaction().rollback();
+//			} catch (Throwable rbEx) {
+//				log.error("Could not rollback transaction after exception!", rbEx);
+//				throw new TechnicalException(rbEx);
+//			}
+//
+//			throw new TechnicalException(e);
+//			// throw e;
+//		} finally {
+//
+//		}
 
 	}
 

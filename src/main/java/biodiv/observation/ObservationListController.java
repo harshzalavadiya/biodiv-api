@@ -1,5 +1,8 @@
 package biodiv.observation;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -13,6 +16,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
@@ -92,12 +97,6 @@ public class ObservationListController {
 
 			@QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate,
 			@QueryParam("validate") String validate,
-
-			@QueryParam("trait_8") String trait_8, @QueryParam("trait_9") String trait_9,
-			@QueryParam("trait_10") String trait_10, @QueryParam("trait_11") String trait_11,
-			@QueryParam("trait_12") String trait_12, @QueryParam("trait_13") String trait_13,
-			@QueryParam("trait_15") String trait_15,
-
 			@DefaultValue("265799") @QueryParam("classifdication") String classificationid,
 			@DefaultValue("10") @QueryParam("max") Integer max, @DefaultValue("0") @QueryParam("offset") Integer offset,
 
@@ -106,11 +105,19 @@ public class ObservationListController {
 
 			@QueryParam("left") Double left, @QueryParam("right") Double right, @QueryParam("top") Double top,
 			@QueryParam("bottom") Double bottom,
-			@QueryParam("onlyFilteredAggregation") Boolean onlyFilteredAggregation
+			@QueryParam("onlyFilteredAggregation") Boolean onlyFilteredAggregation,
+			@Context UriInfo uriInfo, String allParams
 
 	) {
-
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, trait_8, trait_9, trait_10, trait_11, trait_12, trait_13, trait_15, classificationid, max, offset);
+		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(); 
+//	     	System.out.println(queryParams.get);
+		Map<String, List<String>> traitParams=queryParams.entrySet().stream()
+								.filter(entry -> entry.getKey().startsWith("trait"))
+								.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+		
+		
+		
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, traitParams, classificationid, max, offset);
 		
 		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery , max, offset, sortOn,
 				geoAggregationField, geoAggegationPrecision, left, right, top, bottom, onlyFilteredAggregation);
@@ -132,31 +139,28 @@ public class ObservationListController {
 			@DefaultValue("") @QueryParam("mediaFilter") String mediaFilter,
 			@DefaultValue("") @QueryParam("months") String months,
 			@DefaultValue("") @QueryParam("isFlagged") String isFlagged,
-
 			@DefaultValue("lastrevised") @QueryParam("sort") String sortOn,
-
 			@QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate,
 			@QueryParam("validate") String validate,
-
-			@QueryParam("trait_8") String trait_8, @QueryParam("trait_9") String trait_9,
-			@QueryParam("trait_10") String trait_10, @QueryParam("trait_11") String trait_11,
-			@QueryParam("trait_12") String trait_12, @QueryParam("trait_13") String trait_13,
-			@QueryParam("trait_15") String trait_15,
-
 			@DefaultValue("1") @QueryParam("minDay") Integer minDay,
 			@DefaultValue("31") @QueryParam("maxDay") Integer maxDay,
 			@DefaultValue("265799") @QueryParam("classifdication") String classificationid,
 			@DefaultValue("10") @QueryParam("max") Integer max, @DefaultValue("0") @QueryParam("offset") Integer offset,
-
 			@QueryParam("notes") String notes,
-			@Context HttpServletRequest request
+			@Context HttpServletRequest request,
+			@Context UriInfo uriInfo, String allParams
 
 	) {
 
 		CommonProfile profile = AuthUtils.currentUser(request);
 		User suser = userService.findById(Long.parseLong(profile.getId()));
-
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, trait_8, trait_9, trait_10, trait_11, trait_12, trait_13, trait_15, classificationid, max, offset);
+		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(); 
+   // System.out.println(queryParams.get);
+	Map<String, List<String>> traitParams=queryParams.entrySet().stream()
+							.filter(entry -> entry.getKey().startsWith("trait"))
+							.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	System.out.println(traitParams);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, traitParams, classificationid, max, offset);
 
 		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes, getFullURL(request));
 	}

@@ -234,10 +234,6 @@ public class ObservationService extends AbstractService<Observation> {
 				reco.put("speciesId", obj[15]);
 				reco.put("observationId", ((java.math.BigInteger) obj[16]).longValue());
 				reco.put("isLocked", obj[17]);
-				System.out.println("testing reco under unidentified "+((java.math.BigInteger) obj[18]).longValue());
-				System.out.println("testing reco under unidentified "+((java.math.BigInteger) obj[18]).longValue());
-				System.out.println("testing reco under unidentified "+((java.math.BigInteger) obj[18]).longValue());
-				System.out.println("testing reco under unidentified "+((java.math.BigInteger) obj[18]).longValue());
 				reco.put("maxVotedRecoId", ((java.math.BigInteger) obj[18]).longValue());
 				recoVotes.add(reco);
 			}
@@ -367,8 +363,6 @@ public class ObservationService extends AbstractService<Observation> {
 						hasObvLockPerm((Long) recoVote.get("observationId"), (Long) recoVote.get("recoId"),loggedInUserId,isAdmin,isSpeciesAdmin));
 				Long totalCommentCount = commentService.getTotalRecoCommentCount((Long) map.get("recoId"),
 						(Long) recoVote.get("observationId"));
-				System.out.println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
-				System.out.println(totalCommentCount);
 				map.put("totalCommentCount", totalCommentCount);
 			}
 
@@ -464,9 +458,6 @@ public class ObservationService extends AbstractService<Observation> {
 		// System.out.println("remove
 		// "+langToCommonName.remove(englishId.toString()));
 		Set<Recommendation> englishNames = (Set<Recommendation>) langToCommonName.remove(englishId.toString());
-		System.out.println("langToCommonName " + langToCommonName);
-		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-		System.out.println("englishNames " + englishNames);
 
 		List<String> cnList = new ArrayList<String>();
 

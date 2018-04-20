@@ -1,23 +1,23 @@
 package biodiv.auth;
 
-import java.net.URI;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.configuration2.Configuration;
+import org.pac4j.core.config.Config;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
-import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JCallback;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -30,9 +30,6 @@ import biodiv.auth.token.TokenService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
-import javax.ws.rs.NotFoundException;
-
-import javax.inject.Inject;
 
 @Path("/login")
 public class LoginController {
@@ -51,6 +48,9 @@ public class LoginController {
 	@Inject
 	Configuration config;
 
+	@Inject
+	private Config pac4jConfig;
+
 	public LoginController() {
 		log.debug("Login Controller");
 	}
@@ -66,7 +66,7 @@ public class LoginController {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-    @Path("/auth")
+	@Path("/auth")
 	public Response auth(@FormParam("username") String username, @FormParam("password") String password) {
 
 		try {
@@ -122,11 +122,12 @@ public class LoginController {
 	 */
 	@Path("/callback")
 	@GET
-	@Pac4JCallback(skipResponse = true)
+	@Pac4JCallback(skipResponse = false)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response callback(@Pac4JProfile Optional<CommonProfile> profile) {
-		try {
+	public void callback(@Pac4JProfile Optional<CommonProfile> profile, @Context HttpServletResponse response) {
+
+/*		try {
 			if (profile.isPresent()) {
 
 				// Issue a token for the user
@@ -135,7 +136,14 @@ public class LoginController {
 					user = userService.findByEmail(profile.get().getEmail());
 				} catch (NotFoundException e) {
 					log.error("Could not find a user with email : {}", profile.get().getEmail());
-					log.error("Trying to register...");
+					// log.error("Trying to register...");
+					// UriBuilder uriBuilder = UriBuilder
+					// .fromUri(new
+					// URI(config.getString("createSocialAccountFromProfile")));
+					// URI targetURIForRedirection = uriBuilder.build();
+					// return
+					// Response.temporaryRedirect(targetURIForRedirection).build();
+					//
 				}
 				if (user != null) {
 					Map<String, Object> result = tokenService.buildTokenResponse(profile.get(), user, true);
@@ -145,27 +153,26 @@ public class LoginController {
 					Iterator it = result.entrySet().iterator();
 					while (it.hasNext()) {
 						Map.Entry pair = (Map.Entry) it.next();
-                        if(pair.getValue() != null) {
-						    targetURIForRedirection.queryParam((String) pair.getKey(), pair.getValue());
-                        }
+						if (pair.getValue() != null) {
+							targetURIForRedirection.queryParam((String) pair.getKey(), pair.getValue());
+						}
 						it.remove(); // avoids a ConcurrentModificationException
 					}
 					return Response.temporaryRedirect(targetURIForRedirection.build()).build();
 				} else {
-					UriBuilder uriBuilder = UriBuilder
-							.fromUri(new URI(config.getString("createSocialAccountFromProfile")));				
-					URI targetURIForRedirection = uriBuilder.build();
-					return Response.temporaryRedirect(targetURIForRedirection).build();
+					throw new CredentialsException("Invalid credentials");
 				}
 			} else {
 				throw new CredentialsException("Invalid credentials");
+				// Response.temporaryRedirect(context.getResponseHeader(HttpConstants.LOCATION_HEADER)).build();
+				// return null;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, e.getMessage());
 			return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
 		}
-	}
+*/	}
 
 	/**
 	 * 
