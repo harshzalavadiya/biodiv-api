@@ -1,6 +1,7 @@
 package biodiv.userGroup;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -203,6 +204,14 @@ public class UserGroupService extends AbstractService<UserGroup> {
 				SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
 				String newDate=out.format(dataObj.getLastRevised());
 				obj.put("lastrevised",newDate);
+				List<Long> ugIds = new ArrayList<Long>();
+				List<String> ugNames = new ArrayList<String>();
+				for(UserGroup ug: dataObj.getUserGroups()){
+					ugIds.add(ug.getId());
+					ugNames.add(ug.getName());
+				}
+				obj.put("usergroupid", ugIds);
+				obj.put("usergroupname", ugNames);
 				observationListService.update("observation", "observation", dataObj.getId().toString(), obj.toString());
 				
 				//elastic elastic
