@@ -248,7 +248,7 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	public List<Trait> listObservationTrait() {
 		// TODO Auto-generated method stub
 		Query q;
-		q=getCurrentSession().createQuery("From Trait where showInObservation=true");
+		q=getCurrentSession().createQuery("From Trait where showInObservation=true and isNotObservationTrait=false and isDeleted=false");
 		List<Trait> results=null;
 		
 			results=q.getResultList();

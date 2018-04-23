@@ -55,6 +55,14 @@ public class CustomFieldDao extends AbstractDao<CustomField, Long> implements Da
 		List<CustomField> cf = query.getResultList();
 		return cf;
 	}
+
+	public List<CustomField> fetchAllCustomFields() {
+		String hql = "from CustomField cf order by cf.id asc";
+		Query query = getCurrentSession().createQuery(hql);
+		
+		List<CustomField> cf = query.getResultList();
+		return cf;
+	}
 	
 	
 

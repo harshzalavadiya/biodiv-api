@@ -28,6 +28,7 @@ import biodiv.common.AbstractService;
 import biodiv.common.LanguageService;
 import biodiv.common.SpeciesGroup;
 import biodiv.common.SpeciesGroupService;
+import biodiv.customField.CustomField;
 import biodiv.customField.CustomFieldService;
 import biodiv.speciesPermission.SpeciesPermission;
 import biodiv.speciesPermission.SpeciesPermission.PermissionType;
@@ -36,13 +37,17 @@ import biodiv.taxon.datamodel.dao.Taxon;
 import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.userGroup.UserGroup;
+import biodiv.userGroup.UserGroupService;
 import net.minidev.json.JSONObject;
 
 @Service
 public class ObservationService extends AbstractService<Observation> {
 
 	private ObservationDao observationDao;
-
+	
+	@Inject
+	UserGroupService userGroupService;
+	
 	@Inject
 	private CustomFieldService customFieldService;
 
@@ -367,7 +372,7 @@ public class ObservationService extends AbstractService<Observation> {
 			}
 
 			for (Map.Entry<String, Object> entry : obvListRecoVotesResult.entrySet()) {
-				System.out.println("*****************************************8");
+				
 				int totalVotes = 0;
 				Map<String, Object> obvRecoVotesResult = (Map<String, Object>) entry.getValue();
 				System.out.println("testing recoVotes");
@@ -501,6 +506,21 @@ public class ObservationService extends AbstractService<Observation> {
 		}
 		String cNames = String.join(",", cnList);
 		return cNames;
+	}
+
+	public List<CustomField> getAllCustomFieldsByUserGroup(Long uid) {
+		// TODO Auto-generated method stub
+		System.out.println(uid);
+		UserGroup usGp=userGroupService.findById(uid);
+		List<CustomField> cf=customFieldService.fetchCustomFieldsByGroup(usGp);
+		return cf;
+	}
+
+	public List<CustomField> getAllCustomFields() {
+		// TODO Auto-generated method stub
+		List<CustomField> cf=customFieldService.fetchAllCustomFields();
+		
+		return cf;
 	}
 
 }

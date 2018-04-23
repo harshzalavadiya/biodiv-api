@@ -1,35 +1,25 @@
 package biodiv.maps;
 
+import java.util.List;
 import java.util.Set;
 
-public class MapOrBoolQuery {
-	private String key;
+/**
+ * There is "OR" between any two instances of this query.
+ * @author mukund
+ *
+ */
+public class MapOrBoolQuery extends MapBoolQuery {
 
-	private Set<String> values;
-	
-	
-
-	public MapOrBoolQuery(String key, Set<String> values) {
+	public MapOrBoolQuery() {
 		super();
-		this.key = key;
-		this.values = values;
 	}
 
-	public String getKey() {
-		return key;
+	public MapOrBoolQuery(String key, Set<Object> values) {
+		this(key, values, null);
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public MapOrBoolQuery(String key, Set<Object> values, String path) {
+		super(key, values, path);
 	}
 
-	public Set<String> getValues() {
-		return values;
-	}
-
-	public void setValues(Set<String> values) {
-		this.values = values;
-	}
-
-	
 }

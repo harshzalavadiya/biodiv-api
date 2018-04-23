@@ -68,34 +68,34 @@ public class ObservationControllerHelper {
 		
 		CommonMethod commonMethod = new CommonMethod();
 
-		Set<String> groupId = commonMethod.cSTSOT(sGroup);
+		Set<Object> groupId = commonMethod.cSTSOT(sGroup);
 		if (!groupId.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("speciesgroupid", groupId));
 		}
 		
-		Set<String> taxonId = commonMethod.cSTSOT(taxon);
+		Set<Object> taxonId = commonMethod.cSTSOT(taxon);
 		if (!taxonId.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("path", taxonId));
 		}
 
-		Set<String> authorId = commonMethod.cSTSOT(user);
+		Set<Object> authorId = commonMethod.cSTSOT(user);
 
 		if (!authorId.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("authorid", authorId));
 		}
 
-		Set<String> userGroupId = commonMethod.cSTSOT(userGroupList);
+		Set<Object> userGroupId = commonMethod.cSTSOT(userGroupList);
 		if (!userGroupId.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("usergroupid", userGroupId));
 		}
 
-		Set<String> userGroupName = commonMethod.cSTSOT(webaddress);
+		Set<Object> userGroupName = commonMethod.cSTSOT(webaddress);
 		if (!userGroupName.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("usergroupname", userGroupName));
 
 		}
 
-		Set<String> month = commonMethod.cSTSOT(months);
+		Set<Object> month = commonMethod.cSTSOT(months);
 		if (!month.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("frommonth", month));
 
@@ -106,10 +106,10 @@ public class ObservationControllerHelper {
 			if (speciesNames.size() < 2) {
 				String first = (String) speciesNames.toArray()[0];
 				if (first.equalsIgnoreCase("UNIDENTIFED")) {
-					andMapExistQueries.add(new MapExistQuery("name", false));
+					andMapExistQueries.add(new MapExistQuery("name", false, null));
 				}
 				if (first.equalsIgnoreCase("IDENTIFED")) {
-					andMapExistQueries.add(new MapExistQuery("name", true));
+					andMapExistQueries.add(new MapExistQuery("name", true,null));
 				}
 			}
 
@@ -119,12 +119,12 @@ public class ObservationControllerHelper {
 			if (validates.size() < 2) {
 				String first = (String) validates.toArray()[0];
 				if (first.equalsIgnoreCase("invalidate")) {
-					Set<String> data = new HashSet<>();
+					Set<Object> data = new HashSet<>();
 					data.add("false");
 					boolAndLists.add(new MapAndBoolQuery("islocked", data));
 				}
 				if (first.equalsIgnoreCase("validate")) {
-					Set<String> data = new HashSet<>();
+					Set<Object> data = new HashSet<>();
 					data.add("true");
 					boolAndLists.add(new MapAndBoolQuery("islocked", data));
 				}
@@ -179,13 +179,13 @@ public class ObservationControllerHelper {
 		 */
 
 		String isDeleted = "false";
-		Set<String> isdeleted = commonMethod.cSTSOT(isDeleted);
+		Set<Object> isdeleted = commonMethod.cSTSOT(isDeleted);
 		if (!isdeleted.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("isdeleted", isdeleted));
 
 		}
 		String isCheckList = "false";
-		Set<String> ischecklist = commonMethod.cSTSOT(isCheckList);
+		Set<Object> ischecklist = commonMethod.cSTSOT(isCheckList);
 		if (!ischecklist.isEmpty()) {
 			boolAndLists.add(new MapAndBoolQuery("ischecklist", ischecklist));
 
@@ -249,9 +249,9 @@ public class ObservationControllerHelper {
 						String Ids=entry.getValue().get(0);
 						System.out.println(Ids);
 						Set<String> listOfIds = commonMethod.cSTSOT(Ids);
-						listOfIds=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
+						Set<Object> listOfIdsWithObject=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
 						key="traits."+key;
-						boolAndLists.add(new MapAndBoolQuery(key,listOfIds));
+						boolAndLists.add(new MapAndBoolQuery(key,listOfIdsWithObject));
 					}
 					
 					
@@ -335,10 +335,10 @@ public class ObservationControllerHelper {
 							else{
 								lMin=l-5L;
 							}
-							System.out.println(hMax+""+hMin+" "+ sMin+ " "+ sMax+ " " +lMin+ " "+lMax);
-							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".h",hMin,hMax));
-							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".s",sMin,sMax));
-							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".l",lMin,lMax));
+							
+							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".h",hMin,hMax,"traits_json."+key));
+							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".s",sMin,sMax,"traits_json."+key));
+							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".l",lMin,lMax,"traits_json."+key));
 						}
 					}
 					if(value.equalsIgnoreCase("range")){
@@ -351,6 +351,7 @@ public class ObservationControllerHelper {
 							rMin=listOfIds.get(0);
 							rMax=listOfIds.get(1);
 							
+
 							rangeAndLists.add(new MapAndRangeQuery("traits."+key,rMin,rMax));
 						}
 						
