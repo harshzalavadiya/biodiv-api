@@ -134,8 +134,8 @@ public class CustomFieldService extends AbstractService<CustomField> {
 			if(obvId == null){
 				return cf.getDefaultValue();
 			}
-			String query = "select cf1."+cf.fetchSqlColumnName(cf.getId(),false)+ " from "
-					+CustomField.getTableNameForGroup(cf.getUserGroup().getId(),false)+" cf1 where cf1.observation.id =:obvId";
+			String query = "select cf1."+cf.fetchSqlColumnName(cf.getId(),true)+ " from "
+					+CustomField.getTableNameForGroup(cf.getUserGroup().getId(),true)+" cf1 where cf1.observation_id =:obvId";
 			//String query = "from "+CustomField.getTableNameForGroup(cf.getUserGroup().getId());
 			Object result = customFieldDao.fetchValue(query,obvId);
 			return result;

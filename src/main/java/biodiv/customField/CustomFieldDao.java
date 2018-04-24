@@ -21,7 +21,7 @@ public class CustomFieldDao extends AbstractDao<CustomField, Long> implements Da
 
 	public Object fetchValue(String genericQuery, Long obvId) {
 		String hql = genericQuery;
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = getCurrentSession().createSQLQuery(hql);
 		query.setParameter("obvId", obvId);
 		List result = query.getResultList();
 		if(result.size() == 0 || result.get(0) == null){
