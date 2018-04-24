@@ -1,33 +1,25 @@
 package biodiv.maps;
 
+import java.util.List;
 import java.util.Set;
 
-public class MapAndBoolQuery {
+/**
+ * There is "AND" between any two instances of this query.
+ * @author mukund
+ *
+ */
+public class MapAndBoolQuery extends MapBoolQuery {
 
-	private String key;
-
-	private Set<String> values;
-
-	public MapAndBoolQuery(String key, Set<String> values) {
+	public MapAndBoolQuery() {
 		super();
-		this.key = key;
-		this.values = values;
 	}
 
-	public String getKey() {
-		return key;
+	public MapAndBoolQuery(String key, Set<Object> values) {
+		this(key, values, null);
 	}
 
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public Set<String> getValues() {
-		return values;
-	}
-
-	public void setValues(Set<String> values) {
-		this.values = values;
+	public MapAndBoolQuery(String key, Set<Object> values, String path) {
+		super(key, values, path);
 	}
 
 }

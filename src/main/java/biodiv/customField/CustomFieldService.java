@@ -205,10 +205,21 @@ public class CustomFieldService extends AbstractService<CustomField> {
 		}
 	}
 
-	private List<CustomField> fetchCustomFieldsByGroup(UserGroup ug) {
+	public List<CustomField> fetchCustomFieldsByGroup(UserGroup ug) {
 		
 		try{
 			List<CustomField> cf = customFieldDao.fetchCustomFieldsByGroup(ug);
+			return cf;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			
+		}
+	}
+
+	public List<CustomField> fetchAllCustomFields() {
+		try{
+			List<CustomField> cf = customFieldDao.fetchAllCustomFields();
 			return cf;
 		}catch(Exception e){
 			throw e;

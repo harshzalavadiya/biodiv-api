@@ -1,37 +1,22 @@
 package biodiv.maps;
 
-public class MapOrRangeQuery {
-	
-	private String key;
-	private Object start;
-	private Object end;
-	
-	
+/**
+ * There is "OR" between any two instances of this query.
+ * @author mukund
+ *
+ */
+public class MapOrRangeQuery extends MapRangeQuery {
+
+	public MapOrRangeQuery() {
+		super();
+	}
 	
 	public MapOrRangeQuery(String key, Object start, Object end) {
-		super();
-		this.key = key;
-		this.start = start;
-		this.end = end;
+		this(key, start, end, null);
 	}
-	public String getKey() {
-		return key;
+
+	public MapOrRangeQuery(String key, Object start, Object end, String path) {
+		super(key, start, end, path);
 	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-	public Object getStart() {
-		return start;
-	}
-	public void setStart(Object start) {
-		this.start = start;
-	}
-	public Object getEnd() {
-		return end;
-	}
-	public void setEnd(Object end) {
-		this.end = end;
-	}
-	
 
 }

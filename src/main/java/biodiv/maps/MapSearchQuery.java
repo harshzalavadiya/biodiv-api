@@ -13,8 +13,6 @@ public class MapSearchQuery {
 	    private List<MapExistQuery> andExistQueries;
 	    
 	    
-	    
-	    
 		public MapSearchQuery(List<MapAndBoolQuery> andBoolQueries, List<MapOrBoolQuery> orBoolQueries,
 				List<MapAndRangeQuery> andRangeQueries, List<MapOrRangeQuery> orRangeQueries,
 				List<MapExistQuery> andExistQueries) {

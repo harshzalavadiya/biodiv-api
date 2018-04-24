@@ -25,7 +25,9 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
+import biodiv.customField.CustomField;
 import biodiv.userGroup.UserGroup;
 
 @Path("/observation")
@@ -63,12 +65,28 @@ public class ObservationController {
 	@GET
 	@Path("/customFields")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public List<Map<String, Object>> getCustomFields(@QueryParam("obvId") Long obvId) {
 
 		List<Map<String, Object>> cf = observationService.getCustomFields(obvId);
 		return cf;
 	}
-
+	@GET
+	@Path("/customFields/list")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public List<CustomField> getAllCustomFields(@QueryParam("uid") Long uid ) {
+		List<CustomField> cf =null;
+		if(uid != null){
+			System.out.println(uid);
+			cf= observationService.getAllCustomFieldsByUserGroup(uid);
+		}
+		else{
+			cf= observationService.getAllCustomFields();
+		}
+		
+		return cf;
+	}
 	@POST
 	@Path("/updateCustomField")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -101,7 +119,7 @@ public class ObservationController {
 		return observation;
 	}
 
-		@GET
+	@GET
 	@Path("/recommendationVotes")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Map<String, Object> getRecommendationVotes(@QueryParam("obvIds") String obvs,@QueryParam("loggedInUserId") Long loggedInUserId,
