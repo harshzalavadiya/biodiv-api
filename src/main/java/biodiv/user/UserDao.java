@@ -10,6 +10,7 @@ import javax.ws.rs.NotFoundException;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import javax.persistence.NoResultException;
 
 
 public class UserDao extends AbstractDao<User, Long> implements DaoInterface<User, Long>{
@@ -27,7 +28,15 @@ public class UserDao extends AbstractDao<User, Long> implements DaoInterface<Use
 	public User findByEmail(String email) throws NotFoundException {
 		Query q = getCurrentSession().createQuery("from User where email=:email");
 		q.setParameter("email", email);
-		User user = (User) q.getSingleResult();
+		User user = null;
+		try {
+		user = (User) q.getSingleResult();
+		} catch(NoResultException e ) {
+                        e.printStackTrace();
+            throw new NotFoundException(e);
+
+                }
+
 		if(user != null) return  user;
 		else return null;
 	}
