@@ -13,88 +13,45 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.NoResultException;
+
 public abstract class AbstractDao<T, K extends Serializable> {
 
-	private static final Logger log = LoggerFactory.getLogger(AbstractDao.class);
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	//private Session currentSession;
+	protected SessionFactory sessionFactory;
 	
-	@Inject
-	private SessionFactory sessionFactory;
-	
-	//private Transaction currentTransaction;
-
 	protected Class<? extends T> daoType;
 
-	protected AbstractDao() {
+	protected AbstractDao(SessionFactory sessionFactory) {
 		log.trace("AbstractDao constructor");
 		daoType = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		this.sessionFactory = sessionFactory;
 	}
 
-
-//	public Session openCurrentSession() {		
-//		currentSession = sessionFactory.openSession();
-//		return currentSession;
-//	}
-//
-//	public Session openCurrentSessionWithTransaction() {
-//		currentSession = sessionFactory.openSession();
-//		currentTransaction = currentSession.beginTransaction();
-//		return currentSession;
-//	}
-//
-//	public void closeCurrentSession() {
-//		//sessionFactory.getCurrentSession().close();
-//	}
-//
-//	public void closeCurrentSessionWithTransaction() {
-//		currentTransaction.commit();
-//		currentSession.close();
-//		log.debug("committing current transaction and closing current session");
-//	}
-
-	public Session getCurrentSession() {
-		//System.out.println(System.identityHashCode(sessionFactory.getCurrentSession()));
-		return sessionFactory.getCurrentSession();
-	}
-
-//	public void setCurrentSession(Session currentSession) {
-//		this.currentSession = currentSession;
-//	}
-//
-//	public Transaction getCurrentTransaction() {
-//		return currentTransaction;
-//	}
-//
-//	public void setCurrentTransaction(Transaction currentTransaction) {
-//		this.currentTransaction = currentTransaction;
-//	}
-//
 	public void save(T entity) {
-		getCurrentSession().save(entity);
+		sessionFactory.getCurrentSession().save(entity);
 	}
 
 	public void update(T entity) {
-		getCurrentSession().update(entity);
+		sessionFactory.getCurrentSession().update(entity);
 	}
 
 	public void delete(T entity) {
-		getCurrentSession().delete(entity);
+		sessionFactory.getCurrentSession().delete(entity);
 	}
 
 	public abstract T findById(K id);
 
 	@SuppressWarnings("unchecked")
 	public List<T> findAll() {
-		System.out.println("findalllll");
-		return (List<T>) getCurrentSession().createCriteria(daoType)
+		return (List<T>) sessionFactory.getCurrentSession().createCriteria(daoType)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<T> findAll(int limit, int offset) {
-		System.out.println("findalllllaa");
-		return (List<T>) getCurrentSession().createCriteria(daoType)
+		return (List<T>) sessionFactory.getCurrentSession().createCriteria(daoType)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).setFirstResult(offset).setMaxResults(limit).list();
 	}
 	
@@ -105,13 +62,21 @@ public abstract class AbstractDao<T, K extends Serializable> {
 			    "from "+daoType.getSimpleName()+" t " +
 			    "where t."+property+" "+condition+" :value" ;
 		log.debug ("Running query : "+queryStr);
-		org.hibernate.query.Query query = getCurrentSession().createQuery(queryStr);
+		org.hibernate.query.Query query = sessionFactory.getCurrentSession().createQuery(queryStr);
 		query.setParameter("value", value);
 		
-		T entity = (T) query.getSingleResult();
+		T entity = null;
+        try {
+            entity = (T) query.getSingleResult();
+        } catch(NoResultException e)  {
+            e.printStackTrace();
+        }
 		
 		return entity;
 
 	}
 
+	public void flush() {
+		sessionFactory.getCurrentSession().flush();
+	}
 }

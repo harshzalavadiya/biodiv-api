@@ -365,7 +365,12 @@ public class User extends CommonMethod implements Principal {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
-
+	
+	public void addRole(Role role) {
+		if(this.roles == null) this.roles = new HashSet<Role>(0);
+		this.roles.add(role);
+	}
+	
 	public boolean hasRole(String role) {
 		for (Role r : this.roles) {
 			if (r.getAuthority().equalsIgnoreCase(role)) {

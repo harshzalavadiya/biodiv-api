@@ -144,6 +144,8 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 				servletContainer.reload(newRC);
 
 				log.debug("Initializing guicebridge with servicelocator");
+				//InjectionManager im = container.getApplicationHandler().getInjectionManager();
+				//ServiceLocator serviceLocator = im.getInstance(ServiceLocator.class);
 				ServiceLocator serviceLocator = container.getApplicationHandler().getServiceLocator();
 
 				GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);

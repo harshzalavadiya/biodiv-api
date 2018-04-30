@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,20 +29,21 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 	@Context
 	private ResourceContext resourceContext;
 
-	protected ObservationDao() {
-		System.out.println("ObservationDao constructor");
+	@Inject
+	public ObservationDao(SessionFactory sessionFactory) {
+		super(sessionFactory);
 	}
 
 	@Override
 	public Observation findById(Long id) {
-		Observation entity = (Observation) getCurrentSession().get(Observation.class, id);
+		Observation entity = (Observation) sessionFactory.getCurrentSession().get(Observation.class, id);
 		System.out.println(entity);
 		return entity;
 	}
 
 	public List<UserGroup> obvUserGroups(long id) {
 		String hql = "select obv.userGroups from Observation obv where obv.id =:id";
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		query.setParameter("id", id);
 		List<UserGroup> listResult = query.getResultList();
 		System.out.println(listResult);
@@ -51,7 +53,7 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 	public List<ObservationResource> getResource(long id) {
 		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession()
+		q = sessionFactory.getCurrentSession()
 				.createQuery("select obvr.resourceId from ObservationResource  as obvr where obvr.observationId.id=:id")
 				.setParameter("id", id);
 		List<ObservationResource> observationResources = q.getResultList();
@@ -89,7 +91,7 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		// LongStream obvs =
 		// Arrays.asList(allObvs.split(",")).stream().map(String::trim).mapToLong(Long::parseLong);
 		// List<Long> obvs = Arrays.asList(allObvs.split(","));
-		Query query = getCurrentSession().createSQLQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(hql);
 		if (singleObv == true) {
 			query.setParameter("obvId", obvId);
 		} else {

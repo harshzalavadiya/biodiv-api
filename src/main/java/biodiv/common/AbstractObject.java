@@ -3,8 +3,12 @@ package biodiv.common;
 import java.io.Serializable;
 
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AbstractObject {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private SessionFactory sessionFactory;
 	
@@ -25,4 +29,5 @@ public class AbstractObject {
 		}
 		return null;
 	}
+	
 }

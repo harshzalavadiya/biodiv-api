@@ -20,29 +20,36 @@ public class Utils {
 
 	public static String generateLink(String controller, String action, Map<String, String> linkParams,
 			HttpServletRequest request) throws Exception {
-		/* TODO: build userGroup context link
-		 * return userGroupService.userGroupBasedLink(base:
+		/*
+		 * TODO: build userGroup context link return
+		 * userGroupService.userGroupBasedLink(base:
 		 * Utils.getDomainServerUrl(request), controller: controller, action:
 		 * action, 'userGroupWebaddress':params.webaddress, params: linkParams)
 		 */
-		return buildURL(request.getRequestURL() + "/" + controller + "/" + action, linkParams);
+		return buildURL(request, "/" + controller + "/" + action, linkParams);
 	}
 
-	private static String buildURL(String base, Map<String, String> parameters) throws Exception {
-		if (base != null && StringUtils.isNotBlank(base)) {
-			URIBuilder builder = new URIBuilder(base);
-			if (parameters != null && !parameters.isEmpty()) {
-				for (Map.Entry<String, String> entry : parameters.entrySet()) {
-					String key = entry.getKey();
-					if (StringUtils.isNotBlank(key)) {
-						String value = entry.getValue();
-						builder.addParameter(key, value);
-					}
+	private static String buildURL(HttpServletRequest request, String pathInfo, Map<String, String> parameters)
+			throws Exception {
+
+		String scheme = request.getScheme();
+		String serverName = request.getServerName();
+		String contextPath = request.getContextPath();
+		StringBuilder url = new StringBuilder();
+		url.append(scheme).append("://").append(serverName);
+		url.append(contextPath).append(pathInfo);
+
+		URIBuilder builder = new URIBuilder(url.toString());
+		if (parameters != null && !parameters.isEmpty()) {
+			for (Map.Entry<String, String> entry : parameters.entrySet()) {
+				String key = entry.getKey();
+				if (StringUtils.isNotBlank(key)) {
+					String value = entry.getValue();
+					builder.addParameter(key, value);
 				}
 			}
-			return builder.build().toString();
 		}
-		return null;
+		return builder.build().toString();
 	}
 
 	public static Date parseDate(Object date, Boolean sendNew) {

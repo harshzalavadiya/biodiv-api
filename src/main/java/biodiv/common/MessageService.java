@@ -25,7 +25,7 @@ public class MessageService {
 	}
 
 	public String getMessage(String code, Map<String, String> params) {
-		ST message = new ST(messageBundle.getString(code));
+		ST message = new ST(messageBundle.getString(code), '$', '$');
 		for (Map.Entry<String, String> entry : params.entrySet()) {
 			System.out.println(entry.getKey() + "/" + entry.getValue());
 			message.add(entry.getKey(), entry.getValue());

@@ -3,7 +3,6 @@ package biodiv.auth.register;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,6 +19,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import biodiv.common.AbstractObject;
+import biodiv.common.CommonMethod;
 
 @Entity
 @Table(name = "registration_code")
