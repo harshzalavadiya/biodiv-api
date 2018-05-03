@@ -26,6 +26,7 @@ public class TaxonModule extends ServletModule {
 		
 		bind(Taxon.class);
 		bind(TaxonDao.class).in(Singleton.class);
+		bind(SearchTaxon.class).in(Singleton.class);
 		bind(TaxonService.class).in(Singleton.class);
 		bind(TaxonController.class).in(Singleton.class);
 		
@@ -35,6 +36,5 @@ public class TaxonModule extends ServletModule {
 		bind(TaxonomyRegistry.class);
 		
 		bind(TaxonRelation.class);
-		bind(SearchTaxon.class).in(Singleton.class);
 	}
 }

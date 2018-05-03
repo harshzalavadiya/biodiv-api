@@ -12,6 +12,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.persistence.NoResultException;
 
 public abstract class AbstractDao<T, K extends Serializable> {
 
@@ -108,7 +109,13 @@ public abstract class AbstractDao<T, K extends Serializable> {
 		org.hibernate.query.Query query = getCurrentSession().createQuery(queryStr);
 		query.setParameter("value", value);
 		
-		T entity = (T) query.getSingleResult();
+		T entity = null;
+		try {
+			entity = (T) query.getSingleResult();
+		} catch(NoResultException e) {
+			e.printStackTrace();
+		}
+
 		
 		return entity;
 
