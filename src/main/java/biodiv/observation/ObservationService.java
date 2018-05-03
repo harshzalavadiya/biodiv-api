@@ -100,13 +100,14 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 	@Transactional
-	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId) throws Exception {
+	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId,Long loggedInUserId,Boolean isAdmin) throws Exception {
 
 		String msg;
 		try {
 			Observation obv = findById(obvId);
 			Set<UserGroup> obvUserGrps = obv.getUserGroups();
-			msg = customFieldService.updateInlineCf(fieldValue, cfId, obvId, userId, obvUserGrps);
+			msg = customFieldService.updateInlineCf(fieldValue, cfId, obvId, userId, obvUserGrps,loggedInUserId,obv.getAuthor().getId(),
+					isAdmin);
 			
 			
 			Date lastrevised = new Date();
