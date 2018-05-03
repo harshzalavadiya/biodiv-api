@@ -1,8 +1,12 @@
 package biodiv.customField;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -254,8 +258,9 @@ public class CustomField implements java.io.Serializable {
 		
 		String psqlType;
 		Object defVal = (value != null)?value.trim():cf.getDefaultValue();
+		//System.out.println("dateType for cf "+cf.getDataType());
 		switch(cf.getDataType()){
-		case "Integer":
+		case "INTEGER":
 			psqlType = "bigint";
 			try{
 				defVal = defVal !=null ? Integer.parseInt((String) defVal): null;
@@ -276,9 +281,10 @@ public class CustomField implements java.io.Serializable {
 			defVal = defVal !=null? Boolean.parseBoolean((String) defVal): false;
 			break;
 
-		case "Date":
+		case "DATE":
 			psqlType = "timestamp without time zone";
 			defVal =  parseDate(defVal);
+			//System.out.println("inside date type "+defVal);
 			break;
 		
 		case "PARAGRAPH_TEXT":
@@ -286,7 +292,7 @@ public class CustomField implements java.io.Serializable {
 			defVal = defVal !=null?defVal: "";
 			break;
 		
-		case "Text":
+		case "TEXT":
 			psqlType = "character varying(400)";
 			defVal = defVal !=null?defVal: "";
 			break;
@@ -303,9 +309,22 @@ public class CustomField implements java.io.Serializable {
 		
 	}
 
-	private Object parseDate(Object defVal) {
+	private Date parseDate(Object defVal) {
 		Date date = Utils.parseDate(defVal,true);
-		return null;
+		//System.out.println("return date "+date);
+		
+		String dateStr = (String)defVal;
+		DateFormat formatter = new SimpleDateFormat("EE MMM dd HH:mm:ss z yyyy",
+                Locale.ENGLISH);
+		Date dat = null;
+		try {
+			 dat = (Date)formatter.parse(dateStr);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//System.out.println(dat);    
+		return date;
 	}
 
 }
