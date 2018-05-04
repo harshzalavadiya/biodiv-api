@@ -44,6 +44,7 @@ public class ObservationControllerHelper {
 			String maxDate,
 			String validate,
 			Map<String, List<String>> traitParams,
+			Map<String, List<String>> customParams,
 			String classificationid,
 			Integer max, Integer offset
 ) {
@@ -233,6 +234,68 @@ public class ObservationControllerHelper {
 
 			}
 		}
+		/**
+		 * Filter to implement custom fields
+		 */
+		
+		if(!customParams.isEmpty()){
+			for(Map.Entry<String, List<String>>entry:customParams.entrySet()){
+				String value=entry.getKey().split("\\.")[1];
+				
+				if(value.equalsIgnoreCase("string")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					Set<String> listOfIds = commonMethod.cSTSOT(Ids);
+					Set<Object> listOfIdsWithObject=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
+					
+					String newKey="custom_fields."+key+".value";
+					boolAndLists.add(new MapAndBoolQuery(newKey,listOfIdsWithObject));
+				}
+				
+				if(value.equalsIgnoreCase("range")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					List<Long> listOfIds = commonMethod.getListOfIds(Ids);
+					Long rMin;
+					Long rMax;
+					if(listOfIds.size()>=2){
+						rMin=listOfIds.get(0);
+						rMax=listOfIds.get(1);
+						rangeAndLists.add(new MapAndRangeQuery("custom_fileds."+key+".value",rMin,rMax));
+					}
+				}
+				if(value.equalsIgnoreCase("para")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					
+					List<Long> listOfIds = commonMethod.getListOfIds(Ids);
+					if(listOfIds.size()==1){
+						Long yesorno=listOfIds.get(0);
+						if (yesorno==0L) {
+							andMapExistQueries.add(new MapExistQuery("custom_fields."+key+".value", false, null));
+						}
+						if (yesorno==1L) {
+							andMapExistQueries.add(new MapExistQuery("custom_fields."+key+".value", true,null));
+						}
+					}
+					
+				}
+				if(value.equalsIgnoreCase("date")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					String [] y = Ids.split(",");
+					String minCustomDate;
+					String maxCustomDate;
+					if(y[0]!=null &&y[1]!=null){
+						minCustomDate=y[0].trim().substring(0, y[0].length()-1);
+						maxCustomDate=y[1].trim().substring(0, y[1].length()-1);
+						rangeAndLists.add(new MapAndRangeQuery("custom_fields."+key+".value",minCustomDate,maxCustomDate));
+					}
+					
+					
+				}
+			}
+		}
 		
 		
 		/**
@@ -350,8 +413,6 @@ public class ObservationControllerHelper {
 						if(listOfIds.size()>=2){
 							rMin=listOfIds.get(0);
 							rMax=listOfIds.get(1);
-							
-
 							rangeAndLists.add(new MapAndRangeQuery("traits."+key,rMin,rMax));
 						}
 						

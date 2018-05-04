@@ -115,9 +115,11 @@ public class ObservationListController {
 								.filter(entry -> entry.getKey().startsWith("trait"))
 								.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 		
+		Map<String, List<String>> customParams=queryParams.entrySet().stream()
+				.filter(entry -> entry.getKey().startsWith("custom"))
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 		
-		
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, traitParams, classificationid, max, offset);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, traitParams, customParams,classificationid, max, offset);
 		
 		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery , max, offset, sortOn.toLowerCase(),
 				geoAggregationField, geoAggegationPrecision, left, right, top, bottom, onlyFilteredAggregation);
@@ -159,8 +161,12 @@ public class ObservationListController {
 	Map<String, List<String>> traitParams=queryParams.entrySet().stream()
 							.filter(entry -> entry.getKey().startsWith("trait"))
 							.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	Map<String, List<String>> customParams=queryParams.entrySet().stream()
+			.filter(entry -> entry.getKey().startsWith("custom"))
+			.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	
 	System.out.println(traitParams);
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn.toLowerCase(), minDate, maxDate, validate, traitParams, classificationid, max, offset);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn.toLowerCase(), minDate, maxDate, validate, traitParams,customParams, classificationid, max, offset);
 
 		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes, getFullURL(request));
 	}
