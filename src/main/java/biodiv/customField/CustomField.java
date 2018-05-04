@@ -313,16 +313,16 @@ public class CustomField implements java.io.Serializable {
 		Date date = Utils.parseDate(defVal,true);
 		//System.out.println("return date "+date);
 		
-		String dateStr = (String)defVal;
-		DateFormat formatter = new SimpleDateFormat("EE MMM dd HH:mm:ss z yyyy",
-                Locale.ENGLISH);
-		Date dat = null;
-		try {
-			 dat = (Date)formatter.parse(dateStr);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		String dateStr = (String)defVal;
+//		DateFormat formatter = new SimpleDateFormat("EE MMM dd HH:mm:ss z yyyy",
+//                Locale.ENGLISH);
+//		Date dat = null;
+//		try {
+//			 dat = (Date)formatter.parse(dateStr);
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		//System.out.println(dat);    
 		return date;
 	}

@@ -1,6 +1,9 @@
 package biodiv.customField;
 
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -8,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -22,6 +26,8 @@ import biodiv.observation.ObservationService;
 import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.userGroup.UserGroup;
+import joptsimple.util.DateConverter;
+import net.minidev.json.JSONObject;
 
 public class CustomFieldService extends AbstractService<CustomField> {
 	
@@ -41,7 +47,7 @@ public class CustomFieldService extends AbstractService<CustomField> {
 		this.customFieldDao = customFieldDao;
 	}
 
-	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId,Set<UserGroup> obvUserGrps,Long loggedInUserId,
+	public List<Object> updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId,Set<UserGroup> obvUserGrps,Long loggedInUserId,
 			Long obvAuthorId,Boolean isAdmin) {
 	
 		try{
@@ -49,8 +55,13 @@ public class CustomFieldService extends AbstractService<CustomField> {
 			Date dateCreated = new Date();
 			Date lastUpdated = dateCreated;
 			CustomField cf = findById(cfId);
+			List<Object> toReturn =  new ArrayList<Object>();
+			String msg = null;
 			if(cf == null){
-				return "cf not found error";
+				msg =  "cf not found error";
+				toReturn.add(msg);
+				toReturn.add(null);
+				return toReturn;
 			}else{
 				
 				if(cf.getAllowedParticipation() || (!cf.getAllowedParticipation() && (loggedInUserId.equals(obvAuthorId) || isAdmin))){
@@ -80,12 +91,25 @@ public class CustomFieldService extends AbstractService<CustomField> {
 							
 							activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
 						}
-						return "success";
+						System.out.println("new value of cf "+newValue);
+						JSONObject cfObject = new JSONObject();
+						cfObject.put("key", cf.getName());
+						cfObject.put("value", convertForElastic(newValue,cf));
+						msg = "success";
+						toReturn.add(msg);
+						toReturn.add(cfObject);
+						return toReturn;
 					}else{
-						return "This observation doesn't have the targeted custom field type";
+						msg = "This observation doesn't have the targeted custom field type";
+						toReturn.add(msg);
+						toReturn.add(null);
+						return toReturn;
 					}	
 				}else{
-					return "You don't have permission to edit this Custom Field";
+					msg = "You don't have permission to edit this Custom Field";
+					toReturn.add(msg);
+					toReturn.add(null);
+					return toReturn;
 				}
 				
 				
@@ -97,6 +121,36 @@ public class CustomFieldService extends AbstractService<CustomField> {
 			
 		}
 			
+	}
+
+	private Object convertForElastic(Object newValue,CustomField cf) {
+		
+		Object value = newValue;
+		
+		if(cf.getDataType().equalsIgnoreCase("DATE")){
+			DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			String input = inputFormat.format(newValue);
+			value = input;
+      		System.out.println("input "+input);
+//			DateFormat outputFormat =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//			
+//			Date date;
+//			try {
+//				date = outputFormat.parse( input);
+//				System.out.println("output "+date);
+//				value = date; 
+//			} catch (ParseException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+		}
+		
+		if(cf.getDataType().equalsIgnoreCase("TEXT") && cf.isAllowedMultiple()){
+			String[] allValues = ((String) newValue).split(",");
+			value = allValues;
+		}
+		
+		return value;
 	}
 
 	private void updateRow(CustomField cf, Map<String, Object> map) {

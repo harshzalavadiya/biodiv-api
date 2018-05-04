@@ -106,7 +106,7 @@ public class ObservationService extends AbstractService<Observation> {
 		try {
 			Observation obv = findById(obvId);
 			Set<UserGroup> obvUserGrps = obv.getUserGroups();
-			msg = customFieldService.updateInlineCf(fieldValue, cfId, obvId, userId, obvUserGrps,loggedInUserId,obv.getAuthor().getId(),
+			List<Object> toReturn = customFieldService.updateInlineCf(fieldValue, cfId, obvId, userId, obvUserGrps,loggedInUserId,obv.getAuthor().getId(),
 					isAdmin);
 			
 			
@@ -115,14 +115,23 @@ public class ObservationService extends AbstractService<Observation> {
 			save(obv);
 			
 			//elastic elastic
-			JSONObject obj = new JSONObject();
-			SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
-			SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
-			String newDate=out.format(obv.getLastRevised());
-			obj.put("lastrevised",newDate);
-			observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
+			if(((String)toReturn.get(0)).equalsIgnoreCase("success")){
+				JSONObject obj = new JSONObject();
+				
+				SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
+				SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
+				String newDate=out.format(obv.getLastRevised());
+				obj.put("lastrevised",newDate);
+				JSONObject cfObj = new JSONObject();
 			
-			//elastic elastic
+				cfObj.put(cfId.toString(), toReturn.get(1));
+				obj.put("custom_fields", cfObj);
+				System.out.println("testin elastic*********************************************************************** "+obj.toString());
+				observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
+				
+				//elastic elastic
+			}
+			msg = (String)toReturn.get(0);
 			return msg;
 		} catch (Exception e) {
 			throw e;
