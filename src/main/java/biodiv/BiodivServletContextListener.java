@@ -123,7 +123,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 
 					dbProps.setProperty(Environment.USE_SECOND_LEVEL_CACHE, "true");
 					dbProps.setProperty(Environment.USE_QUERY_CACHE, "true");
-					dbProps.setProperty(Environment.CACHE_REGION_FACTORY, org.hibernate.cache.redis.hibernate52.SingletonRedisRegionFactory.class.getName());
+					dbProps.setProperty(Environment.CACHE_REGION_FACTORY, BiodivRedisRegionFactory.class.getName());
 					dbProps.setProperty(Environment.CACHE_REGION_PREFIX, "hibernate");
 
 					// Optional setting for second level cache statistics

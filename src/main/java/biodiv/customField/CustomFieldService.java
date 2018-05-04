@@ -1,5 +1,9 @@
 package biodiv.customField;
 
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -7,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -21,6 +26,8 @@ import biodiv.observation.ObservationService;
 import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.userGroup.UserGroup;
+import joptsimple.util.DateConverter;
+import net.minidev.json.JSONObject;
 
 public class CustomFieldService extends AbstractService<CustomField> {
 	
@@ -40,46 +47,72 @@ public class CustomFieldService extends AbstractService<CustomField> {
 		this.customFieldDao = customFieldDao;
 	}
 
-	public String updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId,Set<UserGroup> obvUserGrps) {
+	public List<Object> updateInlineCf(String fieldValue, Long cfId, Long obvId, long userId,Set<UserGroup> obvUserGrps,Long loggedInUserId,
+			Long obvAuthorId,Boolean isAdmin) {
 	
 		try{
 			
 			Date dateCreated = new Date();
 			Date lastUpdated = dateCreated;
 			CustomField cf = findById(cfId);
+			List<Object> toReturn =  new ArrayList<Object>();
+			String msg = null;
 			if(cf == null){
-				return "cf not found error";
+				msg =  "cf not found error";
+				toReturn.add(msg);
+				toReturn.add(null);
+				return toReturn;
 			}else{
-				UserGroup ugHavingGivenCf = cf.getUserGroup();
-				//Observation obv = observationService.findById(obvId);
-				//Set<UserGroup> obvUserGrps = obv.getUserGroups();
 				
-				if(obvUserGrps.contains(ugHavingGivenCf)){
-					User user = userService.findById((Long)userId);
+				if(cf.getAllowedParticipation() || (!cf.getAllowedParticipation() && (loggedInUserId.equals(obvAuthorId) || isAdmin))){
+					UserGroup ugHavingGivenCf = cf.getUserGroup();
+					//Observation obv = observationService.findById(obvId);
+					//Set<UserGroup> obvUserGrps = obv.getUserGroups();
 					
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put("columnName", cf.fetchSqlColumnName(cf.getId(),true));
-					map.put("columnValue", cf.fetchTypecastValue(fieldValue,cf).get("defaultValue"));
-					map.put("obvId", obvId);
-			
-					Object oldValue = fetchValue(cf,obvId);
-					updateRow(cf,map);
-					Object newValue = fetchValue(cf,obvId);
-					
-					//activityFeed code
-					if(oldValue != newValue){
-						String activityDescription = cf.getName()+" : "+ map.get("columnValue");
-						String description = activityDescription;
-						Map<String, Object> afNew = activityFeedService.createMapforAf("Object",obvId,null,
-								"species.participation.Observation","species.participation.Observation",obvId,
-								"Custom field edited","Custom field edited",activityDescription,description,null,null,null,true,null,dateCreated,lastUpdated);
+					if(obvUserGrps.contains(ugHavingGivenCf)){
+						User user = userService.findById((Long)userId);
 						
-						activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
-					}
-					return "success";
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("columnName", cf.fetchSqlColumnName(cf.getId(),true));
+						map.put("columnValue", cf.fetchTypecastValue(fieldValue,cf).get("defaultValue"));
+						map.put("obvId", obvId);
+				
+						Object oldValue = fetchValue(cf,obvId);
+						updateRow(cf,map);
+						Object newValue = fetchValue(cf,obvId);
+						
+						//activityFeed code
+						if(oldValue != newValue){
+							String activityDescription = cf.getName()+" : "+ map.get("columnValue");
+							String description = activityDescription;
+							Map<String, Object> afNew = activityFeedService.createMapforAf("Object",obvId,null,
+									"species.participation.Observation","species.participation.Observation",obvId,
+									"Custom field edited","Custom field edited",activityDescription,description,null,null,null,true,null,dateCreated,lastUpdated);
+							
+							activityFeedService.addActivityFeed(user, afNew, null,(String)afNew.get("rootHolderType"));
+						}
+						System.out.println("new value of cf "+newValue);
+						JSONObject cfObject = new JSONObject();
+						cfObject.put("key", cf.getName());
+						cfObject.put("value", convertForElastic(newValue,cf));
+						msg = "success";
+						toReturn.add(msg);
+						toReturn.add(cfObject);
+						return toReturn;
+					}else{
+						msg = "This observation doesn't have the targeted custom field type";
+						toReturn.add(msg);
+						toReturn.add(null);
+						return toReturn;
+					}	
 				}else{
-					return "This observation doesn't have the targeted custom field type";
-				}	
+					msg = "You don't have permission to edit this Custom Field";
+					toReturn.add(msg);
+					toReturn.add(null);
+					return toReturn;
+				}
+				
+				
 			}
 			
 		}catch(Exception e){
@@ -90,11 +123,41 @@ public class CustomFieldService extends AbstractService<CustomField> {
 			
 	}
 
+	private Object convertForElastic(Object newValue,CustomField cf) {
+		
+		Object value = newValue;
+		
+		if(cf.getDataType().equalsIgnoreCase("DATE")){
+			DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			String input = inputFormat.format(newValue);
+			value = input;
+      		System.out.println("input "+input);
+//			DateFormat outputFormat =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//			
+//			Date date;
+//			try {
+//				date = outputFormat.parse( input);
+//				System.out.println("output "+date);
+//				value = date; 
+//			} catch (ParseException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+		}
+		
+		if(cf.getDataType().equalsIgnoreCase("TEXT") && cf.isAllowedMultiple()){
+			String[] allValues = ((String) newValue).split(",");
+			value = allValues;
+		}
+		
+		return value;
+	}
+
 	private void updateRow(CustomField cf, Map<String, Object> map) {
 		
 		String query;
 		try{
-			if(isRowExist(CustomField.getTableNameForGroup(cf.getUserGroup().getId(),false),(Long) map.get("obvId"))){
+			if(isRowExist(CustomField.getTableNameForGroup(cf.getUserGroup().getId(),true),(Long) map.get("obvId"))){
 				query = "update "+CustomField.getTableNameForGroup(cf.getUserGroup().getId(),true)+" set "+
 						map.get("columnName")+" =:columnValue where observation_id =:obvId";
 				customFieldDao.updateOrInsertRow(query,map,true);
@@ -114,9 +177,9 @@ public class CustomFieldService extends AbstractService<CustomField> {
 	private boolean isRowExist(String tableName, Long obvId) {
 		
 		try{
-			String query = "select count(*) from "+tableName+" where observation.id =:obvId";
-			Long result = customFieldDao.isRowExist(query,obvId);
-			if(result>0){
+			String query = "select count(*) from "+tableName+" where observation_id =:obvId";
+			BigInteger result = customFieldDao.isRowExist(query,obvId);
+			if(result.compareTo(BigInteger.ZERO) == 1){
 				return true;
 			}else{
 				return false;
@@ -134,8 +197,8 @@ public class CustomFieldService extends AbstractService<CustomField> {
 			if(obvId == null){
 				return cf.getDefaultValue();
 			}
-			String query = "select cf1."+cf.fetchSqlColumnName(cf.getId(),false)+ " from "
-					+CustomField.getTableNameForGroup(cf.getUserGroup().getId(),false)+" cf1 where cf1.observation.id =:obvId";
+			String query = "select cf1."+cf.fetchSqlColumnName(cf.getId(),true)+ " from "
+					+CustomField.getTableNameForGroup(cf.getUserGroup().getId(),true)+" cf1 where cf1.observation_id =:obvId";
 			//String query = "from "+CustomField.getTableNameForGroup(cf.getUserGroup().getId());
 			Object result = customFieldDao.fetchValue(query,obvId);
 			return result;
