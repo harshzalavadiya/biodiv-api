@@ -27,6 +27,9 @@ import biodiv.maps.MapSearchQuery;
 
 public class ObservationControllerHelper {
 
+	
+	public static final String custom_fields="custom_fields";
+	
 	public static MapSearchQuery getMapSearchQuery(
 			String sGroup,
 			String taxon,
@@ -249,6 +252,8 @@ public class ObservationControllerHelper {
 					Set<Object> listOfIdsWithObject=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
 					
 					String newKey="custom_fields."+key+".value";
+				
+					
 					boolAndLists.add(new MapAndBoolQuery(newKey,listOfIdsWithObject));
 				}
 				
@@ -261,7 +266,8 @@ public class ObservationControllerHelper {
 					if(listOfIds.size()>=2){
 						rMin=listOfIds.get(0);
 						rMax=listOfIds.get(1);
-						rangeAndLists.add(new MapAndRangeQuery("custom_fileds."+key+".value",rMin,rMax));
+						
+						rangeAndLists.add(new MapAndRangeQuery("custom_fields."+key+".value",rMin,rMax));
 					}
 				}
 				if(value.equalsIgnoreCase("para")){
@@ -374,7 +380,7 @@ public class ObservationControllerHelper {
 							h=listOfIds.get(0);
 							hMax=h+5L;
 							if(h-5L<0){
-								hMin=h-5L+360L;
+								hMin=0L;
 							}
 							else{
 								hMin=h-5L;
@@ -398,6 +404,7 @@ public class ObservationControllerHelper {
 							else{
 								lMin=l-5L;
 							}
+						
 							
 							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".h",hMin,hMax,"traits_json."+key));
 							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".s",sMin,sMax,"traits_json."+key));
