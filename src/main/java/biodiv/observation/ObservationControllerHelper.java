@@ -19,10 +19,13 @@ import javax.ws.rs.QueryParam;
 
 import biodiv.common.CommonMethod;
 import biodiv.maps.MapAndBoolQuery;
+import biodiv.maps.MapAndMatchPhraseQuery;
 import biodiv.maps.MapAndRangeQuery;
 import biodiv.maps.MapExistQuery;
 import biodiv.maps.MapOrBoolQuery;
+import biodiv.maps.MapOrMatchPhraseQuery;
 import biodiv.maps.MapOrRangeQuery;
+import biodiv.maps.MapSearchParams;
 import biodiv.maps.MapSearchQuery;
 
 public class ObservationControllerHelper {
@@ -40,16 +43,13 @@ public class ObservationControllerHelper {
 			String mediaFilter,
 			String months,
 			String isFlagged,
-
-			String sortOn,
-
 			String minDate,
 			String maxDate,
 			String validate,
 			Map<String, List<String>> traitParams,
 			Map<String, List<String>> customParams,
 			String classificationid,
-			Integer max, Integer offset
+			MapSearchParams mapSearchParams
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -59,13 +59,13 @@ public class ObservationControllerHelper {
 		List<MapAndRangeQuery> rangeAndLists = new ArrayList<MapAndRangeQuery>();
 
 		List<MapExistQuery> andMapExistQueries = new ArrayList<MapExistQuery>();
+		List<MapAndMatchPhraseQuery> andMatchPhraseQueries =new ArrayList<MapAndMatchPhraseQuery>();
 
-		if(offset == null) {
-			offset = 0;
-		}
-		if(max == null) {
-			max = 10;
-		}
+		List<MapOrMatchPhraseQuery> orMatchPhraseQueriesnew =new ArrayList<MapOrMatchPhraseQuery>();
+		
+		
+
+	
 		if(classificationid == null) {
 			classificationid = "265799";
 		}
@@ -252,9 +252,9 @@ public class ObservationControllerHelper {
 					Set<Object> listOfIdsWithObject=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
 					
 					String newKey="custom_fields."+key+".value";
-				
-					
-					boolAndLists.add(new MapAndBoolQuery(newKey,listOfIdsWithObject));
+					for (Object data:listOfIdsWithObject){
+						orMatchPhraseQueriesnew.add(new MapOrMatchPhraseQuery(newKey,data));
+					}
 				}
 				
 				if(value.equalsIgnoreCase("range")){
@@ -443,7 +443,7 @@ public class ObservationControllerHelper {
 		 */
 
 		MapSearchQuery mapSearchQuery = new MapSearchQuery(boolAndLists, boolOrLists, rangeAndLists, rangeOrLists,
-				andMapExistQueries);
+				andMapExistQueries,andMatchPhraseQueries,orMatchPhraseQueriesnew,mapSearchParams);
 
 		return mapSearchQuery;
 	}

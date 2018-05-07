@@ -22,7 +22,7 @@ public interface MapService {
 
 	public MapHttpResponse termSearch(String index, String type, String key, String value, Integer from, Integer limit);
 	
-	public MapBiodivResponse search(String index, String type, MapSearchQuery query ,Integer from, Integer limit,String sortOn, String geoAggregationField, Integer geoAggegationPrecision,Double left, Double right, Double top, Double bottom, Boolean onlyFilteredAggregation);
+	public MapBiodivResponse search(String index, String type, MapSearchQuery query , String geoAggregationField, Integer geoAggegationPrecision,Boolean onlyFilteredAggregation);
 
 	public List<String> searchBool(String index, String type, List<MapAndBoolQuery> queries, Integer from, Integer limit);
 
