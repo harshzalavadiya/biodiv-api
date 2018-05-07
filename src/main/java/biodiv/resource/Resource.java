@@ -26,7 +26,7 @@ import biodiv.user.User;
  */
 @Entity
 @Table(name = "resource", schema = "public")
-//@Cache(region="common", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(region="common", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Resource implements java.io.Serializable {
 
 	private long id;
