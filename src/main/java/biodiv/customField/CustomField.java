@@ -139,7 +139,7 @@ public class CustomField implements java.io.Serializable {
 		this.version = version;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_group_id", nullable = false)
 	public UserGroup getUserGroup() {
 		return this.userGroup;

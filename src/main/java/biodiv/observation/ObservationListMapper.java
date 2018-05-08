@@ -91,6 +91,7 @@ public class ObservationListMapper {
 	private Map<String,Object> traits;
 	private Map<String,Object> traits_json;
 	private Map<String,Object> traits_season;
+	private Map<String,Object> custom_fields;
 	private List<String> imageresource;
 	private List<String> urlresource;
 	private List<String> featuredgroups;
@@ -807,6 +808,16 @@ public class ObservationListMapper {
 
 	public void setTraits_season(Map<String, Object> traits_season) {
 		this.traits_season = traits_season;
+	}
+
+
+	public Map<String, Object> getCustom_fields() {
+		return custom_fields;
+	}
+
+
+	public void setCustom_fields(Map<String, Object> custom_fields) {
+		this.custom_fields = custom_fields;
 	}
 
 
