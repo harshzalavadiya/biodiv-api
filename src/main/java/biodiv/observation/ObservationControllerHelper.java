@@ -256,6 +256,17 @@ public class ObservationControllerHelper {
 						orMatchPhraseQueriesnew.add(new MapOrMatchPhraseQuery(newKey,data));
 					}
 				}
+				if(value.equalsIgnoreCase("text")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					Set<String> listOfIds = commonMethod.cSTSOT(Ids);
+					Set<Object> listOfIdsWithObject=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
+					
+					String newKey="custom_fields."+key+".value";
+					for (Object data:listOfIdsWithObject){
+						boolAndLists.add(new MapAndBoolQuery(newKey,listOfIdsWithObject));
+					}
+				}
 				
 				if(value.equalsIgnoreCase("range")){
 					String key=entry.getKey().split("\\.")[0].split("_")[1];
