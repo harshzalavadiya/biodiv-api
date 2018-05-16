@@ -25,9 +25,12 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
 import biodiv.maps.MapBiodivResponse;
+import biodiv.maps.MapBounds;
 import biodiv.maps.MapHttpResponse;
 import biodiv.maps.MapResponse;
+import biodiv.maps.MapSearchParams;
 import biodiv.maps.MapSearchQuery;
+import biodiv.maps.MapSortType;
 import biodiv.scheduler.SchedulerService;
 import biodiv.scheduler.SchedulerStatus;
 import biodiv.user.User;
@@ -92,18 +95,18 @@ public class ObservationListController {
 			@DefaultValue("") @QueryParam("mediaFilter") String mediaFilter,
 			@DefaultValue("") @QueryParam("months") String months,
 			@DefaultValue("") @QueryParam("isFlagged") String isFlagged,
-
 			@DefaultValue("lastrevised") @QueryParam("sort") String sortOn,
-
-			@QueryParam("minDate") String minDate, @QueryParam("maxDate") String maxDate,
+			@QueryParam("minDate") String minDate, 
+			@QueryParam("maxDate") String maxDate,
 			@QueryParam("validate") String validate,
 			@DefaultValue("265799") @QueryParam("classifdication") String classificationid,
-			@DefaultValue("10") @QueryParam("max") Integer max, @DefaultValue("0") @QueryParam("offset") Integer offset,
-
+			@DefaultValue("10") @QueryParam("max")Integer max,
+			@DefaultValue("0") @QueryParam("offset") Integer offset,
 			@DefaultValue("") @QueryParam("geoAggregationField") String geoAggregationField,
 			@DefaultValue("1") @QueryParam("geoAggegationPrecision") Integer geoAggegationPrecision,
-
-			@QueryParam("left") Double left, @QueryParam("right") Double right, @QueryParam("top") Double top,
+			@QueryParam("left") Double left,
+			@QueryParam("right") Double right,
+			@QueryParam("top") Double top,
 			@QueryParam("bottom") Double bottom,
 			@QueryParam("onlyFilteredAggregation") Boolean onlyFilteredAggregation,
 			@Context UriInfo uriInfo, String allParams
@@ -115,12 +118,23 @@ public class ObservationListController {
 								.filter(entry -> entry.getKey().startsWith("trait"))
 								.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 		
+		Map<String, List<String>> customParams=queryParams.entrySet().stream()
+				.filter(entry -> entry.getKey().startsWith("custom"))
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+		
+
+		MapSortType sortType = null;
+		MapBounds mapBounds=null;
+		if(top!=null){
+			 mapBounds=new MapBounds(top, left, bottom, right);
+		}
+		
+		MapSearchParams mapSearchParams=new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,mapBounds);
 		
 		
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn, minDate, maxDate, validate, traitParams, classificationid, max, offset);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams, customParams,classificationid,mapSearchParams);
 		
-		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery , max, offset, sortOn.toLowerCase(),
-				geoAggregationField, geoAggegationPrecision, left, right, top, bottom, onlyFilteredAggregation);
+		MapBiodivResponse mapResponse = observationListService.search(index,type, mapSearchQuery,geoAggregationField, geoAggegationPrecision, onlyFilteredAggregation);
 
 		return mapResponse;
 	}
@@ -131,7 +145,8 @@ public class ObservationListController {
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	@Transactional
 	public SchedulerStatus download(@PathParam("index") String index, @PathParam("type") String type,
-			@DefaultValue("") @QueryParam("sGroup") String sGroup, @DefaultValue("") @QueryParam("taxon") String taxon,
+			@DefaultValue("") @QueryParam("sGroup") String sGroup,
+			@DefaultValue("") @QueryParam("taxon") String taxon,
 			@DefaultValue("") @QueryParam("user") String user,
 			@DefaultValue("") @QueryParam("userGroupList") String userGroupList,
 			@DefaultValue("") @QueryParam("webaddress") String webaddress,
@@ -145,8 +160,13 @@ public class ObservationListController {
 			@DefaultValue("1") @QueryParam("minDay") Integer minDay,
 			@DefaultValue("31") @QueryParam("maxDay") Integer maxDay,
 			@DefaultValue("265799") @QueryParam("classifdication") String classificationid,
-			@DefaultValue("10") @QueryParam("max") Integer max, @DefaultValue("0") @QueryParam("offset") Integer offset,
+			@DefaultValue("10") @QueryParam("max") Integer max,
+			@DefaultValue("0") @QueryParam("offset") Integer offset,
 			@QueryParam("notes") String notes,
+			@QueryParam("top") Double top,
+			@QueryParam("bottom") Double bottom,
+			@QueryParam("left") Double left,
+			@QueryParam("right") Double right,
 			@Context HttpServletRequest request,
 			@Context UriInfo uriInfo, String allParams
 
@@ -159,8 +179,18 @@ public class ObservationListController {
 	Map<String, List<String>> traitParams=queryParams.entrySet().stream()
 							.filter(entry -> entry.getKey().startsWith("trait"))
 							.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
-	System.out.println(traitParams);
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, sortOn.toLowerCase(), minDate, maxDate, validate, traitParams, classificationid, max, offset);
+	Map<String, List<String>> customParams=queryParams.entrySet().stream()
+			.filter(entry -> entry.getKey().startsWith("custom"))
+			.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	
+		MapSortType sortType = null;
+		MapBounds mapBounds=null;
+		if(top!=null){
+			 mapBounds=new MapBounds(top, left, bottom, right);
+		}
+		
+		MapSearchParams mapSearchParams=new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,mapBounds);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams,customParams, classificationid,mapSearchParams);
 
 		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes, getFullURL(request));
 	}

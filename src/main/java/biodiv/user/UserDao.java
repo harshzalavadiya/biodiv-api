@@ -14,6 +14,7 @@ import org.hibernate.SessionFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import javax.persistence.NoResultException;
 
 
 public class UserDao extends AbstractDao<User, Long> implements DaoInterface<User, Long>{
@@ -33,14 +34,18 @@ public class UserDao extends AbstractDao<User, Long> implements DaoInterface<Use
 		Query q = sessionFactory.getCurrentSession().createQuery("from User where email=:email");
 		q.setParameter("email", email);
 		User user = null;
+
         try {
             user = (User) q.getSingleResult();
-        } catch(NoResultException e) {
-            e.printStackTrace(); 
+        } catch(NoResultException e ) {
+            e.printStackTrace();
             throw new NotFoundException(e);
+
         }
-        return user;
-	}
+
+        if(user != null) return  user;
+        else return null;
+    }
 	
 	public User findByEmailAndPassword(String email, String password)  throws NotFoundException {
 		Query q = sessionFactory.getCurrentSession().createQuery("from User where email=:email and password=:password");

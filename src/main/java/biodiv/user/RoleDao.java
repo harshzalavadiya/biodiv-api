@@ -8,6 +8,8 @@ import org.hibernate.SessionFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import biodiv.userGroup.UserGroup;
+import javax.persistence.NoResultException;
 
 public class RoleDao extends AbstractDao<Role,Long> implements DaoInterface<Role,Long>{
 
@@ -27,11 +29,12 @@ public class RoleDao extends AbstractDao<Role,Long> implements DaoInterface<Role
 		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		query.setParameter("authority", authority);
 		Role role = null;
-        try {
-            role = (Role) query.getSingleResult();
-        } catch(NoResultException e) {
-            e.printStackTrace();
-        }
+
+		try {
+			role = (Role) query.getSingleResult();
+		} catch(NoResultException e) {
+        		e.printStackTrace();
+		}
 		return role;
 	}
 

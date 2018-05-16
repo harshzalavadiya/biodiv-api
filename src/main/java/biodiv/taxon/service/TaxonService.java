@@ -22,7 +22,10 @@ import biodiv.taxon.search.SearchTaxon;
 public class TaxonService extends AbstractService<Taxon> {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
-
+	
+	@Inject
+	SearchTaxon searchTaxon;
+	
 	private static final String ID = "id";
 	private static final String taxonid = "taxonid";
 	private static final String text = "text";
@@ -203,7 +206,6 @@ public class TaxonService extends AbstractService<Taxon> {
 	 */
 	public Object search(String term) {
 
-		SearchTaxon searchTaxon = new SearchTaxon();
 		Object name = searchTaxon.search(term);
 		return name;
 

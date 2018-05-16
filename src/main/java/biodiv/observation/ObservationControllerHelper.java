@@ -19,14 +19,20 @@ import javax.ws.rs.QueryParam;
 
 import biodiv.common.CommonMethod;
 import biodiv.maps.MapAndBoolQuery;
+import biodiv.maps.MapAndMatchPhraseQuery;
 import biodiv.maps.MapAndRangeQuery;
 import biodiv.maps.MapExistQuery;
 import biodiv.maps.MapOrBoolQuery;
+import biodiv.maps.MapOrMatchPhraseQuery;
 import biodiv.maps.MapOrRangeQuery;
+import biodiv.maps.MapSearchParams;
 import biodiv.maps.MapSearchQuery;
 
 public class ObservationControllerHelper {
 
+	
+	public static final String custom_fields="custom_fields";
+	
 	public static MapSearchQuery getMapSearchQuery(
 			String sGroup,
 			String taxon,
@@ -37,15 +43,13 @@ public class ObservationControllerHelper {
 			String mediaFilter,
 			String months,
 			String isFlagged,
-
-			String sortOn,
-
 			String minDate,
 			String maxDate,
 			String validate,
 			Map<String, List<String>> traitParams,
+			Map<String, List<String>> customParams,
 			String classificationid,
-			Integer max, Integer offset
+			MapSearchParams mapSearchParams
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -55,13 +59,13 @@ public class ObservationControllerHelper {
 		List<MapAndRangeQuery> rangeAndLists = new ArrayList<MapAndRangeQuery>();
 
 		List<MapExistQuery> andMapExistQueries = new ArrayList<MapExistQuery>();
+		List<MapAndMatchPhraseQuery> andMatchPhraseQueries =new ArrayList<MapAndMatchPhraseQuery>();
 
-		if(offset == null) {
-			offset = 0;
-		}
-		if(max == null) {
-			max = 10;
-		}
+		List<MapOrMatchPhraseQuery> orMatchPhraseQueriesnew =new ArrayList<MapOrMatchPhraseQuery>();
+		
+		
+
+	
 		if(classificationid == null) {
 			classificationid = "265799";
 		}
@@ -233,6 +237,82 @@ public class ObservationControllerHelper {
 
 			}
 		}
+		/**
+		 * Filter to implement custom fields
+		 */
+		
+		if(!customParams.isEmpty()){
+			for(Map.Entry<String, List<String>>entry:customParams.entrySet()){
+				String value=entry.getKey().split("\\.")[1];
+				
+				if(value.equalsIgnoreCase("string")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					Set<String> listOfIds = commonMethod.cSTSOT(Ids);
+					Set<Object> listOfIdsWithObject=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
+					
+					String newKey="custom_fields."+key+".value";
+					for (Object data:listOfIdsWithObject){
+						orMatchPhraseQueriesnew.add(new MapOrMatchPhraseQuery(newKey,data));
+					}
+				}
+				if(value.equalsIgnoreCase("text")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					Set<String> listOfIds = commonMethod.cSTSOT(Ids);
+					Set<Object> listOfIdsWithObject=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
+					
+					String newKey="custom_fields."+key+".value";
+					for (Object data:listOfIdsWithObject){
+						boolAndLists.add(new MapAndBoolQuery(newKey,listOfIdsWithObject));
+					}
+				}
+				
+				if(value.equalsIgnoreCase("range")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					List<Long> listOfIds = commonMethod.getListOfIds(Ids);
+					Long rMin;
+					Long rMax;
+					if(listOfIds.size()>=2){
+						rMin=listOfIds.get(0);
+						rMax=listOfIds.get(1);
+						
+						rangeAndLists.add(new MapAndRangeQuery("custom_fields."+key+".value",rMin,rMax));
+					}
+				}
+				if(value.equalsIgnoreCase("para")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					
+					List<Long> listOfIds = commonMethod.getListOfIds(Ids);
+					if(listOfIds.size()==1){
+						Long yesorno=listOfIds.get(0);
+						if (yesorno==0L) {
+							andMapExistQueries.add(new MapExistQuery("custom_fields."+key+".value", false, null));
+						}
+						if (yesorno==1L) {
+							andMapExistQueries.add(new MapExistQuery("custom_fields."+key+".value", true,null));
+						}
+					}
+					
+				}
+				if(value.equalsIgnoreCase("date")){
+					String key=entry.getKey().split("\\.")[0].split("_")[1];
+					String Ids=entry.getValue().get(0);
+					String [] y = Ids.split(",");
+					String minCustomDate;
+					String maxCustomDate;
+					if(y[0]!=null &&y[1]!=null){
+						minCustomDate=y[0].trim().substring(0, y[0].length()-1);
+						maxCustomDate=y[1].trim().substring(0, y[1].length()-1);
+						rangeAndLists.add(new MapAndRangeQuery("custom_fields."+key+".value",minCustomDate,maxCustomDate));
+					}
+					
+					
+				}
+			}
+		}
 		
 		
 		/**
@@ -311,7 +391,7 @@ public class ObservationControllerHelper {
 							h=listOfIds.get(0);
 							hMax=h+5L;
 							if(h-5L<0){
-								hMin=h-5L+360L;
+								hMin=0L;
 							}
 							else{
 								hMin=h-5L;
@@ -335,6 +415,7 @@ public class ObservationControllerHelper {
 							else{
 								lMin=l-5L;
 							}
+						
 							
 							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".h",hMin,hMax,"traits_json."+key));
 							rangeAndLists.add(new MapAndRangeQuery("traits_json."+key+".s",sMin,sMax,"traits_json."+key));
@@ -350,8 +431,6 @@ public class ObservationControllerHelper {
 						if(listOfIds.size()>=2){
 							rMin=listOfIds.get(0);
 							rMax=listOfIds.get(1);
-							
-
 							rangeAndLists.add(new MapAndRangeQuery("traits."+key,rMin,rMax));
 						}
 						
@@ -375,7 +454,7 @@ public class ObservationControllerHelper {
 		 */
 
 		MapSearchQuery mapSearchQuery = new MapSearchQuery(boolAndLists, boolOrLists, rangeAndLists, rangeOrLists,
-				andMapExistQueries);
+				andMapExistQueries,andMatchPhraseQueries,orMatchPhraseQueriesnew,mapSearchParams);
 
 		return mapSearchQuery;
 	}

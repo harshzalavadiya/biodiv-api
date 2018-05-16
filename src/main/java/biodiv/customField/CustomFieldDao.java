@@ -1,5 +1,6 @@
 package biodiv.customField;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,11 +39,11 @@ public class CustomFieldDao extends AbstractDao<CustomField, Long> implements Da
 		else return result.get(0);
 	}
 
-	public Long isRowExist(String genericQuery, Long obvId) {
+	public BigInteger isRowExist(String genericQuery, Long obvId) {
 		String hql = genericQuery;
 		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		query.setParameter("obvId", obvId);
-		Long result = (Long) query.getSingleResult();
+		BigInteger result = (BigInteger) query.getSingleResult();
 		return result;
 
 	}
