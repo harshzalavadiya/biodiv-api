@@ -79,10 +79,9 @@ public class DownloadJob implements Job {
 
 		if(httpResponse != null) {
 			try {
-				filePath = (String) httpResponse.getDocument();
+				String jsonFilePath = (String) httpResponse.getDocument();
 				status = SchedulerStatus.Success;
-				adminService.downloadFile(filePath);
-				System.out.println(filePath);
+				 filePath=adminService.downloadFile(jsonFilePath);
 				
 				addDownloadMail(user);
 				

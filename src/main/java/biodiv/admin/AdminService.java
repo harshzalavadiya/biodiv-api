@@ -35,7 +35,7 @@ public class AdminService {
 	private CustomFieldService customFieldService;
 	
 	@Transactional
-	public void downloadFile(String fileName) throws IOException {
+	public String downloadFile(String fileName) throws IOException {
 		// TODO Auto-generated method stub
 		String traitsQuery="select '{' || string_agg(format('\"%s\":{%s:%s}', to_json(tvs.id),to_json(tvs.name), to_json(tvs.values)), ',') || '}' as alltraits  from ( select  t.id as id,t.name as name,array_remove(array_agg(DISTINCT tv.value), NULL) as values from trait t left join trait_value  tv on tv.trait_instance_id = t.id group by t.id,t.name) as tvs";
 		String customQuery="select id,name,options from custom_field where options is not null";
@@ -308,9 +308,11 @@ public class AdminService {
 	        // Or we could just do this: 
 	         ex1.printStackTrace();
 	    } 
+	    return outfileName;
 		
 		
 	}
+	
 
 	
 	
