@@ -17,6 +17,7 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Transactional;
 import biodiv.observation.ObservationListService;
 import biodiv.user.UserController;
 
@@ -27,19 +28,21 @@ public class AdminController {
 	
 	@Inject
 	ObservationListService observationListService;
+	@Inject
+	AdminService adminService;
 	
 	/**
 	 * 
 	 * @param index
 	 * The this going to allow admin to upload setting and mapping 
 	 */
-	@POST
-	@Path("/{index}/uploadmapping")
+	@GET
+	@Path("download")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
-	public void uploadMapping(@PathParam("index") String index,String settingsAndMappings){
+	@Transactional
+	public void downloadFile(){
 		
-		observationListService.uploadSettingsAndMappings(index,settingsAndMappings);
+		adminService.downloadFile();
       
 	}
 

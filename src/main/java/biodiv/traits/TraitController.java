@@ -149,7 +149,7 @@ public class TraitController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public Trait list(@PathParam("id") Long id) {
-		Trait result = traitService.list(id);
+		Trait result = traitService.getSingleTrait(id);
 		return result;
 	}
 

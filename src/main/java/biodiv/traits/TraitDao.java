@@ -1,5 +1,6 @@
 package biodiv.traits;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Query;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
@@ -268,6 +271,38 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 		List<TraitValue> results=q.getResultList();
 		return results;
 	
+	}
+
+	public Map<String, Map<String, Object>> getAllTraitsWithValues(String traitsQuery) {
+		// TODO Auto-generated method stub
+		String hql = traitsQuery;
+		Query query = getCurrentSession().createSQLQuery(hql);
+		
+		List result = query.getResultList();
+		if(result.size() == 0 || result.get(0) == null){
+			return null;
+		}
+		else{
+		
+			ObjectMapper objectMapper=new ObjectMapper();
+			try {
+				Map<String,Map<String,Object>> results=objectMapper.readValue(result.get(0).toString(), Map.class);
+				return results;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+
+	public Trait getSingleTraitWithId(Long id) {
+		// TODO Auto-generated method stub
+		Query q;
+		q=getCurrentSession().createQuery("from Trait where id=:id");
+		q.setParameter("id", id);
+		Trait results=(Trait) q.getSingleResult();
+		return results;
 	}
 
 

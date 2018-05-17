@@ -366,4 +366,16 @@ public class TraitService extends AbstractService<Trait> {
 		return results;
 	}
 
+	public Map<String,Map<String,Object>> getAllTraitsWithValues(String traitsQuery) {
+		// TODO Auto-generated method stub
+		Map<String,Map<String,Object>> traiitValues=traitDao.getAllTraitsWithValues(traitsQuery);
+		return traiitValues;
+	}
+
+	public Trait getSingleTrait(Long id) {
+		// TODO Auto-generated method stub
+		Trait result=traitDao.getSingleTraitWithId(id);
+		return result;
+	}
+
 }
