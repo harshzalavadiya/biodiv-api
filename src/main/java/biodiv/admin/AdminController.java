@@ -1,5 +1,6 @@
 package biodiv.admin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
@@ -40,9 +42,14 @@ public class AdminController {
 	@Path("download")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public void downloadFile(){
+	public void downloadFile(@QueryParam("fileName") String fileName){
 		
-		adminService.downloadFile();
+		try {
+			adminService.downloadFile(fileName);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
       
 	}
 

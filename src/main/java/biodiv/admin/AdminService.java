@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +18,14 @@ import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.customField.CustomField;
 import biodiv.customField.CustomFieldService;
+import biodiv.scheduler.CSVUtils;
 import biodiv.traits.Trait;
 import biodiv.traits.TraitService;
+
 
 public class AdminService {
 	
@@ -29,8 +33,9 @@ public class AdminService {
 	private TraitService traitService;
 	@Inject 
 	private CustomFieldService customFieldService;
-
-	public void downloadFile() {
+	
+	@Transactional
+	public void downloadFile(String fileName) throws IOException {
 		// TODO Auto-generated method stub
 		String traitsQuery="select '{' || string_agg(format('\"%s\":{%s:%s}', to_json(tvs.id),to_json(tvs.name), to_json(tvs.values)), ',') || '}' as alltraits  from ( select  t.id as id,t.name as name,array_remove(array_agg(DISTINCT tv.value), NULL) as values from trait t left join trait_value  tv on tv.trait_instance_id = t.id group by t.id,t.name) as tvs";
 		String customQuery="select id,name,options from custom_field where options is not null";
@@ -38,12 +43,17 @@ public class AdminService {
 		ArrayList<JSONObject> json=new ArrayList<JSONObject>();
 	    JSONObject obj;
 	    
-	    String fileName = "/home/sunil/Desktop/csv/download_search.json";
+	    
 	    
 	    String line = null;
 	    Map<String,Map<String,Object>> traitValues= traitService.getAllTraitsWithValues(traitsQuery);
 	    List<CustomField> allCustomFields=customFieldService.fetchAllCustomFields();
 
+	    List<Object> header = new ArrayList<>();
+	    String[] arr=fileName.split("\\.");
+	    String outfileName=arr[0]+".csv";
+	    System.out.println(outfileName);
+	    FileWriter fileWriter = new FileWriter(outfileName);
 	    try {
 	        // FileReader reads text files in the default encoding.
 	        FileReader fileReader = new FileReader(fileName);
@@ -271,10 +281,21 @@ public class AdminService {
 			  * here convert this Map<String, Object> to csv
 			  */
 			 
-			   System.out.println(originalData);
+//			   System.out.println(originalData);
+			   
+			   if(header.isEmpty()) {
+				   header.addAll(originalData.keySet());
+			   fileWriter.write(CSVUtils.getCsvString(header));
+			   }
+			   List<Object> values = new ArrayList<>();
+			   for(String key : originalData.keySet())
+				   values.add(originalData.get(key));
+			   String csvString = CSVUtils.getCsvString(values);
+			   fileWriter.write(csvString);
 			 
 			
 	        }
+	        fileWriter.close();
 	        //end of object 2
 	        // Always close files.
 	        bufferedReader.close();         

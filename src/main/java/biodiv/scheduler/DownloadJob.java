@@ -2,6 +2,7 @@ package biodiv.scheduler;
 
 import java.util.List;
 
+
 import javax.inject.Inject;
 
 import org.apache.http.ParseException;
@@ -12,6 +13,8 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Transactional;
+import biodiv.admin.AdminService;
 import biodiv.common.NakshaUrlService;
 import biodiv.mail.DownloadMailingService;
 import biodiv.maps.MapHttpResponse;
@@ -20,7 +23,6 @@ import biodiv.maps.MapSearchQuery;
 import biodiv.scheduler.DownloadLog.DownloadType;
 import biodiv.scheduler.DownloadLog.SourceType;
 import biodiv.user.User;
-
 public class DownloadJob implements Job {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -40,6 +42,8 @@ public class DownloadJob implements Job {
 
 	@Inject
 	NakshaUrlService nakshaUrlService;
+	@Inject
+	AdminService adminService;
 
 	@Inject
 	DownloadMailingService downloadMailingService;
@@ -77,6 +81,8 @@ public class DownloadJob implements Job {
 			try {
 				filePath = (String) httpResponse.getDocument();
 				status = SchedulerStatus.Success;
+				adminService.downloadFile(filePath);
+				System.out.println(filePath);
 				
 				addDownloadMail(user);
 				
