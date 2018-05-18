@@ -1,9 +1,12 @@
-package biodiv.scheduler;
+package biodiv.common;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class CSVParser {
+public class CSVUtils {
 
     private static final char DEFAULT_SEPARATOR = ',';
     private static final char DEFAULT_QUOTE = '"';
@@ -99,5 +102,45 @@ public class CSVParser {
 
         return result;
     }
+
+	private static String followCVSformat(Object value) {
+		if (value == null)
+			return "";
+
+		String result = value.toString();
+		result = result.replace("\n", "").replace("\r", "");
+		// https://tools.ietf.org/html/rfc4180
+		if (result.contains("\"")) {
+			result = result.replace("\"", "\"\"");
+		}
+		if (result.contains(",")) {
+			result = "\"" + result + "\"";
+		}
+		return result;
+	}
+
+	public static String getCsvString(Collection<Object> values) {
+		boolean first = true;
+
+		StringBuilder sb = new StringBuilder();
+		for (Object value : values) {
+			if (!first)
+				sb.append(DEFAULT_SEPARATOR);
+
+			sb.append(followCVSformat(value));
+			first = false;
+		}
+
+		sb.append("\n");
+		return sb.toString();
+	}
+
+	public static byte[] getCsvBytes(Collection<Object> values) {
+		return getCsvString(values).getBytes();
+	}
+
+	public static void writeCsvLine(Writer w, Collection<Object> values) throws IOException {
+		w.write(getCsvString(values));
+	}
 
 }
