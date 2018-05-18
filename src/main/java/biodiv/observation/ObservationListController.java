@@ -95,6 +95,7 @@ public class ObservationListController {
 			@DefaultValue("") @QueryParam("mediaFilter") String mediaFilter,
 			@DefaultValue("") @QueryParam("months") String months,
 			@DefaultValue("") @QueryParam("isFlagged") String isFlagged,
+			
 			@DefaultValue("lastrevised") @QueryParam("sort") String sortOn,
 			@QueryParam("minDate") String minDate, 
 			@QueryParam("maxDate") String maxDate,
@@ -108,7 +109,9 @@ public class ObservationListController {
 			@QueryParam("right") Double right,
 			@QueryParam("top") Double top,
 			@QueryParam("bottom") Double bottom,
+			@QueryParam("recom") String maxvotedrecoid,
 			@QueryParam("onlyFilteredAggregation") Boolean onlyFilteredAggregation,
+			
 			@Context UriInfo uriInfo, String allParams
 
 	) {
@@ -132,7 +135,7 @@ public class ObservationListController {
 		MapSearchParams mapSearchParams=new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,mapBounds);
 		
 		
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams, customParams,classificationid,mapSearchParams);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams, customParams,classificationid,mapSearchParams,maxvotedrecoid);
 		
 		MapBiodivResponse mapResponse = observationListService.search(index,type, mapSearchQuery,geoAggregationField, geoAggegationPrecision, onlyFilteredAggregation);
 
@@ -167,6 +170,7 @@ public class ObservationListController {
 			@QueryParam("bottom") Double bottom,
 			@QueryParam("left") Double left,
 			@QueryParam("right") Double right,
+			@QueryParam("recom") String maxvotedrecoid,
 			@Context HttpServletRequest request,
 			@Context UriInfo uriInfo, String allParams
 
@@ -190,7 +194,7 @@ public class ObservationListController {
 		}
 		
 		MapSearchParams mapSearchParams=new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,mapBounds);
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams,customParams, classificationid,mapSearchParams);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams,customParams, classificationid,mapSearchParams,maxvotedrecoid);
 
 		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes, getFullURL(request));
 	}

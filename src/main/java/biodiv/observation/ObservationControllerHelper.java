@@ -49,7 +49,8 @@ public class ObservationControllerHelper {
 			Map<String, List<String>> traitParams,
 			Map<String, List<String>> customParams,
 			String classificationid,
-			MapSearchParams mapSearchParams
+			MapSearchParams mapSearchParams,
+			String maxvotedrecoid
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -104,7 +105,11 @@ public class ObservationControllerHelper {
 			boolAndLists.add(new MapAndBoolQuery("frommonth", month));
 
 		}
-
+		Set<Object> maxvotedrecoids=commonMethod.cSTSOT(maxvotedrecoid);
+		if(!maxvotedrecoids.isEmpty()){
+			boolAndLists.add(new MapAndBoolQuery("maxvotedrecoid", maxvotedrecoids));
+		}
+		
 		Set<String> speciesNames = commonMethod.cSTSOT(speciesName);
 		if (!speciesNames.isEmpty()) {
 			if (speciesNames.size() < 2) {
