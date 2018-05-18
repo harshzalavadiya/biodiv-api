@@ -19,18 +19,19 @@ public class ZipService {
 	private ZipService() {
 	}
 
-	public static void zipFile(String filePath) {
+	public static String zipFile(String filePath) {
 
 		File file = new File(filePath);
-		String zipFileName = file.getName().concat(".zip");
-
+		
+		String zipFileName = file.getAbsolutePath().concat(".zip");
+		
 		try (
 			FileOutputStream fos = new FileOutputStream(zipFileName);
 			ZipOutputStream zos = new ZipOutputStream(fos)) {
 
-			zos.putNextEntry(new ZipEntry(file.getName()));
+			zos.putNextEntry(new ZipEntry(file.getName()+".csv"));
 
-			byte[] bytes = Files.readAllBytes(Paths.get(filePath));
+			byte[] bytes = Files.readAllBytes(Paths.get(filePath+".csv"));
 			zos.write(bytes, 0, bytes.length);
 
 		} catch (FileNotFoundException ex) {
@@ -38,6 +39,7 @@ public class ZipService {
 		} catch (IOException ex) {
 			log.error("I/O error: {}", ex);
 		}
+		return zipFileName;
 	}
 
 	public static void zipFiles(String... filePaths) {

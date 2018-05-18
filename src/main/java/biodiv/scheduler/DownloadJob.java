@@ -81,7 +81,7 @@ public class DownloadJob implements Job {
 			try {
 				String jsonFilePath = (String) httpResponse.getDocument();
 				status = SchedulerStatus.Success;
-				 filePath=adminService.downloadFile(jsonFilePath);
+				filePath=adminService.downloadFile(jsonFilePath);
 				
 				addDownloadMail(user);
 				
