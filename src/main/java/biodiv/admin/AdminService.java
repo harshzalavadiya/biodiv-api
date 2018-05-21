@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
-import biodiv.admin.ElasticSearchDownloadServiceImpl.DownloadFileType;
 import biodiv.common.ZipService;
 import biodiv.customField.CustomField;
 import biodiv.customField.CustomFieldService;
