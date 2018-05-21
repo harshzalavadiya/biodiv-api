@@ -37,26 +37,25 @@ public class TraitController {
 
 	@Inject
 	private TraitService traitService;
-	
+
 	@Inject
 	private TaxonService taxonService;
 
 	/**
 	 * 
 	 * @param sGroup
-	 * dummy
+	 *            dummy
 	 * @param classificationId
-	 * dummy
+	 *            dummy
 	 * @param isNotObservationTrait
-	 * dummy
+	 *            dummy
 	 * @param showInObservation
-	 * dummy
+	 *            dummy
 	 * @param objectType
-	 * dummy
+	 *            dummy
 	 * @param objectId
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 
 	@GET
@@ -79,11 +78,10 @@ public class TraitController {
 	/**
 	 * 
 	 * @param id
-	 * dummy
+	 *            dummy
 	 * @param objectType
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	@GET
 	@Path("/observation/{id}")
@@ -99,17 +97,16 @@ public class TraitController {
 	/**
 	 * 
 	 * @param trait
-	 * dummy
+	 *            dummy
 	 * @param traitId
-	 * dummy
+	 *            dummy
 	 * @param objectId
-	 * dummy
+	 *            dummy
 	 * @param objectType
-	 * dummy
+	 *            dummy
 	 * @param profile
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	@POST
 	@Path("/fact/update")
@@ -139,9 +136,8 @@ public class TraitController {
 	/**
 	 * 
 	 * @param id
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 
 	@GET
@@ -156,9 +152,8 @@ public class TraitController {
 	/**
 	 * 
 	 * @param id
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	@GET
 	@Path("fact/{id}")
@@ -169,21 +164,22 @@ public class TraitController {
 		return result;
 
 	}
-	
+
 	@GET
 	@Path("observation/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public List<Trait> listObservationTrait(){
-		List<Trait> results=traitService.listObservationTrait();
+	public List<Trait> listObservationTrait() {
+		List<Trait> results = traitService.listObservationTrait();
 		return results;
 	}
+
 	@GET
 	@Path("/traitvalue/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public List<TraitValue> getTraitValue(@PathParam("id") Long id){
-		List<TraitValue> results=traitService.getTraitValue(id);
+	public List<TraitValue> getTraitValue(@PathParam("id") Long id) {
+		List<TraitValue> results = traitService.getTraitValue(id);
 		return results;
 	}
 

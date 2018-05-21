@@ -156,20 +156,22 @@ public class ObservationControllerHelper {
 		try {
 
 			if (minDate != null) {
-				minDates = java.net.URLDecoder.decode(minDate, "UTF-8");
 
-				minDateValue = out.format(in.parse(minDates));
+				minDateValue = minDate;
 			}
 			if (maxDate != null) {
-				maxDates = java.net.URLDecoder.decode(maxDate, "UTF-8");
-				maxDateValue = out.format(in.parse(maxDates));
+				maxDateValue = maxDate;
 			}
 
-		} catch (UnsupportedEncodingException | ParseException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		System.out.println("11111111111111111111111111111111111111111111111111111111");
+		System.out.println(minDateValue);
+		System.out.println(maxDateValue);
+		System.out.println("11111111111111111111111111111111111111111111111111111111");
+		
 		if (minDateValue != null && maxDateValue != null) {
 
 			rangeAndLists.add(new MapAndRangeQuery("fromdate", minDateValue, maxDateValue));

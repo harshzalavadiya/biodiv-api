@@ -27,15 +27,13 @@ public class TraitValue extends CommonMethod implements java.io.Serializable {
 	private String source;
 	private String value;
 	private boolean isDeleted;
-	//private Set facts = new HashSet(0);
+	// private Set facts = new HashSet(0);
 
 	public TraitValue() {
 	}
 
-
-
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", unique = true, nullable = false)
 	public long getId() {
 		return this.id;
@@ -91,7 +89,6 @@ public class TraitValue extends CommonMethod implements java.io.Serializable {
 		this.value = value;
 	}
 
-	
 	@Column(name = "trait_instance_id", nullable = false)
 	public long getTraitId() {
 		return traitId;
@@ -100,6 +97,7 @@ public class TraitValue extends CommonMethod implements java.io.Serializable {
 	public void setTraitId(long traitId) {
 		this.traitId = traitId;
 	}
+
 	@Column(name = "is_deleted", nullable = false)
 	public boolean isDeleted() {
 		return isDeleted;
@@ -108,16 +106,14 @@ public class TraitValue extends CommonMethod implements java.io.Serializable {
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
-	
-	
 
-//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "traitValue")
-//	public Set getFacts() {
-//		return this.facts;
-//	}
-//
-//	public void setFacts(Set facts) {
-//		this.facts = facts;
-//	}
+	// @OneToMany(fetch = FetchType.LAZY, mappedBy = "traitValue")
+	// public Set getFacts() {
+	// return this.facts;
+	// }
+	//
+	// public void setFacts(Set facts) {
+	// this.facts = facts;
+	// }
 
 }
