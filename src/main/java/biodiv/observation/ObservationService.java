@@ -125,7 +125,7 @@ public class ObservationService extends AbstractService<Observation> {
 				JSONObject cfObj = new JSONObject();
 			
 				cfObj.put(cfId.toString(), toReturn.get(1));
-				//obj.put("custom_fields", cfObj);
+				obj.put("custom_fields", cfObj);
 				System.out.println("testin elastic*********************************************************************** "+obj.toString());
 				observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
 				
