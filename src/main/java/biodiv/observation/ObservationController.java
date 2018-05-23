@@ -112,10 +112,10 @@ public class ObservationController {
 	@Path("/updategroup")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
-	public Object updateGroup(@QueryParam("objectid") Long objectid, @QueryParam("newGroupId") Long newGroupId,
-			@QueryParam("oldGroupId") Long oldGroupId, @Context HttpServletRequest request) {
+	public String updateGroup(@QueryParam("objectIds") String objectIds, @QueryParam("newGroupId") Long newGroupId,
+			 @Context HttpServletRequest request) {
 		CommonProfile profile = AuthUtils.currentUser(request);
-		Object observation = observationService.updateGroup(objectid, newGroupId, oldGroupId,
+		String observation = observationService.updateGroup(objectIds, newGroupId,
 				Long.parseLong(profile.getId()));
 		return observation;
 	}
