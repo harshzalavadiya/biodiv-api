@@ -50,7 +50,9 @@ public class ObservationControllerHelper {
 			Map<String, List<String>> customParams,
 			String classificationid,
 			MapSearchParams mapSearchParams,
-			String maxvotedrecoid
+			String maxvotedrecoid,
+			String createdOnMaxDate,
+			String createdOnMinDate
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -167,10 +169,8 @@ public class ObservationControllerHelper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("11111111111111111111111111111111111111111111111111111111");
-		System.out.println(minDateValue);
-		System.out.println(maxDateValue);
-		System.out.println("11111111111111111111111111111111111111111111111111111111");
+		
+		
 		
 		if (minDateValue != null && maxDateValue != null) {
 
@@ -182,7 +182,43 @@ public class ObservationControllerHelper {
 		if (minDateValue == null && maxDateValue != null) {
 			rangeAndLists.add(new MapAndRangeQuery("fromdate", out.format(date), maxDateValue));
 		}
+		
+		/**
+		 * CretedOnfilter
+		 */
+		
+		String createdOnMaxDateValue = null;
+		String createdOnMinDateValue = null;
+		String creattedOnMinDates = null;
+		String creattedOnMaxDates = null;
+		try {
 
+			if (createdOnMinDate != null) {
+
+				createdOnMinDateValue = createdOnMinDate;
+			}
+			if (createdOnMaxDate != null) {
+				createdOnMaxDateValue = createdOnMaxDate;
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		if (createdOnMinDateValue != null && createdOnMaxDateValue != null) {
+
+			rangeAndLists.add(new MapAndRangeQuery("createdon", createdOnMinDateValue, createdOnMaxDateValue));
+		}
+		if (createdOnMinDateValue != null && createdOnMaxDateValue == null) {
+			rangeAndLists.add(new MapAndRangeQuery("createdon", createdOnMinDateValue, out.format(date)));
+		}
+		if (createdOnMinDateValue == null && createdOnMaxDateValue != null) {
+			rangeAndLists.add(new MapAndRangeQuery("createdon", out.format(date), createdOnMaxDateValue));
+		}
+		
+		
 		/**
 		 * General conditions
 		 * 
