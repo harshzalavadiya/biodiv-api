@@ -175,6 +175,7 @@ public class ObservationListController {
 			@DefaultValue("10") @QueryParam("max") Integer max,
 			@DefaultValue("0") @QueryParam("offset") Integer offset,
 			@QueryParam("notes") String notes,
+			@QueryParam("geoField") String geoField,
 			@QueryParam("top") Double top,
 			@QueryParam("bottom") Double bottom,
 			@QueryParam("left") Double left,
@@ -205,7 +206,8 @@ public class ObservationListController {
 		MapSearchParams mapSearchParams=new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,mapBounds);
 		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams,customParams, classificationid,mapSearchParams,maxvotedrecoid,createdOnMaxDate,createdOnMinDate,status,taxonId);
 
-		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, notes, getFullURL(request));
+
+		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, geoField, notes, getFullURL(request));
 	}
 
 	private static String getFullURL(HttpServletRequest request) {
