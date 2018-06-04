@@ -54,7 +54,8 @@ public class ObservationControllerHelper {
 			String createdOnMaxDate,
 			String createdOnMinDate,
 			String status,
-			String taxonId
+			String taxonId,
+			String recoName
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -163,6 +164,12 @@ public class ObservationControllerHelper {
 					}
 				}
 
+		}
+		/**
+		 * Query for recoName
+		 */
+		if(recoName!=null){
+			andMatchPhraseQueries.add(new MapAndMatchPhraseQuery("name",recoName.toLowerCase()));
 		}
 		
 
