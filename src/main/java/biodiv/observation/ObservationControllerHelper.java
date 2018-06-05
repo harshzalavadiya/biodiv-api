@@ -52,7 +52,10 @@ public class ObservationControllerHelper {
 			MapSearchParams mapSearchParams,
 			String maxvotedrecoid,
 			String createdOnMaxDate,
-			String createdOnMinDate
+			String createdOnMinDate,
+			String status,
+			String taxonId,
+			String recoName
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -80,9 +83,9 @@ public class ObservationControllerHelper {
 			boolAndLists.add(new MapAndBoolQuery("speciesgroupid", groupId));
 		}
 		
-		Set<Object> taxonId = commonMethod.cSTSOT(taxon);
-		if (!taxonId.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("path", taxonId));
+		Set<Object> taxonIds = commonMethod.cSTSOT(taxon);
+		if (!taxonIds.isEmpty()) {
+			boolAndLists.add(new MapAndBoolQuery("path", taxonIds));
 		}
 
 		Set<Object> authorId = commonMethod.cSTSOT(user);
@@ -142,6 +145,33 @@ public class ObservationControllerHelper {
 			}
 
 		}
+		
+		Set<Object> taxonStatus=commonMethod.cSTSOT(status);
+		if(!taxonStatus.isEmpty()){
+			boolAndLists.add(new MapAndBoolQuery("status", taxonStatus));
+		}
+		
+		Set<Object> taxonIdsArray=commonMethod.cSTSOT(taxonId);
+		if(!taxonIdsArray.isEmpty()){
+				if (taxonIdsArray.size() < 2) {
+					String first = (String) taxonIdsArray.toArray()[0];
+					
+					if (first.equalsIgnoreCase("0")) {
+						andMapExistQueries.add(new MapExistQuery("status", false, null));
+					}
+					if (first.equalsIgnoreCase("1")) {
+						andMapExistQueries.add(new MapExistQuery("status", true,null));
+					}
+				}
+
+		}
+		/**
+		 * Query for recoName
+		 */
+		if(recoName!=null){
+			andMatchPhraseQueries.add(new MapAndMatchPhraseQuery("name",recoName.toLowerCase()));
+		}
+		
 
 		/**
 		 * Date Filter

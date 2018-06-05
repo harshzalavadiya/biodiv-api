@@ -101,7 +101,10 @@ public class ObservationListController {
 			@QueryParam("maxDate") String maxDate,
 			@QueryParam("createdOnMaxDate") String createdOnMaxDate,
 			@QueryParam("createdOnMinDate") String createdOnMinDate,
+			@QueryParam("status") String status,
+			@QueryParam("taxonId") String taxonId,
 			@QueryParam("validate") String validate,
+			@QueryParam("recoName") String recoName,
 			@DefaultValue("265799") @QueryParam("classifdication") String classificationid,
 			@DefaultValue("10") @QueryParam("max")Integer max,
 			@DefaultValue("0") @QueryParam("offset") Integer offset,
@@ -137,7 +140,7 @@ public class ObservationListController {
 		MapSearchParams mapSearchParams=new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,mapBounds);
 		
 		
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams, customParams,classificationid,mapSearchParams,maxvotedrecoid,createdOnMaxDate,createdOnMinDate);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams, customParams,classificationid,mapSearchParams,maxvotedrecoid,createdOnMaxDate,createdOnMinDate,status,taxonId,recoName);
 		
 		MapBiodivResponse mapResponse = observationListService.search(index,type, mapSearchQuery,geoAggregationField, geoAggegationPrecision, onlyFilteredAggregation);
 
@@ -164,7 +167,10 @@ public class ObservationListController {
 			@QueryParam("maxDate") String maxDate,
 			@QueryParam("createdOnMaxDate") String createdOnMaxDate,
 			@QueryParam("createdOnMinDate") String createdOnMinDate,
+			@QueryParam("status") String status,
+			@QueryParam("taxonId") String taxonId,
 			@QueryParam("validate") String validate,
+			@QueryParam("recoName") String recoName,
 			@DefaultValue("1") @QueryParam("minDay") Integer minDay,
 			@DefaultValue("31") @QueryParam("maxDay") Integer maxDay,
 			@DefaultValue("265799") @QueryParam("classifdication") String classificationid,
@@ -199,8 +205,9 @@ public class ObservationListController {
 			 mapBounds=new MapBounds(top, left, bottom, right);
 		}
 		
-		MapSearchParams mapSearchParams=new MapSearchParams(offset, max, sortOn.toLowerCase(), MapSortType.DESC,mapBounds);
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams,customParams, classificationid,mapSearchParams,maxvotedrecoid,createdOnMaxDate,createdOnMinDate);
+		MapSearchParams mapSearchParams=new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,mapBounds);
+		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user, userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate, traitParams,customParams, classificationid,mapSearchParams,maxvotedrecoid,createdOnMaxDate,createdOnMinDate,status,taxonId,recoName);
+
 
 		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, geoField, notes, getFullURL(request));
 	}
