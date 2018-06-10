@@ -60,7 +60,7 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		return observationResources;
 	}
 
-	public Object updateGroup(Observation observation, SpeciesGroup speciesGroup) {
+	public void updateGroup(Observation observation, SpeciesGroup speciesGroup) {
 		if (speciesGroup != null && observation != null) {
 			observation.setGroup(speciesGroup);
 			Date date=new Date();
@@ -79,9 +79,9 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 			obj.put("speciesgroupname", observation.getGroup().getName());
 			observationListService.update("observation", "observation", observation.getId().toString(), obj.toString());
 		}
-		Object data = observationListService.fetch("observation", "observation", observation.getId().toString());
+		//Object data = observationListService.fetch("observation", "observation", observation.getId().toString());
 
-		return data;
+		return ;
 
 	}
 

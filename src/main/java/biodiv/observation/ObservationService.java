@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 
+import org.hibernate.SessionFactory;
 import org.jvnet.hk2.annotations.Service;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
@@ -74,6 +75,9 @@ public class ObservationService extends AbstractService<Observation> {
 	
 	@Inject
 	private SpeciesPermissionService speciesPermissionService;
+	
+	@Inject
+	private SessionFactory sessionFactory;
 
 	@Inject
 	ObservationService(ObservationDao observationDao) {
@@ -125,8 +129,8 @@ public class ObservationService extends AbstractService<Observation> {
 				JSONObject cfObj = new JSONObject();
 			
 				cfObj.put(cfId.toString(), toReturn.get(1));
-				//obj.put("custom_fields", cfObj);
-				System.out.println("testin elastic*********************************************************************** "+obj.toString());
+				obj.put("custom_fields", cfObj);
+				//System.out.println("testin elastic*********************************************************************** "+obj.toString());
 				observationListService.update("observation", "observation", obv.getId().toString(), obj.toString());
 				
 				//elastic elastic
@@ -164,39 +168,61 @@ public class ObservationService extends AbstractService<Observation> {
 	}
 
 	@Transactional
-	public Object updateGroup(Long objectId, Long newGroupId, Long oldGroupId, Long userId) {
-		if (objectId == null || newGroupId == null || userId == null) {
+	public String updateGroup(String objectIds, Long newGroupId,  Long userId) {
+		if (objectIds == null || newGroupId == null || userId == null) {
 			throw new NotFoundException("Null is not a valid Id");
 		}
-
+		
+		long[] objects = Arrays.asList(objectIds.split(",")).stream().map(String::trim).mapToLong(Long::parseLong)
+				.toArray();
 		SpeciesGroup speciesGroup = speciesGroupService.findById(newGroupId);
-		Observation observation = show(objectId);
+		User user = userService.findById(userId);
+		long i = 1;
+		for(long objectId : objects){
+			
+			//SpeciesGroup speciesGroup = speciesGroupService.findById(newGroupId);
+			Observation observation = show(objectId);
 
-		if (speciesGroup == null || observation == null) {
-			throw new NotFoundException("SpeciesGroup or observation is not found");
+			if (speciesGroup == null || observation == null) {
+				throw new NotFoundException("SpeciesGroup or observation is not found");
+			}
+
+			//User user = userService.findById(userId);
+
+			String newSpeciesGroupName = speciesGroup.getName();
+	//		SpeciesGroup oldSpeciesGroup = speciesGroupService.findById(oldGroupId);
+			SpeciesGroup oldSpeciesGroup = observation.getGroup();
+			String oldSpeciesGroupName = oldSpeciesGroup.getName();
+
+			if(speciesGroup.getId() != oldSpeciesGroup.getId()){
+				
+				
+				observationDao.updateGroup(observation, speciesGroup);
+				
+
+				// activityFeed
+				Date dateCreated = new java.util.Date();
+				Date lastUpdated = dateCreated;
+				String activityDescription = oldSpeciesGroupName + " to " + newSpeciesGroupName;
+				System.out.println(activityDescription);
+				Map<String, Object> afNew = activityFeedService.createMapforAf("Object", objectId, observation,
+						"species.participation.Observation", "species.participation.Observation", objectId,
+						"Observation species group updated", "Species group updated", activityDescription, activityDescription,
+						null, null, null, true, null, dateCreated, lastUpdated);
+				activityFeedService.addActivityFeed(user, afNew, observation, (String) afNew.get("rootHolderType"));
+				// activityFeed
+				
+				if (i % 50 == 0) {
+					sessionFactory.getCurrentSession().flush();
+					sessionFactory.getCurrentSession().clear();
+				}
+
+				i++;
+			}
+			
 		}
 
-		User user = userService.findById(userId);
-
-		String newSpeciesGroupName = speciesGroup.getName();
-		SpeciesGroup oldSpeciesGroup = speciesGroupService.findById(oldGroupId);
-		String oldSpeciesGroupName = oldSpeciesGroup.getName();
-
-		Object obj = observationDao.updateGroup(observation, speciesGroup);
-		
-
-		// activityFeed
-		Date dateCreated = new java.util.Date();
-		Date lastUpdated = dateCreated;
-		String activityDescription = oldSpeciesGroupName + " to " + newSpeciesGroupName;
-		System.out.println(activityDescription);
-		Map<String, Object> afNew = activityFeedService.createMapforAf("Object", objectId, observation,
-				"species.participation.Observation", "species.participation.Observation", objectId,
-				"Observation species group updated", "Species group updated", activityDescription, activityDescription,
-				null, null, null, true, null, dateCreated, lastUpdated);
-		activityFeedService.addActivityFeed(user, afNew, observation, (String) afNew.get("rootHolderType"));
-		// activityFeed
-		return obj;
+		return "success";
 	}
 
 	@Transactional

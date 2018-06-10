@@ -12,6 +12,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.admin.AdminService;
 import biodiv.common.NakshaUrlService;
 import biodiv.mail.DownloadMailingService;
 import biodiv.maps.MapHttpResponse;
@@ -20,7 +21,6 @@ import biodiv.maps.MapSearchQuery;
 import biodiv.scheduler.DownloadLog.DownloadType;
 import biodiv.scheduler.DownloadLog.SourceType;
 import biodiv.user.User;
-
 public class DownloadJob implements Job {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -31,6 +31,7 @@ public class DownloadJob implements Job {
 	public static final String USER_KEY = "user";
 	public static final String SEARCH_KEY = "search";
 	public static final String NOTES_KEY = "notes";
+	public static final String GEO_FIELD_KEY = "geoField";
 
 	@Inject
 	MapIntegrationService mapIntegrationService;
@@ -40,6 +41,8 @@ public class DownloadJob implements Job {
 
 	@Inject
 	NakshaUrlService nakshaUrlService;
+	@Inject
+	AdminService adminService;
 
 	@Inject
 	DownloadMailingService downloadMailingService;
@@ -56,6 +59,7 @@ public class DownloadJob implements Job {
 		String index = data.getString(INDEX_KEY);
 		String indexType = data.getString(TYPE_KEY);
 		MapSearchQuery mapSearchQuery = (MapSearchQuery) data.get(DATA_KEY);
+		String geoField = data.getString(GEO_FIELD_KEY);
 		
 		User user = (User) data.get(USER_KEY);
 		String filterUrl = data.getString(SEARCH_KEY);
@@ -67,7 +71,7 @@ public class DownloadJob implements Job {
 		DownloadLog downloadLog = new DownloadLog(user, filterUrl, notes, status, type, sourceType, 0);
 		downloadLogService.save(downloadLog);
 
-		String url = nakshaUrlService.getDownloadUrl(index, indexType);
+		String url = nakshaUrlService.getDownloadUrl(index, indexType, geoField);
 		MapHttpResponse httpResponse = mapIntegrationService.postRequest(url, mapSearchQuery);
 		
 		String filePath = null;
@@ -75,20 +79,20 @@ public class DownloadJob implements Job {
 
 		if(httpResponse != null) {
 			try {
-				filePath = (String) httpResponse.getDocument();
+				String jsonFilePath = (String) httpResponse.getDocument();
 				status = SchedulerStatus.Success;
+				filePath=adminService.downloadFile(jsonFilePath);
 				
 				addDownloadMail(user);
 				
 			} catch (ParseException e) {
-				e.printStackTrace();
-				log.error("Error while reading the csv file path response from naksha");
+				log.error("Error while reading the csv file path response from naksha", e);
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Error in download job", e);
 			}
 		}
 		
-		log.info("Download file generated with status {} at {}", status.name(), filePath);
+		log.info("Download file generated with status {} at {}", status, filePath);
 		downloadLog.setFilePath(filePath);
 		downloadLog.setStatus(status);
 		downloadLogService.update(downloadLog);
@@ -108,11 +112,11 @@ public class DownloadJob implements Job {
 			}
 		
 			if(!downloadMailingService.isAnyThreadActive()){
-				log.info("no thread is active currently");
 				Thread th = new Thread(downloadMailingService);
 				th.start();
 			}
 		}catch(Exception e){
+			log.error("Error while mailing download status", e);
 			throw e;
 		}
 		

@@ -36,7 +36,7 @@ public class TraitService extends AbstractService<Trait> {
 
 	@Inject
 	private LicenseService licenceService;
-	
+
 	@Inject
 	private ActivityFeedService activityFeedService;
 
@@ -50,19 +50,18 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param objectId
-	 * dummy
+	 *            dummy
 	 * @param objectType
-	 * dummy
+	 *            dummy
 	 * @param sGroup
-	 * dummy
+	 *            dummy
 	 * @param classificationId
-	 * dummy
+	 *            dummy
 	 * @param isNotObservationTrait
-	 * dummy
+	 *            dummy
 	 * @param showInObservation
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	public List<TraitFactUi> list(Long objectId, String objectType, Long sGroup, Long classificationId,
 			Boolean isNotObservationTrait, Boolean showInObservation) {
@@ -99,11 +98,10 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param id
-	 * dummy
+	 *            dummy
 	 * @param objectType
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 
 	public List<Fact> slist(Long id, String objectType) {
@@ -115,19 +113,19 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param traitValues
-	 * dummy
+	 *            dummy
 	 * @param traitId
-	 * dummy
+	 *            dummy
 	 * @param objectId
-	 * dummy
+	 *            dummy
 	 * @param objectType
-	 * dummy
+	 *            dummy
 	 * @param profile
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
-	public Serializable updateFact(Set<Long> traitValues, Long traitId, Long objectId, String objectType,CommonProfile profile) {
+	public Serializable updateFact(Set<Long> traitValues, Long traitId, Long objectId, String objectType,
+			CommonProfile profile) {
 		Serializable result = null;
 		if (traitValues == null || traitId == null || objectId == null || objectType == null) {
 			return null;
@@ -145,7 +143,7 @@ public class TraitService extends AbstractService<Trait> {
 			listFact = traitDao.getFact(objectId, objectType, traitId);
 
 			Fact fact1 = new Fact();
-			
+
 			if (listFact.size() == 0) {
 				Fact newupdated = new Fact();
 				newupdated.setFromDate(new Date());
@@ -173,14 +171,14 @@ public class TraitService extends AbstractService<Trait> {
 				Optional<Long> firstString = traitValues.stream().findFirst();
 				if (firstString.isPresent()) {
 					Long value = firstString.get();
-					
-					//TraitValue traitValue=(TraitValue) new TraitValue().get(value);
-					TraitValue traitValue=traitDao.getTraitValue(traitId,value);
-					
+
+					// TraitValue traitValue=(TraitValue) new
+					// TraitValue().get(value);
+					TraitValue traitValue = traitDao.getTraitValue(traitId, value);
+
 					if (traitValue != null) {
 						newupdated.setTraitValue(traitValue);
-					}
-					else{
+					} else {
 						return null;
 					}
 
@@ -188,33 +186,33 @@ public class TraitService extends AbstractService<Trait> {
 				/**
 				 * Getting user corresponding to given id
 				 */
-				User user=new User();
-				User s =  (User) user.get(Long.parseLong(profile.getId()));
+				User user = new User();
+				User s = (User) user.get(Long.parseLong(profile.getId()));
 				newupdated.setUser(s);
 				newupdated.setVersion(0L);
 				/**
 				 * Updating fact Table
 				 */
 				newupdated.save();
-				
-				
-				//activityFeed
+
+				// activityFeed
 				Long factId = newupdated.getId();
 				Date dateCreated = new java.util.Date();
 				Date lastUpdated = dateCreated;
-				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
-				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
-						"species.participation.Observation","species.trait.Fact",factId,"Added a fact",
-						"Added a fact",activityDescription,activityDescription,null,null,null,true,null,dateCreated,lastUpdated);
-				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
-				//activityFeed
+				String activityDescription = trait.getName() + ":" + newupdated.getTraitValue().getValue();
+				Map<String, Object> afNew = activityFeedService.createMapforAf("Object", objectId, null,
+						"species.participation.Observation", "species.trait.Fact", factId, "Added a fact",
+						"Added a fact", activityDescription, activityDescription, null, null, null, true, null,
+						dateCreated, lastUpdated);
+				activityFeedService.addActivityFeed(s, afNew, null, (String) afNew.get("rootHolderType"));
+				// activityFeed
 
 			} else {
-					
+
 				int Deleteresult = traitDao.deleteFact(objectId, objectType, traitId);
 				Fact newupdated = new Fact();
-				User user=new User();
-				User s =  (User) user.get(Long.parseLong(profile.getId()));
+				User user = new User();
+				User s = (User) user.get(Long.parseLong(profile.getId()));
 				for (Fact fact : listFact) {
 
 					newupdated.setFromDate(new Date());
@@ -233,33 +231,33 @@ public class TraitService extends AbstractService<Trait> {
 					Optional<Long> firstString = traitValues.stream().findFirst();
 					if (firstString.isPresent()) {
 						Long value = firstString.get();
-						
-						TraitValue traitValue=traitDao.getTraitValue(traitId,value);
-						
+
+						TraitValue traitValue = traitDao.getTraitValue(traitId, value);
+
 						if (traitValue != null) {
 							newupdated.setTraitValue(traitValue);
-						}
-						else{
+						} else {
 							return null;
 						}
 					}
-					
+
 					newupdated.setUser(s);
 					newupdated.setVersion(fact.getVersion() + 1L);
 
 				}
 				newupdated.save();
-				
-				//activityFeed
+
+				// activityFeed
 				Long factId = newupdated.getId();
 				Date dateCreated = new java.util.Date();
 				Date lastUpdated = dateCreated;
-				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
-				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
-						"species.participation.Observation","species.trait.Fact",factId,"Updated fact",
-						"Updated fact",activityDescription,activityDescription,null,null,null,true,null,dateCreated,lastUpdated);
-				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
-				//activityFeed
+				String activityDescription = trait.getName() + ":" + newupdated.getTraitValue().getValue();
+				Map<String, Object> afNew = activityFeedService.createMapforAf("Object", objectId, null,
+						"species.participation.Observation", "species.trait.Fact", factId, "Updated fact",
+						"Updated fact", activityDescription, activityDescription, null, null, null, true, null,
+						dateCreated, lastUpdated);
+				activityFeedService.addActivityFeed(s, afNew, null, (String) afNew.get("rootHolderType"));
+				// activityFeed
 			}
 
 		} else if (trait.getTraitTypes().equalsIgnoreCase(multiple_category)) {
@@ -271,9 +269,9 @@ public class TraitService extends AbstractService<Trait> {
 				throw new NotFoundException("No license find with name : ");
 			}
 
-			User user=new User();
-			User s =  (User) user.get(Long.parseLong(profile.getId()));
-			String activityType = Deleteresult == 0?"Added a fact":"Updated fact";
+			User user = new User();
+			User s = (User) user.get(Long.parseLong(profile.getId()));
+			String activityType = Deleteresult == 0 ? "Added a fact" : "Updated fact";
 			for (Long traitValue : traitValues) {
 				Fact newupdated = new Fact();
 				newupdated.setFromDate(new Date());
@@ -286,44 +284,42 @@ public class TraitService extends AbstractService<Trait> {
 				newupdated.setToDate(new Date());
 				newupdated.setToValue(null);
 				newupdated.setTrait(trait);
-				
-				//TraitValue traitValue1=(TraitValue) new TraitValue().get(traitValue);
-						
-				//TraitValue traitValue1 = traitDao.getTraitValue(traitValue);
-				
-				TraitValue traitValue1=traitDao.getTraitValue(traitId,traitValue);
+
+				// TraitValue traitValue1=(TraitValue) new
+				// TraitValue().get(traitValue);
+
+				// TraitValue traitValue1 = traitDao.getTraitValue(traitValue);
+
+				TraitValue traitValue1 = traitDao.getTraitValue(traitId, traitValue);
 				if (traitValue1 != null) {
 					newupdated.setTraitValue(traitValue1);
-				}
-				else{
+				} else {
 					return null;
 				}
-				
+
 				newupdated.setUser(s);
 				newupdated.setVersion(0L);
 
 				newupdated.save();
-				
-				//activityFeed
+
+				// activityFeed
 				Long factId = newupdated.getId();
 				Date dateCreated = new java.util.Date();
 				Date lastUpdated = dateCreated;
-				String activityDescription = trait.getName()+ ":"+newupdated.getTraitValue().getValue();
-				Map<String, Object> afNew = activityFeedService.createMapforAf("Object",objectId,null,
-						"species.participation.Observation","species.trait.Fact",factId,activityType,
-						activityType,activityDescription,activityDescription,null,null,null,true,null,dateCreated,lastUpdated);
-				activityFeedService.addActivityFeed(s,afNew,null,(String)afNew.get("rootHolderType"));
-				//activityFeed
+				String activityDescription = trait.getName() + ":" + newupdated.getTraitValue().getValue();
+				Map<String, Object> afNew = activityFeedService.createMapforAf("Object", objectId, null,
+						"species.participation.Observation", "species.trait.Fact", factId, activityType, activityType,
+						activityDescription, activityDescription, null, null, null, true, null, dateCreated,
+						lastUpdated);
+				activityFeedService.addActivityFeed(s, afNew, null, (String) afNew.get("rootHolderType"));
+				// activityFeed
 			}
 
-		}
-		else if(trait.getTraitTypes().equalsIgnoreCase(range_category)){
-			
-		}
-		else{
+		} else if (trait.getTraitTypes().equalsIgnoreCase(range_category)) {
+
+		} else {
 			throw new NotFoundException("Trait not found");
 		}
-		
 
 		return result;
 	}
@@ -331,12 +327,11 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param id
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	public Trait list(Long id) {
-		Trait result=(Trait) new Trait().get(id);
+		Trait result = (Trait) new Trait().get(id);
 		return result;
 
 	}
@@ -344,26 +339,37 @@ public class TraitService extends AbstractService<Trait> {
 	/**
 	 * 
 	 * @param id
-	 * dummy
-	 * @return
-	 * dummy
+	 *            dummy
+	 * @return dummy
 	 */
 	public Fact listFact(Long id) {
 
-		Fact result=(Fact) new Fact().get(id);
+		Fact result = (Fact) new Fact().get(id);
 		return result;
 	}
 
 	public List<Trait> listObservationTrait() {
 		// TODO Auto-generated method stub
-		List<Trait> results=traitDao.listObservationTrait();
+		List<Trait> results = traitDao.listObservationTrait();
 		return results;
 	}
 
 	public List<TraitValue> getTraitValue(Long id) {
 		// TODO Auto-generated method stub
-		List<TraitValue> results=traitDao.getTraitValueWithTraitId(id);
+		List<TraitValue> results = traitDao.getTraitValueWithTraitId(id);
 		return results;
+	}
+
+	public Map<String, Map<String, Object>> getAllTraitsWithValues(String traitsQuery) {
+		// TODO Auto-generated method stub
+		Map<String, Map<String, Object>> traiitValues = traitDao.getAllTraitsWithValues(traitsQuery);
+		return traiitValues;
+	}
+
+	public Trait getSingleTrait(Long id) {
+		// TODO Auto-generated method stub
+		Trait result = traitDao.getSingleTraitWithId(id);
+		return result;
 	}
 
 }

@@ -49,7 +49,13 @@ public class ObservationControllerHelper {
 			Map<String, List<String>> traitParams,
 			Map<String, List<String>> customParams,
 			String classificationid,
-			MapSearchParams mapSearchParams
+			MapSearchParams mapSearchParams,
+			String maxvotedrecoid,
+			String createdOnMaxDate,
+			String createdOnMinDate,
+			String status,
+			String taxonId,
+			String recoName
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -77,9 +83,9 @@ public class ObservationControllerHelper {
 			boolAndLists.add(new MapAndBoolQuery("speciesgroupid", groupId));
 		}
 		
-		Set<Object> taxonId = commonMethod.cSTSOT(taxon);
-		if (!taxonId.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("path", taxonId));
+		Set<Object> taxonIds = commonMethod.cSTSOT(taxon);
+		if (!taxonIds.isEmpty()) {
+			boolAndLists.add(new MapAndBoolQuery("path", taxonIds));
 		}
 
 		Set<Object> authorId = commonMethod.cSTSOT(user);
@@ -104,7 +110,11 @@ public class ObservationControllerHelper {
 			boolAndLists.add(new MapAndBoolQuery("frommonth", month));
 
 		}
-
+		Set<Object> maxvotedrecoids=commonMethod.cSTSOT(maxvotedrecoid);
+		if(!maxvotedrecoids.isEmpty()){
+			boolAndLists.add(new MapAndBoolQuery("maxvotedrecoid", maxvotedrecoids));
+		}
+		
 		Set<String> speciesNames = commonMethod.cSTSOT(speciesName);
 		if (!speciesNames.isEmpty()) {
 			if (speciesNames.size() < 2) {
@@ -135,6 +145,33 @@ public class ObservationControllerHelper {
 			}
 
 		}
+		
+		Set<Object> taxonStatus=commonMethod.cSTSOT(status);
+		if(!taxonStatus.isEmpty()){
+			boolAndLists.add(new MapAndBoolQuery("status", taxonStatus));
+		}
+		
+		Set<Object> taxonIdsArray=commonMethod.cSTSOT(taxonId);
+		if(!taxonIdsArray.isEmpty()){
+				if (taxonIdsArray.size() < 2) {
+					String first = (String) taxonIdsArray.toArray()[0];
+					
+					if (first.equalsIgnoreCase("0")) {
+						andMapExistQueries.add(new MapExistQuery("status", false, null));
+					}
+					if (first.equalsIgnoreCase("1")) {
+						andMapExistQueries.add(new MapExistQuery("status", true,null));
+					}
+				}
+
+		}
+		/**
+		 * Query for recoName
+		 */
+		if(recoName!=null){
+			andMatchPhraseQueries.add(new MapAndMatchPhraseQuery("name",recoName.toLowerCase()));
+		}
+		
 
 		/**
 		 * Date Filter
@@ -151,20 +188,20 @@ public class ObservationControllerHelper {
 		try {
 
 			if (minDate != null) {
-				minDates = java.net.URLDecoder.decode(minDate, "UTF-8");
 
-				minDateValue = out.format(in.parse(minDates));
+				minDateValue = minDate;
 			}
 			if (maxDate != null) {
-				maxDates = java.net.URLDecoder.decode(maxDate, "UTF-8");
-				maxDateValue = out.format(in.parse(maxDates));
+				maxDateValue = maxDate;
 			}
 
-		} catch (UnsupportedEncodingException | ParseException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		
+		
 		if (minDateValue != null && maxDateValue != null) {
 
 			rangeAndLists.add(new MapAndRangeQuery("fromdate", minDateValue, maxDateValue));
@@ -175,7 +212,43 @@ public class ObservationControllerHelper {
 		if (minDateValue == null && maxDateValue != null) {
 			rangeAndLists.add(new MapAndRangeQuery("fromdate", out.format(date), maxDateValue));
 		}
+		
+		/**
+		 * CretedOnfilter
+		 */
+		
+		String createdOnMaxDateValue = null;
+		String createdOnMinDateValue = null;
+		String creattedOnMinDates = null;
+		String creattedOnMaxDates = null;
+		try {
 
+			if (createdOnMinDate != null) {
+
+				createdOnMinDateValue = createdOnMinDate;
+			}
+			if (createdOnMaxDate != null) {
+				createdOnMaxDateValue = createdOnMaxDate;
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		if (createdOnMinDateValue != null && createdOnMaxDateValue != null) {
+
+			rangeAndLists.add(new MapAndRangeQuery("createdon", createdOnMinDateValue, createdOnMaxDateValue));
+		}
+		if (createdOnMinDateValue != null && createdOnMaxDateValue == null) {
+			rangeAndLists.add(new MapAndRangeQuery("createdon", createdOnMinDateValue, out.format(date)));
+		}
+		if (createdOnMinDateValue == null && createdOnMaxDateValue != null) {
+			rangeAndLists.add(new MapAndRangeQuery("createdon", out.format(date), createdOnMaxDateValue));
+		}
+		
+		
 		/**
 		 * General conditions
 		 * 

@@ -1,5 +1,6 @@
 package biodiv.traits;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import javax.inject.Inject;
 import javax.persistence.Query;
 
 import org.hibernate.SessionFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
@@ -241,19 +243,53 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 
 	public List<Trait> listObservationTrait() {
 		Query q;
-		q=sessionFactory.getCurrentSession().createQuery("From Trait where showInObservation=true and isNotObservationTrait=false and isDeleted=false");
-		List<Trait> results=null;
-		results=q.getResultList();
+		q = sessionFactory.getCurrentSession().createQuery(
+				"From Trait where showInObservation=true and isNotObservationTrait=false and isDeleted=false");
+		List<Trait> results = null;
+
+		results = q.getResultList();
+
 		return results;
 	}
 
 	public List<TraitValue> getTraitValueWithTraitId(Long id) {
 		Query q;
+
 		q = sessionFactory.getCurrentSession().createQuery("from TraitValue where traitId=:id");
 		q.setParameter("id", id);
 		List<TraitValue> results = q.getResultList();
 		return results;
 
+	}
+
+	public Map<String, Map<String, Object>> getAllTraitsWithValues(String traitsQuery) {
+		// TODO Auto-generated method stub
+		String hql = traitsQuery;
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(hql);
+
+		List result = query.getResultList();
+		if (result.size() == 0 || result.get(0) == null) {
+			return null;
+		} else {
+
+			ObjectMapper objectMapper = new ObjectMapper();
+			try {
+				Map<String, Map<String, Object>> results = objectMapper.readValue(result.get(0).toString(), Map.class);
+				return results;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+
+	public Trait getSingleTraitWithId(Long id) {
+		Query q;
+		q = sessionFactory.getCurrentSession().createQuery("from Trait where id=:id");
+		q.setParameter("id", id);
+		Trait results = (Trait) q.getSingleResult();
+		return results;
 	}
 
 }
