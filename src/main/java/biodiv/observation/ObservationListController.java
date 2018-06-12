@@ -126,6 +126,8 @@ public class ObservationListController {
 
 		MapSortType sortType = null;
 		MapBounds bounds = null;
+		if(top != null || bottom != null || left != null || right != null)
+			bounds = new MapBounds(top, left, bottom, right);
 		List<MapGeoPoint> polygon = new ArrayList<MapGeoPoint>();
 
 		MapBoundParams mapBoundsParams = new MapBoundParams(bounds, polygon);

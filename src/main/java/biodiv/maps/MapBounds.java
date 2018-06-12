@@ -7,15 +7,15 @@ package biodiv.maps;
  */
 public class MapBounds {
 
-	private double top;
+	private Double top;
 	
-	private double left;
+	private Double left;
 	
-	private double bottom;
+	private Double bottom;
 	
-	private double right;
+	private Double right;
 
-	public MapBounds(double top, double left, double bottom, double right) {
+	public MapBounds(Double top, Double left, Double bottom, Double right) {
 		super();
 		this.top = top;
 		this.left = left;
@@ -23,35 +23,35 @@ public class MapBounds {
 		this.right = right;
 	}
 
-	public double getTop() {
+	public Double getTop() {
 		return top;
 	}
 
-	public void setTop(double top) {
+	public void setTop(Double top) {
 		this.top = top;
 	}
 
-	public double getLeft() {
+	public Double getLeft() {
 		return left;
 	}
 
-	public void setLeft(double left) {
+	public void setLeft(Double left) {
 		this.left = left;
 	}
 
-	public double getBottom() {
+	public Double getBottom() {
 		return bottom;
 	}
 
-	public void setBottom(double bottom) {
+	public void setBottom(Double bottom) {
 		this.bottom = bottom;
 	}
 
-	public double getRight() {
+	public Double getRight() {
 		return right;
 	}
 
-	public void setRight(double right) {
+	public void setRight(Double right) {
 		this.right = right;
 	}
 
