@@ -345,7 +345,7 @@ public class ObservationControllerHelper {
 					String key=entry.getKey().split("\\.")[0].split("_")[1];
 					String Ids=entry.getValue().get(0);
 					List<Long> listOfIds = commonMethod.getListOfIds(Ids);
-					Long rMin;
+					Long rMin;	
 					Long rMax;
 					if(listOfIds.size()>=2){
 						rMin=listOfIds.get(0);
