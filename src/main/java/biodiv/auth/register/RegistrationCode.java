@@ -3,6 +3,7 @@ package biodiv.auth.register;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,9 +31,15 @@ public class RegistrationCode extends AbstractObject {
 	private String token;
 	private String username;
 
+	RegistrationCode() {
+		this.dateCreated = new Date();
+		this.token = UUID.randomUUID().toString().replaceAll("-", "");
+		this.username = username;
+	}
+	
 	@AssistedInject
 	public RegistrationCode(SessionFactory sessionFactory, @Assisted String username) {
-		super(sessionFactory);
+		//super(sessionFactory);
 		this.dateCreated = new Date();
 		this.token = UUID.randomUUID().toString().replaceAll("-", "");
 		this.username = username;

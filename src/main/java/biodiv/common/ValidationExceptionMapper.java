@@ -20,8 +20,6 @@ import javax.validation.ValidationException;
 
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.validation.internal.LocalizationMessages;
-import org.glassfish.jersey.server.validation.internal.ValidationHelper;
-import org.glassfish.jersey.server.validation.ValidationError;
 
 @Provider
 public class ValidationExceptionMapper implements ExceptionMapper<ValidationException>{

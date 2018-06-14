@@ -1,11 +1,13 @@
 package biodiv.auth.register;
 
-import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -16,37 +18,21 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.Transactional;
-import biodiv.common.Language;
 import biodiv.common.LanguageService;
 import biodiv.common.MailService;
 import biodiv.common.MessageService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
-import biodiv.util.Utils;
 
 @Path("/register")
 public class RegisterController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
-
-	@Inject
-	private UserService userService;
-
-	@Inject
-	private LanguageService languageService;
-
-	@Inject
-	private MessageService messageService;
-
-	@Inject
-	private MailService mailService;
 
 	@Inject
 	Configuration config;
@@ -64,15 +50,15 @@ public class RegisterController {
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
-	@Path("/user")
-	public Response register(@BeanParam RegisterCommand registerCommand, @Context HttpServletRequest request) {
+	public Response register(@Valid @BeanParam RegisterCommand registerCommand, @Context HttpServletRequest request) {
 		log.debug("Registering user " + registerCommand.toString());
 
 		try {
 			User user = registerService.create(registerCommand, request);
 			Map<String, Object> result = new HashMap<String, Object>();
-			return Response.ok(result).build();
+			result.put("success", true);
+			result.put("msg", "Welcome. Ac activation email has been sent to your email. Please click the confirmation link to activate your account.");
+			return Response.ok(result).entity(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, e.getMessage());
@@ -81,22 +67,34 @@ public class RegisterController {
 	}
 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
+	//@Produces(MediaType.APPLICATION_JSON)
 	@Path("/verifyRegistration")
-	public Response verifyRegistration(@QueryParam("t") String token) {
+	public void verifyRegistration(@QueryParam("t") String token) {
 		// TODO: if (springSecurityService.isLoggedIn()) {
 		// redirect uri:request.scheme+"://"+request.serverName+
 		// SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 		// return;
 		// }
+		log.debug("Verifying registration code : " + token);
 
 		Map<String, Object> result = registerService.verifyRegistration(token);
 		if ((boolean) result.get("success") == true) {
-			return Response.ok(result).build();
+			//return Response.ok(result).build();
+			try {
+				Response.temporaryRedirect(new URI(config.getString("serverUrl")));
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			//return Response.ok(result).build();
 		} else {
-			ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, (String) result.get("message"));
-			return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
+			//ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, (String) result.get("message"));
+			//return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
+			try {
+				Response.temporaryRedirect(new URI(config.getString("serverUrl")));
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		}
 	}

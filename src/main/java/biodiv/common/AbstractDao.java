@@ -58,7 +58,8 @@ public abstract class AbstractDao<T, K extends Serializable> {
 	
 	//TODO:improve this to do dynamic finder on any property
 	public T findByPropertyWithCondition(String property, String value, String condition) {
-		
+		log.debug("findByPropertyWithCondition {}, {}", property, value);
+		log.debug("daoType {} ", daoType);
 		String queryStr = "" +
 			    "from "+daoType.getSimpleName()+" t " +
 			    "where t."+property+" "+condition+" :value" ;

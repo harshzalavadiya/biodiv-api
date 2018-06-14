@@ -84,9 +84,10 @@ public class UserService extends AbstractService<User> {
 	}
 
 	public void setDefaultRoles(User user) {
-		List<Object> defaultRoleNames = config.getList("user.defaultRoleNames");
-		for(Object roleName : defaultRoleNames) {
-			Role role = roleService.findRoleByAuthority((String)roleName);
+		String[] defaultRoleNames = config.getStringArray("user.defaultRoleNames");
+		log.debug("setDefaultRoles {}", defaultRoleNames.toString());
+		for(int i=0; i<defaultRoleNames.length; i++) {
+			Role role = roleService.findRoleByAuthority((String)defaultRoleNames[i]);
 			user.addRole(role);
 		}				
 	}

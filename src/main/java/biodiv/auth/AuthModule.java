@@ -25,6 +25,9 @@ import biodiv.auth.register.RegistrationCodeFactory;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenDao;
 import biodiv.auth.token.TokenService;
+import biodiv.auth.register.RegisterDao;
+import biodiv.auth.register.RegisterService;
+import biodiv.auth.register.RegistrationCode;
 
 public class AuthModule extends ServletModule {
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -43,6 +46,9 @@ public class AuthModule extends ServletModule {
 
 		bind(LoginController.class).in(Singleton.class);
 		bind(LogoutController.class).in(Singleton.class);
+		bind(RegistrationCode.class);
+		bind(RegisterDao.class).in(Singleton.class);
+		bind(RegisterService.class).in(Singleton.class);
 		bind(RegisterController.class).in(Singleton.class);
 		
 		//bind(JaxRsContextFactoryProvider.class).asEagerSingleton();

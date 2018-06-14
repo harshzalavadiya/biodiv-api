@@ -9,9 +9,11 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.configuration2.Configuration;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Transactional;
 import biodiv.common.AbstractService;
 import biodiv.common.Language;
 import biodiv.common.LanguageService;
@@ -47,8 +49,13 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	Configuration config;
 
 	@Inject
-	public RegisterService(RegisterDao dao) {
-		super(dao);
+	private SessionFactory sessionFactory;
+	
+	@Inject
+	public RegisterService(RegisterDao registerDao) {
+		super(registerDao);
+		this.registerDao = registerDao;
+		System.out.println("RegisterService constructor");
 	}
 
 	/**
@@ -110,6 +117,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 
 		if (registerCommand.openId != null) {
 			log.debug("Is an openId registration");
+			user.setAccountLocked(false);
 			/*
 			 * user.accountLocked = false; user.addToOpenIds(url:
 			 * command.openId); user.password = "openIdPassword"
@@ -124,7 +132,17 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		} else {
 			log.debug("Is an local account registration");
 			user.setAccountLocked(true);
+		}
+		
+		try {
+			sessionFactory.getCurrentSession().beginTransaction();
 			userService.save(user);
+			sessionFactory.getCurrentSession().getTransaction().commit();
+		} catch(Exception re) {
+			log.error("persist failed for user", re);
+			sessionFactory.getCurrentSession().getTransaction().rollback(); 
+			user = null;
+			throw re;
 		}
 		
 /*		   if (user == null || user.hasErrors()) {
@@ -152,7 +170,12 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 			        activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
 			        SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
 */
-		RegistrationCode registrationCode = registerAndEmail(user, request);
+		if(user != null) {
+			try {
+				sessionFactory.getCurrentSession().beginTransaction();
+			
+				RegistrationCode registrationCode = registerAndEmail(user, request);
+		
 
 /*			        if (registrationCode == null || registrationCode.hasErrors()) {
 			            msg = messageSource.getMessage("register.errors.send.verification.token", [user] as Object[], RCU.getLocale(request))
@@ -169,6 +192,13 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 			            xml { render model as XML }
 			        }
 */
+				sessionFactory.getCurrentSession().getTransaction().commit();
+			} catch(Exception re) {
+				log.error("persist failed for registration code", re);
+				sessionFactory.getCurrentSession().getTransaction().rollback(); 
+				throw re;
+			}
+		}
 		return user;
 	}
 
@@ -233,13 +263,15 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		}
 	}
 
+	@Transactional
 	Map<String, Object> verifyRegistration(String token) {
 
 		Map<String, Object> result = new HashMap<String, Object>();
-
+		log.debug("Verifying registration code {} ", token);
+		log.debug("registerDao {}", registerDao);
 		if (token != null) {
 			RegistrationCode registrationCode = registerDao.findByPropertyWithCondition("token", token, "=");
-
+			log.debug("registrationCode {}", registrationCode);
 			if (registrationCode == null) {
 				result.put("success", false);
 				result.put("message", "Bad registration code");

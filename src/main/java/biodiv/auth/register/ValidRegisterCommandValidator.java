@@ -15,8 +15,7 @@ public class ValidRegisterCommandValidator implements ConstraintValidator<ValidR
             return true;
         }
         
-        boolean isValid = (object.password == object.password2);
-
+        boolean isValid = (object.password.equals(object.password2));
         if ( !isValid ) {
             constraintValidatorContext.disableDefaultConstraintViolation();
             constraintValidatorContext

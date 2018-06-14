@@ -11,7 +11,6 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 
-import org.glassfish.jersey.server.validation.ValidationError;
 
 import jersey.repackaged.com.google.common.base.Function;
 import jersey.repackaged.com.google.common.collect.Lists;
@@ -32,10 +31,7 @@ public class ValidationHelper {
                     public ValidationError apply(final ConstraintViolation<?> violation) {
                         return new ValidationError(
                                 violation.getMessage(),
-                                violation.getMessageTemplate(),
-                                getViolationPath(violation),
-                                getViolationInvalidValue(violation.getInvalidValue())
-                        );
+                                getViolationPath(violation));
                     }
                 });
     }
@@ -46,7 +42,7 @@ public class ValidationHelper {
      * @param invalidValue invalid value causing BV exception.
      * @return string value of given object or {@code null}.
      */
-    private static String getViolationInvalidValue(final Object invalidValue) {
+/*    private static String getViolationInvalidValue(final Object invalidValue) {
         if (invalidValue == null) {
             return null;
         }
@@ -75,7 +71,7 @@ public class ValidationHelper {
 
         return invalidValue.toString();
     }
-
+*/
     /**
      * Get a path to a field causing constraint violations.
      *
@@ -84,10 +80,21 @@ public class ValidationHelper {
      */
     private static String getViolationPath(final ConstraintViolation violation) {
         final String rootBeanName = violation.getRootBean().getClass().getSimpleName();
-        final String propertyPath = violation.getPropertyPath().toString();
+        final String propertyPath = getLastElement(violation.getPropertyPath()).toString();
 
         //return rootBeanName + (!"".equals(propertyPath) ? '.' + propertyPath : "");
         return propertyPath;
+    }
+    
+    public static <T> T getLastElement(final Iterable<T> elements) {
+        final Iterator<T> itr = elements.iterator();
+        T lastElement = itr.next();
+
+        while(itr.hasNext()) {
+            lastElement=itr.next();
+        }
+
+        return lastElement;
     }
 
     /**

@@ -13,6 +13,8 @@
 	<logger name="org.hibernate" level="ALL" additivity="false"></logger>
 	<logger name="com.mchange" level="WARN" additivity="false"></logger>
 	<logger name="org.glassfish.hk2" level="ALL" additivity="false"></logger>
+	<logger name="org.redisson.command.CommandAsyncService" level="INFO" additivity="false"></logger>
+	<logger name="io.netty.util.Recycler" level="INFO" additivity="false"></logger>
 
 	<logger name="biodiv.*" level="ALL" additivity="false"></logger>
 
