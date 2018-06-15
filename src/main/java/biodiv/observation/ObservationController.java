@@ -137,4 +137,17 @@ public class ObservationController {
 		return recoVotes;
 
 	}
+	
+	@POST
+	@Path("/addRecommendationVote")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
+	public String addRecommendationVote(@QueryParam("obvIds") String obvIds,@QueryParam("commonName") String commonName,
+			@QueryParam("languageName") String languageName,@QueryParam("recoName") String recoName,@QueryParam("recoId") Long recoId,
+			@QueryParam("recoComment") String recoComment,@Context HttpServletRequest request){
+		
+		CommonProfile profile = AuthUtils.currentUser(request);
+		String msg = observationService.addRecommendationVote(obvIds,commonName,languageName,recoName,recoId,recoComment,Long.parseLong(profile.getId()));
+		return msg;
+	}
 }

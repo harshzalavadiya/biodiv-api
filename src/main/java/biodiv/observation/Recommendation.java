@@ -5,9 +5,12 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -15,8 +18,11 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import biodiv.taxon.datamodel.dao.Taxon;
+import biodiv.user.User;
 
 @Entity
 @Table(name = "recommendation", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = {
@@ -41,15 +47,15 @@ public class Recommendation implements java.io.Serializable {
 	public Recommendation() {
 	}
 
-	public Recommendation(long id, Date lastModified, String name) {
-		this.id = id;
+	public Recommendation( Date lastModified, String name) {
+		//this.id = id;
 		this.lastModified = lastModified;
 		this.name = name;
 	}
 
-	public Recommendation(long id, Date lastModified, String name,
+	public Recommendation(Date lastModified, String name,
 			Boolean isScientificName, Long languageId, String lowercaseName, String flaggingReason, Boolean isFlagged) {
-		this.id = id;
+		//this.id = id;
 		this.lastModified = lastModified;
 		this.name = name;
 		this.isScientificName = isScientificName;
@@ -58,9 +64,28 @@ public class Recommendation implements java.io.Serializable {
 		this.flaggingReason = flaggingReason;
 		this.isFlagged = isFlagged;
 	}
+	
+	public Recommendation(Date lastModified,String name,String lowercaseName,Taxon taxonConcept,Boolean isScientificName,Long languageId){
+		
+		this.lastModified = lastModified;
+		this.name = name;
+		this.lowercaseName = lowercaseName;
+		this.taxonConcept = taxonConcept;
+		this.isScientificName = isScientificName;
+		this.languageId = languageId;
+	}
 
 	@Id
-
+	@GenericGenerator(
+	        name = "hibernate_generator",
+	        strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+	        parameters = {
+	                @Parameter(name = "sequence_name", value = "hibernate_sequence"),
+	                @Parameter(name = "increment_size", value = "1"),
+                    @Parameter(name = "optimizer", value = "hilo")
+	        }
+	)
+	@GeneratedValue(generator = "hibernate_generator")
 	@Column(name = "id", unique = true, nullable = false)
 	public long getId() {
 		return this.id;
@@ -154,4 +179,5 @@ public class Recommendation implements java.io.Serializable {
 		this.isFlagged = isFlagged;
 	}
 
+	
 }

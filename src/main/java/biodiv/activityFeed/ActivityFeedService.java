@@ -207,7 +207,13 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 		    if(!activityType.equalsIgnoreCase("Added a comment")){
 		    	if(ro_type != null){
 			    	myJson.setName(name);
-			    	myJson.setRo_id(activityHolderId);
+			    	if(activityType.equals("Suggested species name")){
+			    		//hack to avoid adding one more variable in activitifeed map creation
+			    		myJson.setRo_id(subRootId);
+			    	}else{
+			    		myJson.setRo_id(activityHolderId);
+			    	}
+			    	
 			    	myJson.setRo_type(ro_type);
 			    }
 		    	

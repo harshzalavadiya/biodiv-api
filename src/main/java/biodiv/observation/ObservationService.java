@@ -1,6 +1,5 @@
 package biodiv.observation;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,19 +17,21 @@ import javax.ws.rs.NotFoundException;
 
 import org.hibernate.SessionFactory;
 import org.jvnet.hk2.annotations.Service;
-import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.ProfileManager;
 
 import biodiv.Transactional;
+import biodiv.Checklists.Checklists;
+import biodiv.Checklists.ChecklistsService;
 import biodiv.activityFeed.ActivityFeedService;
-import biodiv.auth.AuthUtils;
 import biodiv.comment.CommentService;
 import biodiv.common.AbstractService;
+import biodiv.common.Language;
 import biodiv.common.LanguageService;
 import biodiv.common.SpeciesGroup;
 import biodiv.common.SpeciesGroupService;
 import biodiv.customField.CustomField;
 import biodiv.customField.CustomFieldService;
+import biodiv.dataTable.DataTableService;
+import biodiv.observation.RecommendationVote.ConfidenceType;
 import biodiv.speciesPermission.SpeciesPermission;
 import biodiv.speciesPermission.SpeciesPermission.PermissionType;
 import biodiv.speciesPermission.SpeciesPermissionService;
@@ -78,6 +79,15 @@ public class ObservationService extends AbstractService<Observation> {
 	
 	@Inject
 	private SessionFactory sessionFactory;
+	
+	@Inject
+	private RecommendationVoteService recommendationVoteService;
+	
+	@Inject
+	ChecklistsService checklistsService;
+	
+	@Inject
+	DataTableService dataTableService;
 
 	@Inject
 	ObservationService(ObservationDao observationDao) {
@@ -558,5 +568,345 @@ public class ObservationService extends AbstractService<Observation> {
 		
 		return cf;
 	}
+	
+	@Transactional
+	public String addRecommendationVote(String obvIds, String commonName, String languageName, String recoName,
+			Long recoId, String recoComment, long authorId) {
+		
+		try{
+			long[] obvs = Arrays.asList(obvIds.split(",")).stream().map(String::trim).mapToLong(Long::parseLong)
+					.toArray();
+			User author = userService.findById(authorId);
+			if(obvs.length>0){
+				long i = 1;
+				for(long obvId : obvs){
+					Boolean canMakeSpeciesCall = true;
+					Map<String,Object> recoVoteResult = null;
+					RecommendationVote recommendationVoteInstance = null;
+					if(canMakeSpeciesCall){
+						recoVoteResult = getRecommendationVote(obvId,author,recoId,recoName,commonName,languageName);
+						if(recoVoteResult != null){
+							recommendationVoteInstance = (RecommendationVote) recoVoteResult.get("recoVote");
+							System.out.println("recoVote got ");
+							System.out.println("recoVote got ");
+							System.out.println("recoVote got ");
+							System.out.println("recoVote got "+recommendationVoteInstance);
+							if(recommendationVoteInstance!=null){
+								System.out.println(recommendationVoteInstance.getId());
+							}
+						}
+					}
+					
+					if(recommendationVoteInstance != null){
+						Observation obv = findById(obvId);
+						//save(recommendationVoteInstance)
+						recommendationVoteService.save(recommendationVoteInstance);
+						//save
+						//calculate maxVotedSpeciesName
+						Map<String,Object> maxVotedMap = calculateMaxVotedSpeciesName(obv);
+						Long maxVotedRecoId = (Long) maxVotedMap.get("reco");
+						Recommendation maxVotedReco = recommendationService.findById(maxVotedRecoId);
+						if(maxVotedReco !=null){
+							obv.setMaxVotedReco(maxVotedReco);
+							obv.setNoOfIdentifications((int) maxVotedMap.get("noOfIdentifications"));
+						}
+						
+						Boolean updateChecklistAnnotations = false;
+						if(maxVotedMap.containsKey("haveToUpdateChecklistAnnotation")){
+							updateChecklistAnnotations = (Boolean) maxVotedMap.get("haveToUpdateChecklistAnnotation");
+						}
+						
+						if(updateChecklistAnnotations == true){
+							String checkAnno =  funcUpdateChecklistAnnotations((RecommendationVote) maxVotedMap.get("recoVoteForChecklist"));
+							obv.setChecklistAnnotations(checkAnno);
+						}
+						//have to save obv
+						save(obv);
+						
+						
+						
+						//update species timeStamp
+						//recommendationVoteService.updateSpeciesTimeStamp(recommendationVoteInstance);
+						
+						//addComment
+						recommendationVoteService.addRecoComment(null,recoComment,null,recommendationVoteInstance.getRecommendationByRecommendationId().getId(),
+								"species.participation.Recommendation",obvId,"species.participation.Observation",null,null,null,null,new Date().getTime(),
+								"/observation/addRecommendationVote","en",authorId);
+						
+						//activityFeed
+						
+						Date dateCreated = new java.util.Date();
+						Date lastUpdated = dateCreated;
+						String name =  recommendationVoteInstance.getGivenSciName()!=null?recommendationVoteInstance.getGivenSciName():
+							recommendationVoteInstance.getRecommendationByRecommendationId().getName();
+						Long ro_id = recommendationVoteInstance.getRecommendationByRecommendationId().getTaxonConcept()!=null? recommendationVoteInstance.getRecommendationByRecommendationId().getTaxonConcept().getId():
+							null;
+						Boolean isScientificName = recommendationVoteInstance.getRecommendationByRecommendationId().getIsScientificName();
+						Map<String, Object> afNew = activityFeedService.createMapforAf("Object", obv.getId(), obv,
+								"species.participation.Observation", "species.participation.RecommendationVote", recommendationVoteInstance.getId(),
+								"Suggested species name", "Suggested species name", null, null,
+								name, "species", isScientificName, true, ro_id, dateCreated, lastUpdated);
+						activityFeedService.addActivityFeed(author, afNew, obv, (String) afNew.get("rootHolderType"));
+						//activityFeed
+					}
+					if (i % 50 == 0) {
+						sessionFactory.getCurrentSession().flush();
+						sessionFactory.getCurrentSession().clear();
+					}
+
+					i++;
+				}
+				String msg = "success";
+				return msg;
+			}else{
+				throw new NotFoundException("No observation id provided");
+			}
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			
+		}
+		
+	}
+
+	private String funcUpdateChecklistAnnotations(RecommendationVote recoVote) {
+		Observation obv = recoVote.getObservation();
+		org.json.JSONObject m = fetchChecklistAnnotation(obv);
+		
+		if(m ==null){
+			return null;
+		}
+		
+		
+		if(obv.isChecklist() && (obv.getSourceId()!=null) && (obv.getDataset()==null)){
+			Checklists cl = checklistsService.findById(obv.getSourceId());
+			
+			if(cl.getSciNameColumn() != null && recoVote.getRecommendationByRecommendationId().getIsScientificName()){
+				m.put(cl.getSciNameColumn(), recoVote.getRecommendationByRecommendationId().getName());
+			}
+			
+			if(cl.getCommonNameColumn() != null && recoVote.getRecommendationByCommonNameRecoId() !=null){
+				m.put(cl.getCommonNameColumn(), recoVote.getRecommendationByCommonNameRecoId().getName());
+			}
+			//convert m to JSON String 
+			return m.toString();
+		}
+		return null;
+		
+	}
+
+	private org.json.JSONObject fetchChecklistAnnotation(Observation obv) {
+		org.json.JSONObject m = new org.json.JSONObject();
+		Checklists cl = checklistsService.findById(obv.getSourceId());
+		if(cl !=null && obv.getChecklistAnnotations() != null && obv.isChecklist()){
+			//JSONObject checklistsJson = new JSONObject(obv.getChecklistAnnotations());
+			//JSONTokener tokener = new JSONTokener(obv.getChecklistAnnotations());
+			org.json.JSONObject root = new org.json.JSONObject(obv.getChecklistAnnotations());
+			List<String> ls = checklistsService.fetchColumnNames(cl);
+			for(String name : ls){
+				m.put(name, root.get(name));
+			}
+		}else if(obv.getDataTable()!=null){
+			if(obv.getChecklistAnnotations()!=null){
+				org.json.JSONObject root = new org.json.JSONObject(obv.getChecklistAnnotations());
+				List<List<String>> ls = dataTableService.fetchColumnNames(obv.getDataTable());
+				for(List<String> name : ls){
+					m.put(name.get(1), root.get(name.get(1)));	
+				}
+			}		
+		}
+		m.put("id", obv.getId());
+		m.put("type", "observation");
+		
+		if(obv.getMaxVotedReco()!=null && obv.getMaxVotedReco().getTaxonConcept()!=null){
+			m.put("speciesId", obv.getMaxVotedReco().getTaxonConcept());//have to do
+			m.put("title",obv.getMaxVotedReco().getTaxonConcept().getCanonicalForm());
+		}else if(obv.getMaxVotedReco()!=null){
+			m.put("title", obv.getMaxVotedReco().getName());
+		}
+			
+		return m;
+		
+	}
+
+	private Map<String,Object> calculateMaxVotedSpeciesName(Observation obv) {
+		Map<String,Object> maxVotedMap = observationDao.calculateMaxVotedSpeciesName(obv);
+		return maxVotedMap;
+		
+	}
+
+	private Map<String, Object> getRecommendationVote(long obvId, User author, Long recoId, String recoName,
+			String commonName, String languageName) {
+		
+		Date dateCreated = new Date();
+		Map<String,Object> toReturn = new HashMap<String,Object>();
+		ConfidenceType confidence = ConfidenceType.CERTAIN;
+		Observation obv = findById(obvId);
+		RecommendationVote existingRecVote = recommendationVoteService.findByAuthorAndObservation(author,obv);
+		Recommendation reco = null;
+		Recommendation commonNameReco = null;
+		Boolean isAgreeRecommendation = false;
+		
+		if(recoId!=null && !(recoName != null || commonName !=null)){
+			  //user presses on agree button so getting reco from id and creating new recoVote without additional common name
+			reco = recommendationService.findById(recoId);
+			isAgreeRecommendation = true;
+		}else{
+			  //add recommendation used so taking both reco and common name reco if available
+			Map<String,Object> recoResultMap = getRecommendations(recoId, recoName, commonName, languageName);
+			reco = (Recommendation) recoResultMap.get("mainReco");
+			commonNameReco =  (Recommendation) recoResultMap.get("commonNameReco");
+		}
+		//if parsing fails
+		RecommendationVote newRecoVote = null;
+		if(reco !=null || commonNameReco!=null){
+			 newRecoVote = new RecommendationVote(obv,reco,commonNameReco,author,confidence,recoName,commonName,dateCreated);
+		}
+		//if parsing fails
+		
+		System.out.println(" &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		System.out.println(" &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		System.out.println(" &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		System.out.println(" &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		if(reco==null){
+			System.out.println(" reco is null");
+			System.out.println(" reco is null");
+			System.out.println(" reco is null");
+			System.out.println(" reco is null");
+			return null;
+		}else{
+			System.out.println("reco is not null");
+			System.out.println("reco is not null");
+			System.out.println("reco is not null");
+			System.out.println("reco is not null");
+			if(existingRecVote==null){
+				System.out.println("exixsting reco  null");
+
+				System.out.println("exixsting reco  null");
+
+				System.out.println("exixsting reco  null");
+
+				System.out.println("exixsting reco  null");
+				toReturn.put("recoVote", newRecoVote);
+				return toReturn;
+			}else{
+				System.out.println("exixtingreco is not null");
+				System.out.println("exixtingreco is not null");
+				System.out.println("exixtingreco is not null");
+				System.out.println("exixtingreco is not null");
+				System.out.println(reco.getId());
+				System.out.println(existingRecVote.getRecommendationByRecommendationId().getId());
+				if(existingRecVote.getRecommendationByRecommendationId().getId() == reco.getId()){
+					//if old recommendation is same as new recommendation then
+
+					System.out.println("if old recommendation is same as new recommendation then");
+					System.out.println("if old recommendation is same as new recommendation then");
+					System.out.println("if old recommendation is same as new recommendation then");
+					System.out.println("if old recommendation is same as new recommendation then");
+					if(!isAgreeRecommendation && !existingRecVote.getRecommendationByCommonNameRecoId().equals(commonNameReco)){
+						//user might want to update(add new common name or delete existing one) the common name
+						System.out.println("if old recommendation is same but new common name");
+						System.out.println("if old recommendation is same but new common name");
+						System.out.println("if old recommendation is same but new common name");
+						System.out.println("if old recommendation is same but new common name");
+						existingRecVote.setRecommendationByCommonNameRecoId(commonNameReco);
+						toReturn.put("recoVote", existingRecVote);
+						return toReturn;
+					}
+					// when same sciName & same commonName
+					System.out.println("same sci Name and common Name");
+					System.out.println("same sci Name and common Name");
+					System.out.println("same sci Name and common Name");
+					System.out.println("same sci Name and common Name");
+					System.out.println("same sci Name and common Name");
+					 return null;
+				}else{
+					System.out.println("both votes id not same");
+					System.out.println("dont know");
+					System.out.println("dont know");
+					System.out.println("dont know");
+					//recommendationVoteService.removeFromRecommendationVote(existingRecVote);
+					//delete existing vote
+					recommendationVoteService.delete(existingRecVote.getId());
+					sessionFactory.getCurrentSession().flush();
+					sessionFactory.getCurrentSession().clear();
+					toReturn.put("recoVote", newRecoVote);
+					return toReturn;
+				}
+			}
+		}
+	}
+
+	private ConfidenceType getConfidenceType(String confidenceType) {
+		if(confidenceType==null) return null;
+//		for(ConfidenceType type ){
+//			
+//		}
+		return null;
+	}
+
+	private Map<String, Object> getRecommendations(Long recoId, String recoName, String commonName,
+			String languageName) {
+		
+		try{
+			Recommendation commonNameReco = null;
+			Recommendation scientificNameReco = null;
+			Language lang = languageService.findByName(languageName); //languageService.findById(205L);
+			Map<String,Object> toReturn = new HashMap<String,Object>();
+			
+			//if selected from dropdown then recoId is there
+			if(recoId!=null){
+				Recommendation r = recommendationService.findById(recoId);
+				if(r.getIsScientificName()){
+					scientificNameReco = r;
+					if(commonName!=null){
+						commonNameReco = recommendationService.findReco(commonName, false, lang.getId(), scientificNameReco.getTaxonConcept(), true, false);
+					}
+				}else{
+					if(commonName!=null){
+						if(commonName.toLowerCase().equals(r.getLowercaseName())){
+							commonNameReco = r;
+						}else{
+							commonNameReco = recommendationService.findReco(commonName, false, lang.getId(), r.getTaxonConcept(), true, false);
+						}
+					}else{
+						commonNameReco = null;
+					}
+					
+					if(r.getTaxonConcept()!= null){
+						scientificNameReco = recommendationService.findReco(r.getTaxonConcept().getCanonicalForm(), true, null, r.getTaxonConcept(), true, false);
+						System.out.println("scientificName reco id "+scientificNameReco.getId());
+						System.out.println("scientificName reco id "+scientificNameReco.getId());
+						System.out.println("scientificName reco id "+scientificNameReco.getId());
+						System.out.println("scientificName reco id "+scientificNameReco.getId());
+					}
+				}
+				
+				toReturn.put("mainReco", scientificNameReco!=null?scientificNameReco:commonNameReco);
+				toReturn.put("commonNameReco", commonNameReco);
+				
+				return toReturn;
+			}
+			
+			//not selected from dropdown
+			
+			if(commonName!=null){
+				commonNameReco = recommendationService.findReco(commonName, false, lang.getId(), null, true, false);
+			}
+			scientificNameReco = recommendationService.findReco(recoName, true, null, null, true, false);
+			toReturn.put("mainReco", scientificNameReco!=null?scientificNameReco:commonNameReco);
+			toReturn.put("commonNameReco", commonNameReco);
+			return toReturn;
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			
+		}
+		
+	}
+	
+	
 
 }

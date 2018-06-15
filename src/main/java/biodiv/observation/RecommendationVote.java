@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -14,6 +15,11 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+import biodiv.customField.CustomField.DataType;
+import biodiv.observation.RecommendationVote.ConfidenceType;
 import biodiv.user.User;
 
 @Entity
@@ -35,6 +41,27 @@ public class RecommendationVote implements java.io.Serializable {
 	private String givenSciName;
 	private String originalAuthor;
 
+	public enum ConfidenceType {
+		CERTAIN ("I am certain"),
+		UNSURE ("DECIMAL");
+		
+		
+		private String value;
+
+		ConfidenceType(String value) {
+			this.value = value;
+		}
+
+		String value() {
+			return this.value;
+		}
+//		static List toList() {
+//			return [INTEGER, DECIMAL, TEXT, PARAGRAPH_TEXT, DATE]
+//		}
+		
+		
+	}
+	
 	public RecommendationVote() {
 	}
 
@@ -66,8 +93,29 @@ public class RecommendationVote implements java.io.Serializable {
 		this.originalAuthor = originalAuthor;
 	}
 
-	@Id
+	public RecommendationVote(Observation obv, Recommendation recommendationByRecommendationId, Recommendation recommendationByCommonNameRecoId,
+			User author,ConfidenceType confidence, String recoName, String commonName,Date votedOn) {
+		this.recommendationByRecommendationId = recommendationByRecommendationId;
+		this.user = author;
+		this.observation = obv;
+		this.recommendationByCommonNameRecoId = recommendationByCommonNameRecoId;
+		this.confidence = confidence.name();
+		this.votedOn = votedOn;
+		this.givenCommonName = commonName;
+		this.givenSciName = recoName;
+	}
 
+	@Id
+	@GenericGenerator(
+	        name = "hibernate_generator",
+	        strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+	        parameters = {
+	                @Parameter(name = "sequence_name", value = "hibernate_sequence"),
+	                @Parameter(name = "increment_size", value = "1"),
+                    @Parameter(name = "optimizer", value = "hilo")
+	        }
+	)
+	@GeneratedValue(generator = "hibernate_generator")
 	@Column(name = "id", unique = true, nullable = false)
 	public long getId() {
 		return this.id;
@@ -190,5 +238,6 @@ public class RecommendationVote implements java.io.Serializable {
 	public void setOriginalAuthor(String originalAuthor) {
 		this.originalAuthor = originalAuthor;
 	}
+
 
 }

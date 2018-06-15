@@ -1,8 +1,11 @@
 package biodiv.observation;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.persistence.Query;
@@ -100,6 +103,61 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		// System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		// System.out.println(listResult.get(0));
 		return listResult;
+	}
+
+	public Map<String,Object> calculateMaxVotedSpeciesName(Observation obv) {
+		
+		String hql = "select rv.recommendationByRecommendationId.id AS reco , count(rv.recommendationByRecommendationId) AS voteCount from RecommendationVote rv where "
+				+"rv.observation.id =:obvId GROUP BY rv.recommendationByRecommendationId.id ORDER BY voteCount DESC";
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("obvId",obv.getId());
+		//System.out.println("query "+query);
+		List<Object[]> recos = query.getResultList();
+		
+		
+		if(recos == null || recos.isEmpty()){
+			 return null;
+		 }
+		Map<String,Object> toReturn = new HashMap<String,Object>();
+		List<Long> recoIds = new ArrayList<Long>();
+		int noOfIdentifications = obv.getNoOfIdentifications();
+		
+		int maxCount =  ((Long) ((Object[]) recos.get(0))[1]).intValue();
+		
+		for(Object[] reco :recos){
+			
+			if(((Long) reco[1]).intValue() == maxCount){
+				
+				recoIds.add( (Long) reco[0]);	
+				
+			}
+			noOfIdentifications += ((Long) reco[1]).intValue();
+			
+		}
+		
+		
+		if(recos.size() ==1){
+			toReturn.put("reco", recoIds.get(0));
+			toReturn.put("noOfIdentifications", noOfIdentifications);
+			return toReturn;
+		}
+		//List<Long> ids = new ArrayList<Long>();
+		
+		
+		//if more than one max_voted,getting the latest one
+		
+		hql = "from RecommendationVote rv where rv.observation =:obv and rv.recommendationByRecommendationId.id in (:ids) order by rv.votedOn desc";
+		Query query1 =  getCurrentSession().createQuery(hql);
+		query1.setParameter("obv",obv);
+		query1.setParameter("ids",recoIds);
+		List<RecommendationVote> lrr =  query1.getResultList();
+		RecommendationVote rr = lrr.get(0);
+		toReturn.put("reco", rr.getRecommendationByRecommendationId().getId());
+		toReturn.put("noOfIdentifications", noOfIdentifications);
+		toReturn.put("haveToUpdateChecklistAnnotation", true);
+		toReturn.put("recoVoteForChecklist", rr);
+		return toReturn;
+		
 	}
 
 }

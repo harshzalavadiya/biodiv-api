@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.common.AbstractService;
+import biodiv.species.AcceptedSynonymService;
 import biodiv.taxon.dao.TaxonDao;
 import biodiv.taxon.datamodel.dao.Classification;
 import biodiv.taxon.datamodel.dao.Taxon;
@@ -25,6 +26,9 @@ public class TaxonService extends AbstractService<Taxon> {
 	
 	@Inject
 	SearchTaxon searchTaxon;
+	
+	@Inject
+	AcceptedSynonymService acceptedSynonymService;
 	
 	private static final String ID = "id";
 	private static final String taxonid = "taxonid";
@@ -288,6 +292,26 @@ public class TaxonService extends AbstractService<Taxon> {
 		// TODO Auto-generated method stub
 		List<Taxon> results=taxonDao.getAllByTaxonDefinitionId(id);
 		return results;
+	}
+
+	public Taxon fetchAccepted(Taxon td) {
+		
+		if(td == null){
+			return null;
+		}
+		System.out.println("fetchAcceptedTaxon");
+		System.out.println("fetchAcceptedTaxon");
+		System.out.println("fetchAcceptedTaxon");
+		System.out.println("fetchAcceptedTaxon");
+		System.out.println(td.getStatus());
+		if(td.getStatus().equals("ACCEPTED")){
+			return td;
+		}
+		List<Taxon> acceptedList = acceptedSynonymService.fetchAcceptedNames( td);
+		if(acceptedList !=null && (acceptedList.size()==1)){
+			return (Taxon) acceptedList.get(0);
+		}
+		return null;
 	}
 
 }
