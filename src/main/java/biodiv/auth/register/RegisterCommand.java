@@ -3,6 +3,7 @@ package biodiv.auth.register;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 
 import org.hibernate.validator.constraints.Email;
@@ -77,6 +78,10 @@ public class RegisterCommand {
 	@FormParam("institutionType")
 	public String institutionType;
 
+	@FormParam("g-recaptcha-response")
+	@DefaultValue("")
+    public String recaptchaResponse;
+	
 	@Override
 	public String toString() {
 		return "RegisterCommand [email=" + email + ", password=XXXX, password2=XXXX" + ", name="

@@ -154,7 +154,9 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 
 					if (gProfile.getDisplayName() != null)
 						p.put("name", gProfile.getDisplayName());
-
+					else
+						p.put("name", gProfile.getEmail().split("@")[0]);
+					
 					if (gProfile.getProfileUrl() != null)
 						p.put("website", gProfile.getProfileUrl().toString());
 

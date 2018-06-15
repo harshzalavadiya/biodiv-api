@@ -2,9 +2,9 @@ package biodiv.auth.register;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -16,11 +16,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 public class GoogleRecaptchaCheck {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private static final String GOOGLE_SECRET_KEY = "6LelEl8UAAAAAG9wxnPRTRYFtAJ0lOzuIpOM4Kxb";
 	private static final String GOOGLE_API_ENDPOINT = "https://www.google.com/recaptcha/api/siteverify";
 	private String userResponse;
@@ -37,21 +43,18 @@ public class GoogleRecaptchaCheck {
 		postParameters.add(new BasicNameValuePair("response", this.userResponse));
 		postRequest.setEntity(new UrlEncodedFormEntity(postParameters));
 		CloseableHttpResponse response = null;
+		log.debug(userResponse);
 		try {
 			response = httpClient.execute(postRequest);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				InputStream body = response.getEntity().getContent();
-				JSONParser jsonParser = new JSONParser();
-				JSONObject json = null;
-				try {
-					json = (JSONObject)jsonParser.parse(
-					      new InputStreamReader(body, "UTF-8"));
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				//JSONObject json = Json.createReader(body).readObject();
-				if (json != null && json.getBoolean("success")) {
+				ObjectMapper mapper = new ObjectMapper();
+				
+				Map<String,Object> json = null;
+				json = mapper.readValue(body, new TypeReference<Map<String,Object>>(){});
+				
+				log.debug(json.toString());
+				if (json != null && ((Boolean) json.get("success")).booleanValue() == true) {
 					return false;
 				}
 				return true;
