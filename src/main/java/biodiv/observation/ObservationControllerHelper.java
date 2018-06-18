@@ -50,7 +50,12 @@ public class ObservationControllerHelper {
 			Map<String, List<String>> customParams,
 			String classificationid,
 			MapSearchParams mapSearchParams,
-			String maxvotedrecoid
+			String maxvotedrecoid,
+			String createdOnMaxDate,
+			String createdOnMinDate,
+			String status,
+			String taxonId,
+			String recoName
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -78,9 +83,9 @@ public class ObservationControllerHelper {
 			boolAndLists.add(new MapAndBoolQuery("speciesgroupid", groupId));
 		}
 		
-		Set<Object> taxonId = commonMethod.cSTSOT(taxon);
-		if (!taxonId.isEmpty()) {
-			boolAndLists.add(new MapAndBoolQuery("path", taxonId));
+		Set<Object> taxonIds = commonMethod.cSTSOT(taxon);
+		if (!taxonIds.isEmpty()) {
+			boolAndLists.add(new MapAndBoolQuery("path", taxonIds));
 		}
 
 		Set<Object> authorId = commonMethod.cSTSOT(user);
@@ -140,6 +145,33 @@ public class ObservationControllerHelper {
 			}
 
 		}
+		
+		Set<Object> taxonStatus=commonMethod.cSTSOT(status);
+		if(!taxonStatus.isEmpty()){
+			boolAndLists.add(new MapAndBoolQuery("status", taxonStatus));
+		}
+		
+		Set<Object> taxonIdsArray=commonMethod.cSTSOT(taxonId);
+		if(!taxonIdsArray.isEmpty()){
+				if (taxonIdsArray.size() < 2) {
+					String first = (String) taxonIdsArray.toArray()[0];
+					
+					if (first.equalsIgnoreCase("0")) {
+						andMapExistQueries.add(new MapExistQuery("status", false, null));
+					}
+					if (first.equalsIgnoreCase("1")) {
+						andMapExistQueries.add(new MapExistQuery("status", true,null));
+					}
+				}
+
+		}
+		/**
+		 * Query for recoName
+		 */
+		if(recoName!=null){
+			andMatchPhraseQueries.add(new MapAndMatchPhraseQuery("name",recoName.toLowerCase()));
+		}
+		
 
 		/**
 		 * Date Filter
@@ -167,10 +199,8 @@ public class ObservationControllerHelper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("11111111111111111111111111111111111111111111111111111111");
-		System.out.println(minDateValue);
-		System.out.println(maxDateValue);
-		System.out.println("11111111111111111111111111111111111111111111111111111111");
+		
+		
 		
 		if (minDateValue != null && maxDateValue != null) {
 
@@ -182,7 +212,43 @@ public class ObservationControllerHelper {
 		if (minDateValue == null && maxDateValue != null) {
 			rangeAndLists.add(new MapAndRangeQuery("fromdate", out.format(date), maxDateValue));
 		}
+		
+		/**
+		 * CretedOnfilter
+		 */
+		
+		String createdOnMaxDateValue = null;
+		String createdOnMinDateValue = null;
+		String creattedOnMinDates = null;
+		String creattedOnMaxDates = null;
+		try {
 
+			if (createdOnMinDate != null) {
+
+				createdOnMinDateValue = createdOnMinDate;
+			}
+			if (createdOnMaxDate != null) {
+				createdOnMaxDateValue = createdOnMaxDate;
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		if (createdOnMinDateValue != null && createdOnMaxDateValue != null) {
+
+			rangeAndLists.add(new MapAndRangeQuery("createdon", createdOnMinDateValue, createdOnMaxDateValue));
+		}
+		if (createdOnMinDateValue != null && createdOnMaxDateValue == null) {
+			rangeAndLists.add(new MapAndRangeQuery("createdon", createdOnMinDateValue, out.format(date)));
+		}
+		if (createdOnMinDateValue == null && createdOnMaxDateValue != null) {
+			rangeAndLists.add(new MapAndRangeQuery("createdon", out.format(date), createdOnMaxDateValue));
+		}
+		
+		
 		/**
 		 * General conditions
 		 * 
@@ -279,7 +345,7 @@ public class ObservationControllerHelper {
 					String key=entry.getKey().split("\\.")[0].split("_")[1];
 					String Ids=entry.getValue().get(0);
 					List<Long> listOfIds = commonMethod.getListOfIds(Ids);
-					Long rMin;
+					Long rMin;	
 					Long rMax;
 					if(listOfIds.size()>=2){
 						rMin=listOfIds.get(0);
