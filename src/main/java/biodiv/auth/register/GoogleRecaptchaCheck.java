@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import org.apache.commons.configuration2.Configuration;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -15,7 +18,6 @@ import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,25 +27,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GoogleRecaptchaCheck {
 
+	@Inject
+	Configuration config;
+	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	private static final String GOOGLE_SECRET_KEY = "6LelEl8UAAAAAG9wxnPRTRYFtAJ0lOzuIpOM4Kxb";
+	private static final String GOOGLE_SECRET_KEY = "googleRecaptchaSecret";
 	private static final String GOOGLE_API_ENDPOINT = "https://www.google.com/recaptcha/api/siteverify";
-	private String userResponse;
 
-	public GoogleRecaptchaCheck(String userResponse) {
-		this.userResponse = userResponse;
+	public GoogleRecaptchaCheck() {
 	}
 
-	public boolean isRobot() throws IOException {
+	public boolean isRobot(String userResponse) throws IOException {
+		
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		
 		HttpPost postRequest = new HttpPost(GOOGLE_API_ENDPOINT);
+		
 		List<NameValuePair> postParameters = new ArrayList<NameValuePair>();
-		postParameters.add(new BasicNameValuePair("secret", GOOGLE_SECRET_KEY));
-		postParameters.add(new BasicNameValuePair("response", this.userResponse));
+		
+		postParameters.add(new BasicNameValuePair("secret", config.getString(GOOGLE_SECRET_KEY)));
+		postParameters.add(new BasicNameValuePair("response", userResponse));
 		postRequest.setEntity(new UrlEncodedFormEntity(postParameters));
+		
 		CloseableHttpResponse response = null;
+		
 		log.debug(userResponse);
+		
 		try {
 			response = httpClient.execute(postRequest);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -59,8 +69,6 @@ public class GoogleRecaptchaCheck {
 				}
 				return true;
 			}
-			// here you might want to log the error-codes element of the json
-			// response and/or the status code.
 			return true;
 		} finally {
 			HttpClientUtils.closeQuietly(httpClient);

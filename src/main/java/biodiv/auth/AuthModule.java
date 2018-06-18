@@ -20,12 +20,14 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.servlet.ServletModule;
 
+import biodiv.auth.register.GoogleRecaptchaCheck;
 import biodiv.auth.register.RegisterController;
 import biodiv.auth.register.RegistrationCodeFactory;
 import biodiv.auth.token.Token;
 import biodiv.auth.token.TokenDao;
 import biodiv.auth.token.TokenService;
 import biodiv.auth.register.RegisterDao;
+import biodiv.auth.register.RegisterMailingService;
 import biodiv.auth.register.RegisterService;
 import biodiv.auth.register.RegistrationCode;
 
@@ -50,6 +52,8 @@ public class AuthModule extends ServletModule {
 		bind(RegisterDao.class).in(Singleton.class);
 		bind(RegisterService.class).in(Singleton.class);
 		bind(RegisterController.class).in(Singleton.class);
+		bind(GoogleRecaptchaCheck.class);
+		bind(RegisterMailingService.class);
 		
 		//bind(JaxRsContextFactoryProvider.class).asEagerSingleton();
 		bind(ServletJaxRsContextFactoryProvider.class).asEagerSingleton();

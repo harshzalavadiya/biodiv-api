@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.ws.rs.BeanParam;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -24,12 +25,8 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import biodiv.common.LanguageService;
-import biodiv.common.MailService;
-import biodiv.common.MessageService;
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
-import biodiv.user.UserService;
 
 @Path("/register")
 public class RegisterController {
@@ -41,6 +38,10 @@ public class RegisterController {
 
 	@Inject
 	private RegisterService registerService;
+	
+	@Inject
+	private GoogleRecaptchaCheck googleRecaptchaCheck;
+	
 
 	/**
 	 * 
@@ -55,9 +56,8 @@ public class RegisterController {
 	public Response register(@Valid @BeanParam RegisterCommand registerCommand, @Context HttpServletRequest request) {
 		log.debug("Registering user " + registerCommand.toString());
 
-		GoogleRecaptchaCheck recaptcha = new GoogleRecaptchaCheck(registerCommand.recaptchaResponse);
 		try {
-			if (recaptcha.isRobot()) {
+			if (googleRecaptchaCheck.isRobot(registerCommand.recaptchaResponse)) {
 				return Response.status(HttpStatus.SC_FORBIDDEN).build();
 			} else {
 				try {
@@ -83,7 +83,7 @@ public class RegisterController {
 	@GET
 	//@Produces(MediaType.APPLICATION_JSON)
 	@Path("/verifyRegistration")
-	public void verifyRegistration(@QueryParam("t") String token) {
+	public Response verifyRegistration(@QueryParam("t") String token) {
 		// TODO: if (springSecurityService.isLoggedIn()) {
 		// redirect uri:request.scheme+"://"+request.serverName+
 		// SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
@@ -93,22 +93,28 @@ public class RegisterController {
 
 		Map<String, Object> result = registerService.verifyRegistration(token);
 		log.debug(result.toString());
+		URI url = null;
+		
+		try {
+			url = new URI(config.getString("serverUrl"));
+		} catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			url = null;
+		}
+		
 		if ((boolean) result.get("success") == true) {
 			try {
-				Response.temporaryRedirect(new URI(config.getString("serverUrl")));
+				return Response.temporaryRedirect(new URI("/login")).build();
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
 			//return Response.ok(result).build();
+			return Response.temporaryRedirect(url).build();
 		} else {
 			//ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, (String) result.get("message"));
 			//return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
-			try {
-				Response.temporaryRedirect(new URI(config.getString("serverUrl")));
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-
+			return Response.temporaryRedirect(url).build();
 		}
 	}
 

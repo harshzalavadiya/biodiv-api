@@ -1,27 +1,29 @@
 package biodiv.auth.register;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.mail.HtmlEmail;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.Transactional;
+import biodiv.activityFeed.ActivityFeedService;
 import biodiv.common.AbstractService;
 import biodiv.common.Language;
 import biodiv.common.LanguageService;
-import biodiv.common.MailService;
 import biodiv.common.MessageService;
-import biodiv.common.ResponseModel;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import biodiv.userGroup.UserGroupMailingService;
 import biodiv.util.Utils;
 
 public class RegisterService extends AbstractService<RegistrationCode> {
@@ -43,13 +45,16 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	private MessageService messageService;
 
 	@Inject
-	private MailService mailService;
-
-	@Inject
 	Configuration config;
 
 	@Inject
 	private SessionFactory sessionFactory;
+	
+	@Inject
+	private ActivityFeedService activityFeedService;
+	
+	@Inject
+	private RegisterMailingService registerMailingService;
 	
 	@Inject
 	public RegisterService(RegisterDao registerDao) {
@@ -76,21 +81,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	            return;            
 	        }   
 	          
-	        def conf = SpringSecurityUtils.securityConfig
-	        if (command.hasErrors()) {      
-	            def errors = [];   
-	            for (int i = 0; i < command.errors.allErrors.size(); i++) {
-	                def formattedMessage = g.message(code: command.errors.getFieldError(command.errors.allErrors.get(i).field).code)
-	                errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
-	            }
-	            msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], RCU.getLocale(request))
-	            def model = utilsService.getErrorModel(msg, null, OK.value(), errors);
-	            withFormat {
-	                json { render model as JSON }
-	                xml { render model as XML }
-	            }
-	            return
-	        }
+	       
 */
 		
 		Language userLanguage = languageService.getCurrentLanguage(request);
@@ -117,18 +108,8 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 
 		if (registerCommand.openId != null) {
 			log.debug("Is an openId registration");
+			//TODO: verify tht openId is valid openId to unlock user account
 			user.setAccountLocked(false);
-			/*
-			 * user.accountLocked = false; user.addToOpenIds(url:
-			 * command.openId); user.password = "openIdPassword"
-			 * 
-			 * SUserService.save(user);
-			 * 
-			 * if(command.facebookUser) { log.debug "registering facebook user"
-			 * def token = session["LAST_FACEBOOK_USER"]
-			 * facebookAuthService.registerFacebookUser token, user } else {
-			 * SUserService.assignRoles(user); }
-			 */
 		} else {
 			log.debug("Is an local account registration");
 			user.setAccountLocked(true);
@@ -138,6 +119,41 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 			sessionFactory.getCurrentSession().beginTransaction();
 			userService.save(user);
 			sessionFactory.getCurrentSession().getTransaction().commit();
+			
+/*		    if(params.webaddress) { 
+	            //trigger joinUs  
+	            def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+	            if(userGroupInstance) {
+	                if(userGroupInstance.allowUsersToJoin) {
+	                    def founder = userGroupInstance.getFounders(1,0)[0];
+	                    log.debug "Adding ${user} to the group ${userGroupInstance} using founder ${founder} authorities ";
+	                    SpringSecurityUtils.doWithAuth(founder.email, {
+	                        if(userGroupInstance.addMember(user)) {
+	                            flash.message = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request));
+	                        }
+	                    });
+	                }
+	            } else {
+	                log.error "Cannot find usergroup with webaddress : "+params.webaddress;
+	            }
+	        }
+*/
+	
+			
+			  String activityDescription = "";
+              Long activityHolderId = user.getId();
+              Date dateCreated = new java.util.Date();
+			Date lastUpdated = dateCreated;
+              Map<String, Object> afNew = activityFeedService.createMapforAf("Object", user.getId(), user, 
+            		  "species.auth.SUser", "species.auth.SUser", user.getId(), "Registered to portal", "Registered to portal",
+            		  activityDescription, activityDescription, null, null, null, true, null,
+						dateCreated, lastUpdated);  
+              activityFeedService.addActivityFeed(user, afNew, null, (String) afNew.get("rootHolderType"));
+				
+//		        SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
+				sendWelcomeMail(user, request);
+			
+			
 		} catch(Exception re) {
 			log.error("persist failed for user", re);
 			sessionFactory.getCurrentSession().getTransaction().rollback(); 
@@ -145,31 +161,6 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 			throw re;
 		}
 		
-/*		   if (user == null || user.hasErrors()) {
-	            def errors = [];
-	            if(user) {
-	                for (int i = 0; i < user.errors.allErrors.size(); i++) {
-	                    def formattedMessage = g.message(code: command.errors.getFieldError(command.errors.allErrors.get(i).field).code)
-	                    errors << [field: command.errors.allErrors.get(i).field, message: formattedMessage]
-	                }
-	            } else {
-	                errors << messageSource.getMessage("user.null", null, RCU.getLocale(request))
-	            }
-
-	            msg = messageSource.getMessage("register.fail.follow.errors", [errors] as Object[], RCU.getLocale(request))
-
-	            def model = utilsService.getErrorModel(msg, null, OK.value(), errors);
-	            withFormat {
-	                json { render model as JSON }
-	                xml { render model as XML }
-	            }
-	            return
-	        }
-
-		  def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
-			        activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
-			        SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
-*/
 		if(user != null) {
 			try {
 				sessionFactory.getCurrentSession().beginTransaction();
@@ -219,6 +210,58 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		return null;
 	}
 
+	void sendWelcomeMail(User user, HttpServletRequest request) {
+		String domain = config.getString("siteName");
+
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("username", Utils.capitalize(user.getUsername()));
+		params.put("domain", domain);
+		params.put("serverUrl", config.getString("serverUrl"));
+		params.put("siteName", config.getString("siteName"));
+		params.put("facebookUrl", config.getString("facebookUrl"));
+		params.put("twitterUrl", config.getString("twitterUrl"));
+		params.put("feedbackFormUrl", config.getString("feedbackFormUrl"));
+		params.put("mailDefaultFrom", config.getString("mail.senderEmail"));
+		params.put("welcomeEmailIntro", messageService.getMessage("welcomeEmail.intro"));
+		params.put("welcomeEmailObservation", messageService.getMessage("welcomeEmail.observation"));
+		params.put("welcomeEmailMap", messageService.getMessage("welcomeEmail.map"));
+		params.put("welcomeEmailChecklist", messageService.getMessage("welcomeEmail.checklist"));
+		params.put("welcomeEmailSpecies", messageService.getMessage("welcomeEmail.species"));
+		params.put("welcomeEmailGroups", messageService.getMessage("welcomeEmail.groups"));
+		params.put("welcomeEmailDocuments", messageService.getMessage("welcomeEmail.documents"));
+
+		Map<String, String> linkParams = new HashMap<String, String>();
+		linkParams.put("id", String.valueOf(user.getId()));
+		String url;
+		try {
+			url = Utils.generateLink("user", "show", linkParams, request);
+			params.put("userProfileUrl", Utils.generateLink("user", "show", linkParams, request));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+
+		try {
+//			mailService.sendMail(email, sub, body);
+			List<User> allBccs = registerMailingService.getAllBccPeople();
+			for(User bcc : allBccs){
+				HtmlEmail emailToBcc = registerMailingService.buildWelcomeMailMessage(bcc.getEmail(), params);
+			}
+			
+			HtmlEmail emailToPostingUser = registerMailingService.buildWelcomeMailMessage(user.getEmail(), params);
+			
+			if(!registerMailingService.isAnyThreadActive()){
+				System.out.println("no thread is active currently");
+				Thread th = new Thread(registerMailingService);
+				th.start();
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error(e.getMessage());
+		}
+	}
+	
 	RegistrationCode registerAndEmail(User user, HttpServletRequest request) {
 
 		RegistrationCode registrationCode = register(user.getEmail());
@@ -245,18 +288,26 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	void sendVerificationMail(String username, String email, String url) {
 		String domain = config.getString("siteName");
 
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("username", Utils.capitalize(username));
 		params.put("url", url);
 		params.put("domain", domain);
 
-		String sub = messageService.getMessage("register.emailSubject", params);
-		log.debug(sub);
-		String body = messageService.getMessage("register.emailBody", params);
-		log.debug(body);
-
 		try {
-			mailService.sendMail(email, sub, body);
+//			mailService.sendMail(email, sub, body);
+			List<User> allBccs = registerMailingService.getAllBccPeople();
+			for(User bcc : allBccs){
+				HtmlEmail emailToBcc = registerMailingService.buildActivationMailMessage(bcc.getEmail(), params);
+			}
+			
+			HtmlEmail emailToPostingUser = registerMailingService.buildActivationMailMessage(email, params);
+			
+			if(!registerMailingService.isAnyThreadActive()){
+				System.out.println("no thread is active currently");
+				Thread th = new Thread(registerMailingService);
+				th.start();
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error(e.getMessage());
