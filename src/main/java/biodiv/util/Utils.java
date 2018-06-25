@@ -32,7 +32,7 @@ public class Utils {
 	private static String buildURL(HttpServletRequest request, String pathInfo, Map<String, String> parameters)
 			throws Exception {
 
-		String scheme = "https://";//request.getScheme();
+		String scheme = "https";//request.getScheme();
 		String serverName = request.getServerName();
 		String contextPath = request.getContextPath();
 		StringBuilder url = new StringBuilder();
