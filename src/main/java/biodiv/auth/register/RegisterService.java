@@ -120,6 +120,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		if (registerCommand.openId != null) {
 			log.debug("Is an openId registration");
 			//TODO: verify tht openId is valid openId to unlock user account
+			userService.setDefaultRoles(user);
 			user.setAccountLocked(false);
 		} else {
 			log.debug("Is an local account registration");
