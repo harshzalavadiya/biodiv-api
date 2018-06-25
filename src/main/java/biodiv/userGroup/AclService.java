@@ -83,7 +83,7 @@ class AclService implements MutableAclService {
 
 	protected AclSid createOrRetrieveSid(Sid sid, boolean allowCreate) {
 		Assert.notNull(sid, "Sid required");
-
+		log.debug("createOrRetrieveSid : {}", sid);
 		String sidName;
 		boolean principal;
 		if (sid instanceof PrincipalSid) {
@@ -97,9 +97,9 @@ class AclService implements MutableAclService {
 		else {
 			throw new IllegalArgumentException("Unsupported implementation of Sid");
 		}
-
+		log.debug("Finding aclsid sidName : {}, principal : {}", sidName, principal);
 		AclSid aclSid = AclSid.findBySidAndPrincipal(sidName, principal, sessionFactory);
-		if (aclSid != null && allowCreate == true) {
+		if (aclSid == null && allowCreate == true) {
 			aclSid = new AclSid(sidName, principal);
 			aclSid.save(sessionFactory);
 		}
@@ -155,6 +155,7 @@ class AclService implements MutableAclService {
 		Query q = sessionFactory.getCurrentSession().createQuery("delete from AclEntry where id=:id");
 		//sessionFactory.getCurrentSession().beginTransaction();
 		for(int i=0; i<entries.size(); i++) {
+			//log.debug("Deleting aclentry {}", entries.get(i));
 			q.setParameter("id", entries.get(i).getId());
 			q.executeUpdate();
 		}
@@ -167,35 +168,44 @@ class AclService implements MutableAclService {
 		AclObjectIdentity aclObjectIdentity = retrieveObjectIdentity(acl.getObjectIdentity());
 
 		List<AclEntry> existingAces = AclEntry.findAllByAclObjectIdentity(aclObjectIdentity, sessionFactory);
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^ "+existingAces);
 
 		List<AclEntry> toDelete = new ArrayList<AclEntry>();
 		for(AclEntry ace : existingAces) {
+			boolean isValid = false;
 			for(AccessControlEntry entry : acl.getEntries()) {
 				if(!(entry.getPermission().getMask() == ace.getMask() && entry.getSid().toString().equals(ace.getAclSid().getSid()))) {
-					toDelete.add(ace);
+					isValid = true;
 				}
 			}
+			if(isValid) {
+				toDelete.add(ace);
+			}
 		}
-		
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		List<AuditableAccessControlEntry> toCreate = new ArrayList<AuditableAccessControlEntry>();
 		for(AccessControlEntry entry : acl.getEntries()) {
+			boolean isValid = false;
 			for(AclEntry ace : existingAces) {
 				if(!(entry.getPermission().getMask() == ace.getMask() && entry.getSid().toString().equals(ace.getAclSid().getSid()))) {
-					toCreate.add((AuditableAccessControlEntry)entry);
+					isValid = true;
 				}
+			}
+			if(isValid)  {
+				toCreate.add((AuditableAccessControlEntry)entry);
 			}
 		}
 		
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println("toDelete^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		log.debug("{}", toDelete);
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-		System.out.println(toDelete);
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-		System.out.println(toCreate);
+		System.out.println("toCreate^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		log.debug("{}", toCreate);
 		// Delete this ACL's ACEs in the acl_entry table
-		deleteEntries( toDelete);
+		deleteEntries(toDelete);
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
@@ -252,6 +262,7 @@ class AclService implements MutableAclService {
 
 	protected void clearCacheIncludingChildren(ObjectIdentity objectIdentity) {
 		Assert.notNull(objectIdentity, "ObjectIdentity required");
+		System.out.println(objectIdentity);
 		for (ObjectIdentity child : findChildren(objectIdentity)) {
 			clearCacheIncludingChildren(child);
 		}
@@ -260,7 +271,7 @@ class AclService implements MutableAclService {
 
 	public List<ObjectIdentity> findChildren(ObjectIdentity parentOid) {
 		
-		Query q = sessionFactory.getCurrentSession().createQuery("select aoi from AclObjectIdentity aoi, AclClass ac where aoi.objectIdIdentity=:objectId and ac.class_=:className");
+		Query q = sessionFactory.getCurrentSession().createQuery("select aoi from AclObjectIdentity aoi where aoi.aclObjectIdentity.objectIdIdentity=:objectId and aoi.aclObjectIdentity.aclClass.class_=:className");
 		q.setParameter("objectId", (long)parentOid.getIdentifier());
 		q.setParameter("className", parentOid.getType());
 		List<AclObjectIdentity> children = q.getResultList();
@@ -271,21 +282,44 @@ class AclService implements MutableAclService {
 
 		List<ObjectIdentity> x = new ArrayList<ObjectIdentity>();
 		for(AclObjectIdentity aoi : children) {
-			try {
-				x.add(new ObjectIdentityImpl(lookupClass(aoi.getAclClass().getClass_()), aoi.getObjectIdIdentity()));
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				x.add(new ObjectIdentityImpl(lookupClassType(aoi.getAclClass().getClass_()), aoi.getObjectIdIdentity()));
 		}
+		System.out.println("$$$$$$$$$$$$$$$$$$$");
+		System.out.println(x);
+		System.out.println("$$$$$$$$$$$$$$$$$$$");
 		return x;
 	}
 
-	protected Class<?> lookupClass(String className) throws ClassNotFoundException {
+	protected Class<?> lookupClass(String className) {
 		// workaround for Class.forName() not working in tests
-		return Class.forName(className, true, Thread.currentThread().getContextClassLoader());
+		try {
+			if(className.equals("species.groups.UserGroup")) {
+				className = "biodiv.userGroup.UserGroup";
+			}
+			return Class.forName(className, true, Thread.currentThread().getContextClassLoader());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
+	protected String lookupClassType(String className) {
+		// workaround for Class.forName() not working in tests
+		try {
+			if(className.equals("species.groups.UserGroup")) {
+				className = "biodiv.userGroup.UserGroup";
+			}
+			if(Class.forName(className, true, Thread.currentThread().getContextClassLoader()) != null) {
+				return "species.groups.UserGroup";
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public Acl readAclById(ObjectIdentity object) throws NotFoundException {
 		return readAclById(object, null);
 	}

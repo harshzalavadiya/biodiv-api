@@ -101,7 +101,7 @@ public class AclUtilService {
 		try {
 			log.debug("reading acl for oid : {}", oid);
 			acl = aclService.readAclById(oid);
-			log.debug("acl : {}", acl);
+			log.debug("read acl");
 		}
 		catch (NotFoundException e) {
 			log.error(e.getMessage());

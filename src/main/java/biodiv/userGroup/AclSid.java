@@ -101,19 +101,19 @@ public class AclSid extends AbstractObject implements java.io.Serializable {
 	public static AclSid findBySidAndPrincipal(String sidName, boolean principal, SessionFactory sessionFactory) {
 		Query q = sessionFactory.getCurrentSession().createQuery("from AclSid where sid=:sid and principal=:principal");
 		q.setParameter("sid", sidName);
-		q.setParameter("principal", principal);
+		q.setParameter("principal", Boolean.valueOf(principal));
 		AclSid aclSid = null;
 
         try {
         	aclSid = (AclSid) q.getSingleResult();
         } catch(NoResultException e ) {
-            e.printStackTrace();
-            throw new NotFoundException(e);
+            //e.printStackTrace();
+            //throw new NotFoundException(e);
 
         }
-
-        if(aclSid != null) return  aclSid;
-        else return null;
+        System.out.println("------------__*************-----------------");
+        System.out.println(aclSid);
+        return aclSid;
 	}
 
 }

@@ -18,6 +18,8 @@ import javax.ws.rs.NotFoundException;
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import biodiv.common.AbstractObject;
 
@@ -25,6 +27,8 @@ import biodiv.common.AbstractObject;
 @Table(name = "acl_entry", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = {
 		"acl_object_identity", "ace_order" }))
 public class AclEntry extends AbstractObject implements java.io.Serializable {
+
+	protected final Logger log = LoggerFactory.getLogger(getClass());
 
 	private long id;
 	private AclSid aclSid;
@@ -137,7 +141,8 @@ public class AclEntry extends AbstractObject implements java.io.Serializable {
 
 	public static List<AclEntry> findAllByAclObjectIdentity(AclObjectIdentity aclObjectIdentity,
 			SessionFactory sessionFactory) {
-		Query q = sessionFactory.getCurrentSession().createQuery("from AclObjectIdentity where aclObjectIdentity=:aclObjectIdentity");
+		System.out.println("aclObjectIdentity "+ aclObjectIdentity);
+		Query q = sessionFactory.getCurrentSession().createQuery("from AclEntry where aclObjectIdentity=:aclObjectIdentity");
 		q.setParameter("aclObjectIdentity", aclObjectIdentity);
 		List<AclEntry> aclEntries = null;
 
