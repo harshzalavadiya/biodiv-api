@@ -26,7 +26,7 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
+import biodiv.Transactional;
 import org.springframework.util.Assert;
 
 import com.google.inject.Inject;
@@ -115,7 +115,7 @@ class AclService implements MutableAclService {
 		return aclClass;
 	}
 
-	@biodiv.Transactional
+	@Transactional
 	public void deleteAcl(ObjectIdentity objectIdentity, boolean deleteChildren) throws ChildrenExistException {
 
 		Assert.notNull(objectIdentity, "Object Identity required");
@@ -146,17 +146,19 @@ class AclService implements MutableAclService {
 			Query q = sessionFactory.getCurrentSession().createQuery("delete from AclEntry where aclObjectIdentity=:aclObjectIdentity");
 			q.setParameter("aclObjectIdentity", oid);
 			q.executeUpdate();
+			sessionFactory.getCurrentSession().flush();
 		}
 	}
 
+	@Transactional
 	protected void deleteEntries(List<AclEntry> entries) {
 		Query q = sessionFactory.getCurrentSession().createQuery("delete from AclEntry where id=:id");
-		sessionFactory.getCurrentSession().beginTransaction();
+		//sessionFactory.getCurrentSession().beginTransaction();
 		for(int i=0; i<entries.size(); i++) {
 			q.setParameter("id", entries.get(i).getId());
 			q.executeUpdate();
 		}
-		sessionFactory.getCurrentSession().getTransaction().commit();
+		sessionFactory.getCurrentSession().flush();
 	}
 
 	@Transactional
@@ -184,9 +186,20 @@ class AclService implements MutableAclService {
 			}
 		}
 		
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println(toDelete);
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println(toCreate);
 		// Delete this ACL's ACEs in the acl_entry table
 		deleteEntries( toDelete);
-
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		
 		// Create this ACL's ACEs in the acl_entry table
 		createEntries(acl, toCreate);
 
@@ -247,7 +260,7 @@ class AclService implements MutableAclService {
 
 	public List<ObjectIdentity> findChildren(ObjectIdentity parentOid) {
 		
-		Query q = sessionFactory.getCurrentSession().createQuery("from AclObjectIdentity, AclClass where objectId=:objectId and className=:className");
+		Query q = sessionFactory.getCurrentSession().createQuery("select aoi from AclObjectIdentity aoi, AclClass ac where aoi.objectIdIdentity=:objectId and ac.class_=:className");
 		q.setParameter("objectId", (long)parentOid.getIdentifier());
 		q.setParameter("className", parentOid.getType());
 		List<AclObjectIdentity> children = q.getResultList();
@@ -292,7 +305,7 @@ class AclService implements MutableAclService {
 
 	public Map<ObjectIdentity, Acl> readAclsById(List<ObjectIdentity> objects, List<Sid> sids) throws NotFoundException {
 		Map<ObjectIdentity, Acl> result = aclLookupStrategy.readAclsById(objects, sids);
-		log.debug("readAclsById result : {}", result);
+		//log.debug("readAclsById result : {}", result);
 		// Check every requested object identity was found (throw NotFoundException if needed)
 		for (ObjectIdentity object : objects) {
 			if (!result.containsKey(object)) {

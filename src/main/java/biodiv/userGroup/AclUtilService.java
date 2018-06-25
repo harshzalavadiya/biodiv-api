@@ -58,7 +58,6 @@ public class AclUtilService {
 		}
 		
 		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(founder.getEmail(), founder.getPassword(), authorities);
-		authentication.setAuthenticated(true);
 		
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
@@ -84,19 +83,6 @@ public class AclUtilService {
 	 * @param permission  the permission to grant
 	 */
 	void addPermission(UserGroup domainObject, User recipient, Permission permission) {
-		System.out.println("****************************");
-		System.out.println("****************************");
-		System.out.println("****************************");
-		System.out.println("****************************");
-		System.out.println("****************************");
-		System.out.println(SecurityContextHolder.getContext());
-		System.out.println(SecurityContextHolder.getContext().getAuthentication());
-		System.out.println(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
-		System.out.println("****************************");
-		System.out.println("****************************");
-		System.out.println("****************************");
-		System.out.println("****************************");
-		System.out.println("****************************");
 		ObjectIdentity oid = objectIdentityRetrievalStrategy.getObjectIdentity(domainObject);
 		addPermission(oid, recipient, permission);
 	}
@@ -122,8 +108,10 @@ public class AclUtilService {
 			log.debug("creating acl for oid : {}", oid);
 			acl = aclService.createAcl(oid);
 		}
+		log.debug("Insert permission {} for Sid {}", permission, sid);
 
 		((AclImpl)acl).insertAce(acl.getEntries().size(), permission, sid, true);
+		log.debug("Updating acl");
 		aclService.updateAcl((MutableAcl)acl);
 		log.debug("Added permission {} for Sid {} for {} with id {}", permission, sid, oid.getType(), oid.getIdentifier());
 	}
