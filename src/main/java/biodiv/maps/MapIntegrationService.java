@@ -117,10 +117,9 @@ public class MapIntegrationService {
 			response1 = httpClient.execute(httpGet);
 			HttpEntity entity1 = response1.getEntity();
 			String content = EntityUtils.toString(entity1);
-			
 			ObjectMapper mapper = new ObjectMapper();
 			MapDocument mapDocument = mapper.readValue(content, MapDocument.class);
-
+				
 			ObservationListMapper result = mapper.readValue(String.valueOf(mapDocument.getDocument()),
 					ObservationListMapper.class);
 
@@ -172,7 +171,6 @@ public class MapIntegrationService {
 			HttpPost post = new HttpPost(url);
 
 			String jsonData = objectMapper.writeValueAsString(querys);
-
 			StringEntity entity = new StringEntity(jsonData, ContentType.APPLICATION_JSON);
 
 			post.setEntity(entity);
@@ -181,10 +179,11 @@ public class MapIntegrationService {
 				CloseableHttpClient httpclient = HttpClients.createDefault();
 
 				response = httpclient.execute(post, context);
-
+				
 				HttpEntity entity1 = response.getEntity();
 
 				String responseString = EntityUtils.toString(entity1);
+				
 				
 				ObjectMapper mapper = new ObjectMapper();
 
