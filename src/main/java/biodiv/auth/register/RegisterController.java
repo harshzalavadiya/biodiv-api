@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.common.ResponseModel;
 import biodiv.user.User;
+import biodiv.util.Utils;
 
 @Path("/register")
 public class RegisterController {
@@ -103,7 +104,7 @@ public class RegisterController {
 	@GET
 	//@Produces(MediaType.APPLICATION_JSON)
 	@Path("/verifyRegistration")
-	public Response verifyRegistration(@QueryParam("t") String token, @Pac4JProfile Optional<CommonProfile> profile) {
+	public Response verifyRegistration(@QueryParam("t") String token, @Context HttpServletRequest request, @Pac4JProfile Optional<CommonProfile> profile) {
 		if (profile.isPresent()) {
 			throw new WebApplicationException(400);
         } 
@@ -123,7 +124,7 @@ public class RegisterController {
 		
 		if ((boolean) result.get("success") == true) {
 			try {
-				return Response.temporaryRedirect(new URI("/login")).build();
+				url = new URI(Utils.generateLink("login", "auth", new HashMap(), request));
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}

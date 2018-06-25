@@ -1,5 +1,6 @@
 package biodiv.util;
 
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class Utils {
 	}
 
 	public static String generateLink(String controller, String action, Map<String, String> linkParams,
-			HttpServletRequest request) throws Exception {
+			HttpServletRequest request) throws URISyntaxException {
 		/*
 		 * TODO: build userGroup context link return
 		 * userGroupService.userGroupBasedLink(base:
@@ -29,8 +30,8 @@ public class Utils {
 		return buildURL(request, "/" + controller + "/" + action, linkParams);
 	}
 
-	private static String buildURL(HttpServletRequest request, String pathInfo, Map<String, String> parameters)
-			throws Exception {
+	private static String buildURL(HttpServletRequest request, String pathInfo, Map<String, String> parameters) throws URISyntaxException
+			{
 
 		String scheme = "https";//request.getScheme();
 		String serverName = request.getServerName();
