@@ -66,11 +66,6 @@ public class RegisterController {
 		
 		System.out.println(profile);
 		if (profile.isPresent()) {
-			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
-			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
-			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
-			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
-			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
 			ResponseModel responseModel = new ResponseModel(Response.Status.BAD_REQUEST, "Please logout before registering.");
 			return Response.status(Response.Status.BAD_REQUEST).entity(responseModel).build();
         } 
@@ -85,8 +80,11 @@ public class RegisterController {
 					User user = registerService.create(registerCommand, webaddress, request);
 					Map<String, Object> result = new HashMap<String, Object>();
 					result.put("success", true);
-					result.put("msg",
-							"Welcome. An activation email has been sent to your email. Please click the confirmation link to activate your account.");
+					String msg = "Welcome !!!";
+					if(registerCommand.openId == null) {
+						msg += "An activation email has been sent to your email. Please click the confirmation link to activate your account.";
+					}
+					result.put("msg", msg);
 					return Response.ok(result).entity(result).build();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -110,7 +108,7 @@ public class RegisterController {
         } 
 		log.debug("Verifying registration code : " + token);
 
-		Map<String, Object> result = registerService.verifyRegistration(token);
+		Map<String, Object> result = registerService.verifyRegistration(token, request);
 		log.debug(result.toString());
 		URI url = null;
 		
@@ -124,7 +122,8 @@ public class RegisterController {
 		
 		if ((boolean) result.get("success") == true) {
 			try {
-				url = new URI(Utils.generateLink("login", "auth", new HashMap(), request));
+				String contextPath = request.getContextPath();
+				url = new URI(Utils.generateLink("login", "auth", new HashMap(), request).replace(contextPath, ""));
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}

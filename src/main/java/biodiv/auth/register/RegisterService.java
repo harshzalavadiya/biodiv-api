@@ -119,7 +119,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 
 		if (registerCommand.openId != null) {
 			log.debug("Is an openId registration");
-			//TODO: verify tht openId is valid openId to unlock user account
+			//TODO: verify tht openId is valid openId to unlock user accounte
 			userService.setDefaultRoles(user);
 			user.setAccountLocked(false);
 		} else {
@@ -166,7 +166,9 @@ public class RegisterService extends AbstractService<RegistrationCode> {
               activityFeedService.addActivityFeed(user, afNew, null, (String) afNew.get("rootHolderType"));
 				
 //		        SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
+			if(registerCommand.openId != null) {
 				sendWelcomeMail(user, request);
+			}
 			
 			
 		} catch(Exception re) {
@@ -330,7 +332,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	}
 
 	@Transactional
-	Map<String, Object> verifyRegistration(String token) {
+	Map<String, Object> verifyRegistration(String token, HttpServletRequest request) {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		log.debug("Verifying registration code {} ", token);
@@ -355,7 +357,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 
 				result.put("success", true);
 				result.put("message", "Registration complete. Welcome!!!");
-
+				sendWelcomeMail(user, request);
 			} catch (NotFoundException e) {
 				e.printStackTrace();
 				result.put("success", false);
