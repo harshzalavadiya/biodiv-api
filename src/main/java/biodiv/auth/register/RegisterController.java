@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -16,12 +17,17 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.http.HttpStatus;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.jax.rs.annotations.Pac4JProfile;
+import org.pac4j.jax.rs.annotations.Pac4JProfileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +59,21 @@ public class RegisterController {
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response register(@Valid @BeanParam RegisterCommand registerCommand, @Context HttpServletRequest request) {
+	public Response register(@Valid @BeanParam RegisterCommand registerCommand, @FormParam("webaddress") String webaddress, @Context HttpServletRequest request, @Pac4JProfile Optional<CommonProfile> profile, @Pac4JProfileManager ProfileManager<CommonProfile> profileM) {
+		System.out.println(profileM);
+		System.out.println(profileM.get(true));
+		
+		System.out.println(profile);
+		if (profile.isPresent()) {
+			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
+			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
+			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
+			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
+			System.out.println("+++++++++++++++++++++++++++++++++++++++++");
+			ResponseModel responseModel = new ResponseModel(Response.Status.BAD_REQUEST, "Please logout before registering.");
+			return Response.status(Response.Status.BAD_REQUEST).entity(responseModel).build();
+        } 
+		
 		log.debug("Registering user " + registerCommand.toString());
 
 		try {
@@ -61,7 +81,7 @@ public class RegisterController {
 				return Response.status(HttpStatus.SC_FORBIDDEN).build();
 			} else {
 				try {
-					User user = registerService.create(registerCommand, request);
+					User user = registerService.create(registerCommand, webaddress, request);
 					Map<String, Object> result = new HashMap<String, Object>();
 					result.put("success", true);
 					result.put("msg",
@@ -83,12 +103,10 @@ public class RegisterController {
 	@GET
 	//@Produces(MediaType.APPLICATION_JSON)
 	@Path("/verifyRegistration")
-	public Response verifyRegistration(@QueryParam("t") String token) {
-		// TODO: if (springSecurityService.isLoggedIn()) {
-		// redirect uri:request.scheme+"://"+request.serverName+
-		// SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
-		// return;
-		// }
+	public Response verifyRegistration(@QueryParam("t") String token, @Pac4JProfile Optional<CommonProfile> profile) {
+		if (profile.isPresent()) {
+			throw new WebApplicationException(400);
+        } 
 		log.debug("Verifying registration code : " + token);
 
 		Map<String, Object> result = registerService.verifyRegistration(token);

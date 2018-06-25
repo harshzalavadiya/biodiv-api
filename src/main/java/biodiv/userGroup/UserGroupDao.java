@@ -1,5 +1,7 @@
 package biodiv.userGroup;
 
+import java.security.Permission;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import biodiv.user.Role;
 import biodiv.user.User;
 import biodiv.userGroup.userGroupMemberRole.UserGroupMemberRole;
 
@@ -146,5 +149,31 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 		else
 			return true;
 	}
+	
+	public List<User> getMembersWithRole(Long ugId, Long roleId) {
 
+		String hql = "from UserGroupMemberRole ugmr where ugmr.role.id =:roleId and ugmr.userGroup.id =:ugId";
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
+		query.setParameter("roleId", roleId);
+		query.setParameter("ugId", ugId);
+
+		List<UserGroupMemberRole> ugmr = query.getResultList();
+		List<User> membersWithRole = new ArrayList<User>();
+		for(int i =0; i<ugmr.size(); i++) {
+			membersWithRole.add(ugmr.get(i).getUser());
+		}
+		return membersWithRole;
+	}
+	
+	private UserGroupMemberRole getMemberRole(Long userId, Long ugId) {
+
+		String hql = "from UserGroupMemberRole ugmr where ugmr.user.id =:userId and ugmr.userGroup.id =:ugId";
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
+		query.setParameter("userId", userId);		
+		query.setParameter("ugId", ugId);
+
+		UserGroupMemberRole ugmr = (UserGroupMemberRole) query.getSingleResult();
+		return ugmr;
+	}
+	
 }

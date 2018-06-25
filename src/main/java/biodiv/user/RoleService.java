@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.common.AbstractService;
+import biodiv.userGroup.userGroupMemberRole.UserGroupMemberRole;
+import biodiv.userGroup.userGroupMemberRole.UserGroupMemberRole.UserGroupMemberRoleType;
 
 public class RoleService extends AbstractService<Role> {
 

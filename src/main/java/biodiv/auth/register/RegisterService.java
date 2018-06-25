@@ -17,14 +17,18 @@ import org.slf4j.LoggerFactory;
 
 import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
+import biodiv.auth.MessageDigestPasswordEncoder;
 import biodiv.common.AbstractService;
 import biodiv.common.Language;
 import biodiv.common.LanguageService;
 import biodiv.common.MessageService;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import biodiv.userGroup.UserGroup;
 import biodiv.userGroup.UserGroupMailingService;
+import biodiv.userGroup.UserGroupService;
 import biodiv.util.Utils;
+import biodiv.userGroup.AclUtilService;
 
 public class RegisterService extends AbstractService<RegistrationCode> {
 
@@ -57,6 +61,12 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	private RegisterMailingService registerMailingService;
 	
 	@Inject
+	private UserGroupService userGroupService;
+	
+	@Inject
+	private AclUtilService aclUtilService;
+	
+	@Inject
 	public RegisterService(RegisterDao registerDao) {
 		super(registerDao);
 		this.registerDao = registerDao;
@@ -69,7 +79,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	 *            dummy
 	 * @return dummy
 	 */
-	User create(RegisterCommand registerCommand, HttpServletRequest request) {
+	User create(RegisterCommand registerCommand, String webaddress, HttpServletRequest request) {
 /*
 		   if (springSecurityService.isLoggedIn()) {
 	            msg = messageSource.getMessage("login.already", null, RCU.getLocale(request))
@@ -90,7 +100,8 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		user.setEmail(registerCommand.email.toLowerCase().trim());
 		user.setName(registerCommand.name);
 		user.setUsername(registerCommand.name);
-		user.setPassword(registerCommand.password);
+		MessageDigestPasswordEncoder passwordEncoder = new MessageDigestPasswordEncoder("MD5");
+		user.setPassword(passwordEncoder.encodePassword(registerCommand.password, null));
 		user.setLocation(registerCommand.location);
 		user.setLatitude(registerCommand.latitude);
 		user.setLongitude(registerCommand.longitude);
@@ -118,32 +129,35 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		try {
 			sessionFactory.getCurrentSession().beginTransaction();
 			userService.save(user);
-			sessionFactory.getCurrentSession().getTransaction().commit();
-			
-/*		    if(params.webaddress) { 
+		    sessionFactory.getCurrentSession().getTransaction().commit();
+
+			sessionFactory.getCurrentSession().beginTransaction();			
+		    if(webaddress != null && !webaddress.isEmpty()) { 
 	            //trigger joinUs  
-	            def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
-	            if(userGroupInstance) {
-	                if(userGroupInstance.allowUsersToJoin) {
-	                    def founder = userGroupInstance.getFounders(1,0)[0];
-	                    log.debug "Adding ${user} to the group ${userGroupInstance} using founder ${founder} authorities ";
-	                    SpringSecurityUtils.doWithAuth(founder.email, {
+	            UserGroup userGroupInstance = userGroupService.findByName(webaddress);
+	            if(userGroupInstance != null) {
+	                if(userGroupInstance.isAllowUsersToJoin() == true) {
+	                    User founder = userGroupService.getFounders(userGroupInstance).get(0);
+	                    log.debug("Adding {} to the group {} using founder {} authorities ", user, userGroupInstance, founder);
+	                	aclUtilService.initializeSecurityContextHolder(founder);
+	                    userGroupService.addMember(userGroupInstance, user);
+	                   /* SpringSecurityUtils.doWithAuth(founder.email, {
 	                        if(userGroupInstance.addMember(user)) {
 	                            flash.message = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request));
 	                        }
-	                    });
+	                    });*/
 	                }
 	            } else {
-	                log.error "Cannot find usergroup with webaddress : "+params.webaddress;
+	                log.error("Cannot find usergroup with webaddress {} ", webaddress);
 	            }
 	        }
-*/
+		    sessionFactory.getCurrentSession().getTransaction().commit();
 	
 			
 			  String activityDescription = "";
               Long activityHolderId = user.getId();
               Date dateCreated = new java.util.Date();
-			Date lastUpdated = dateCreated;
+              Date lastUpdated = dateCreated;
               Map<String, Object> afNew = activityFeedService.createMapforAf("Object", user.getId(), user, 
             		  "species.auth.SUser", "species.auth.SUser", user.getId(), "Registered to portal", "Registered to portal",
             		  activityDescription, activityDescription, null, null, null, true, null,
@@ -199,7 +213,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		try {
 			log.info("Generating registration code for the user {} ", email);
 			RegistrationCode registrationCode = registrationCodeFactory.create(email);
-			if (registrationCode.save() == null) {
+			if (registrationCode.save(sessionFactory) == null) {
 				log.error("Coudn't save registrationCode");
 			} else {
 				return registrationCode;

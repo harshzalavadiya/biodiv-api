@@ -1,6 +1,7 @@
 package biodiv.auth;
 
 import javax.inject.Inject;
+import javax.ws.rs.NotFoundException;
 
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
@@ -44,13 +45,21 @@ public class SimpleUsernamePasswordAuthenticator implements Authenticator<Userna
 
 		log.debug("Validating credentials : " + credentials);
 
-		User user = userService.findByEmail(username);
+		User user = null;
+		try {
+			user = userService.findByEmail(username);
+		} catch(NotFoundException e ) {
+			log.error("No user with email {}", username);
+		}
+		
 		if (user == null) {
 			throwsException("Not a valid user");
 		}
 		// TODO: using null salt and MD5 algorithm. Not safe. Upgrade to BCrypt
 		else if (!passwordEncoder.isPasswordValid(user.getPassword(), password, null)) {
 			throwsException("Password is not valid");
+		} else if(user.isAccountLocked() == true) {
+			throwsException("Account is locked. Please complete the account validation by clicking the link sent in activation email sent to your email account.");
 		} else {
 			CommonProfile profile = userService.createUserProfile(user);
 			log.debug("Setting profile in the context: " + profile);
