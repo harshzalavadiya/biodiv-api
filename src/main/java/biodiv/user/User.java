@@ -52,7 +52,7 @@ public class User extends CommonMethod implements Principal {
 	private Double latitude;
 	private Double longitude;	
 	private Language language;
-	private Float timezone;
+	private float timezone = 0;
 	private String website;
 	private String aboutMe;
 	
@@ -256,11 +256,11 @@ public class User extends CommonMethod implements Principal {
 	}
 
 	@Column(name = "timezone", precision = 8, scale = 8)
-	public Float getTimezone() {
+	public float getTimezone() {
 		return this.timezone;
 	}
 
-	public void setTimezone(Float timezone) {
+	public void setTimezone(float timezone) {
 		this.timezone = timezone;
 	}
 
