@@ -71,7 +71,8 @@ public abstract class AbstractDao<T, K extends Serializable> {
 		try {
 			entity = (T) query.getSingleResult();
 		} catch(NoResultException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			log.error("NoResultException {}", e.getMessage());
 		}
 
 		

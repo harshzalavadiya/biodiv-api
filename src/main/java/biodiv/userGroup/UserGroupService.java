@@ -477,16 +477,37 @@ public class UserGroupService extends AbstractService<UserGroup> {
 		}
 	}
 	
-	public boolean addMember(UserGroup ug, User member) {
-        if(member != null) {
+	@Transactional
+	public boolean addMember(String webaddress, User user) {
+		if(webaddress != null && !webaddress.isEmpty()) { 
+            //trigger joinUs  
+            UserGroup userGroupInstance = findByName(webaddress);
+            if(userGroupInstance != null) {
+                if(userGroupInstance.isAllowUsersToJoin() == true) {
+                    User founder = getFounders(userGroupInstance).get(0);
+                    log.debug("Adding {} to the group {} using founder {} authorities ", user, userGroupInstance, founder);
+                	aclUtilService.initializeSecurityContextHolder(founder);
+                    return addMember(userGroupInstance, user);
+                }
+            } else {
+                log.error("Cannot find usergroup with webaddress {} ", webaddress);
+            }
+        }
+		return false;
+    }
+	
+	@Transactional
+	public boolean addMember(UserGroup ug, User user) {
+        if(user != null) {
             Role memberRole = roleService.findRoleByAuthority(UserGroupMemberRole.UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value());
             List<Permission> permissions = new ArrayList<Permission>();
             permissions.add(BasePermission.WRITE);
-            return addMemberWithRole(ug, member, memberRole, permissions);
+            return addMemberWithRole(ug, user, memberRole, permissions);
         }
         return false;
     }
 	
+	@Transactional
 	private boolean addMemberWithRole(UserGroup ug, User user, Role role, List<Permission> permissions) {
         //User founder = getFounders(ug).get(0);
         //log.debug("Adding {} to the group {} using founder {} authorities ", user, ug, founder);
@@ -524,6 +545,7 @@ public class UserGroupService extends AbstractService<UserGroup> {
          }
 	}
 	
+	@Transactional
 	 //TODO:need to make this better by providing a mapping between this role and associated permissions
     private boolean deletePermissionsAsPerRole(UserGroup ug, User user, Role role) {
         log.debug("Deleting permissions for member {} who had role {} in group {}", user, role, ug);

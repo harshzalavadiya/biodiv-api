@@ -21,16 +21,21 @@ public class Utils {
 
 	public static String generateLink(String controller, String action, Map<String, String> linkParams,
 			HttpServletRequest request) throws URISyntaxException {
+		return generateLink(controller, action, linkParams, request, true);
+	}
+	
+	public static String generateLink(String controller, String action, Map<String, String> linkParams,
+			HttpServletRequest request, boolean includeContextPath) throws URISyntaxException {
 		/*
 		 * TODO: build userGroup context link return
 		 * userGroupService.userGroupBasedLink(base:
 		 * Utils.getDomainServerUrl(request), controller: controller, action:
 		 * action, 'userGroupWebaddress':params.webaddress, params: linkParams)
 		 */
-		return buildURL(request, "/" + controller + "/" + action, linkParams);
+		return buildURL(request, "/" + controller + "/" + action, linkParams, includeContextPath);
 	}
 
-	private static String buildURL(HttpServletRequest request, String pathInfo, Map<String, String> parameters) throws URISyntaxException
+	private static String buildURL(HttpServletRequest request, String pathInfo, Map<String, String> parameters, boolean includeContextPath) throws URISyntaxException
 			{
 
 		String scheme = "https";//request.getScheme();
@@ -38,7 +43,9 @@ public class Utils {
 		String contextPath = request.getContextPath();
 		StringBuilder url = new StringBuilder();
 		url.append(scheme).append("://").append(serverName);
-		url.append(contextPath).append(pathInfo);
+		if(includeContextPath == true)
+			url.append(contextPath);
+		url.append(pathInfo);
 
 		URIBuilder builder = new URIBuilder(url.toString());
 		if (parameters != null && !parameters.isEmpty()) {

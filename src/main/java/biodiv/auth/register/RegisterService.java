@@ -24,11 +24,8 @@ import biodiv.common.LanguageService;
 import biodiv.common.MessageService;
 import biodiv.user.User;
 import biodiv.user.UserService;
-import biodiv.userGroup.UserGroup;
-import biodiv.userGroup.UserGroupMailingService;
 import biodiv.userGroup.UserGroupService;
 import biodiv.util.Utils;
-import biodiv.userGroup.AclUtilService;
 
 public class RegisterService extends AbstractService<RegistrationCode> {
 
@@ -53,19 +50,16 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 
 	@Inject
 	private SessionFactory sessionFactory;
-	
+
 	@Inject
 	private ActivityFeedService activityFeedService;
-	
+
 	@Inject
 	private RegisterMailingService registerMailingService;
-	
+
 	@Inject
 	private UserGroupService userGroupService;
-	
-	@Inject
-	private AclUtilService aclUtilService;
-	
+
 	@Inject
 	public RegisterService(RegisterDao registerDao) {
 		super(registerDao);
@@ -80,20 +74,16 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	 * @return dummy
 	 */
 	User create(RegisterCommand registerCommand, String webaddress, HttpServletRequest request) {
-/*
-		   if (springSecurityService.isLoggedIn()) {
-	            msg = messageSource.getMessage("login.already", null, RCU.getLocale(request))
-	            def model = utilsService.getErrorModel(msg, null, OK.value());
-	            withFormat {
-	                json { render model as JSON }   
-	                xml { render model as XML }
-	            }
-	            return;            
-	        }   
-	          
-	       
-*/
-		
+		/*
+		 * if (springSecurityService.isLoggedIn()) { msg =
+		 * messageSource.getMessage("login.already", null,
+		 * RCU.getLocale(request)) def model = utilsService.getErrorModel(msg,
+		 * null, OK.value()); withFormat { json { render model as JSON } xml {
+		 * render model as XML } } return; }
+		 * 
+		 * 
+		 */
+
 		Language userLanguage = languageService.getCurrentLanguage(request);
 
 		User user = new User();
@@ -119,95 +109,68 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 
 		if (registerCommand.openId != null) {
 			log.debug("Is an openId registration");
-			//TODO: verify tht openId is valid openId to unlock user accounte
+			// TODO: verify tht openId is valid openId to unlock user accounte
 			userService.setDefaultRoles(user);
 			user.setAccountLocked(false);
 		} else {
 			log.debug("Is an local account registration");
 			user.setAccountLocked(true);
 		}
-		
-		try {
-			sessionFactory.getCurrentSession().beginTransaction();
-			userService.save(user);
-		    sessionFactory.getCurrentSession().getTransaction().commit();
 
-			sessionFactory.getCurrentSession().beginTransaction();			
-		    if(webaddress != null && !webaddress.isEmpty()) { 
-	            //trigger joinUs  
-	            UserGroup userGroupInstance = userGroupService.findByName(webaddress);
-	            if(userGroupInstance != null) {
-	                if(userGroupInstance.isAllowUsersToJoin() == true) {
-	                    User founder = userGroupService.getFounders(userGroupInstance).get(0);
-	                    log.debug("Adding {} to the group {} using founder {} authorities ", user, userGroupInstance, founder);
-	                	aclUtilService.initializeSecurityContextHolder(founder);
-	                    userGroupService.addMember(userGroupInstance, user);
-	                   /* SpringSecurityUtils.doWithAuth(founder.email, {
-	                        if(userGroupInstance.addMember(user)) {
-	                            flash.message = messageSource.getMessage("userGroup.joined.to.contribution", [userGroupInstance.name] as Object[], RCU.getLocale(request));
-	                        }
-	                    });*/
-	                }
-	            } else {
-	                log.error("Cannot find usergroup with webaddress {} ", webaddress);
-	            }
-	        }
-		    sessionFactory.getCurrentSession().getTransaction().commit();
-	
-			
-			  String activityDescription = "";
-              Long activityHolderId = user.getId();
-              Date dateCreated = new java.util.Date();
-              Date lastUpdated = dateCreated;
-              Map<String, Object> afNew = activityFeedService.createMapforAf("Object", user.getId(), user, 
-            		  "species.auth.SUser", "species.auth.SUser", user.getId(), "Registered to portal", "Registered to portal",
-            		  activityDescription, activityDescription, null, null, null, true, null,
-						dateCreated, lastUpdated);  
-              activityFeedService.addActivityFeed(user, afNew, null, (String) afNew.get("rootHolderType"));
-				
-//		        SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
-			if(registerCommand.openId != null) {
+		try {
+			userService.save(user);
+			userGroupService.addMember(webaddress, user);
+
+			String activityDescription = "";
+			Long activityHolderId = user.getId();
+			Date dateCreated = new java.util.Date();
+			Date lastUpdated = dateCreated;
+			Map<String, Object> afNew = activityFeedService.createMapforAf("Object", user.getId(), user,
+					"species.auth.SUser", "species.auth.SUser", user.getId(), "Registered to portal",
+					"Registered to portal", activityDescription, activityDescription, null, null, null, true, null,
+					dateCreated, lastUpdated);
+			activityFeedService.addActivityFeed(user, afNew, null, (String) afNew.get("rootHolderType"));
+
+			// SUserService.sendNotificationMail(SUserService.NEW_USER, user,
+			// request, userProfileUrl);
+			if (registerCommand.openId != null) {
 				sendWelcomeMail(user, request);
 			}
-			
-			
-		} catch(Exception re) {
+
+		} catch (Exception re) {
 			log.error("persist failed for user", re);
-			sessionFactory.getCurrentSession().getTransaction().rollback(); 
 			user = null;
 			throw re;
 		}
-		
-		if(user != null) {
-			try {
-				sessionFactory.getCurrentSession().beginTransaction();
-			
-				RegistrationCode registrationCode = registerAndEmail(user, request);
-		
 
-/*			        if (registrationCode == null || registrationCode.hasErrors()) {
-			            msg = messageSource.getMessage("register.errors.send.verification.token", [user] as Object[], RCU.getLocale(request))
-			                def model = utilsService.getErrorModel(msg, null, OK.value());
-			            withFormat {
-			                json { render model as JSON }
-			                xml { render model as XML }
-			            }
-			        }
-			        msg = messageSource.getMessage("register.success.send.verification.token", [user,user.email] as Object[], RCU.getLocale(request))
-			            def model = utilsService.getSuccessModel(msg, null, OK.value());
-			        withFormat {
-			            json { render model as JSON }
-			            xml { render model as XML }
-			        }
-*/
-				sessionFactory.getCurrentSession().getTransaction().commit();
-			} catch(Exception re) {
-				log.error("persist failed for registration code", re);
-				sessionFactory.getCurrentSession().getTransaction().rollback(); 
-				throw re;
-			}
+		if (user != null) {
+			RegistrationCode registrationCode = registerAndEmail(user, request);
 		}
 		return user;
+	}
+
+	@Transactional
+	RegistrationCode registerAndEmail(User user, HttpServletRequest request) {
+
+		RegistrationCode registrationCode = register(user.getEmail());
+
+		log.debug("Got {} ", registrationCode);
+
+		if (registrationCode != null) {
+			Map<String, String> linkParams = new HashMap<String, String>();
+			linkParams.put("t", registrationCode.getToken());
+			String url;
+			try {
+				url = Utils.generateLink("register", "verifyRegistration", linkParams, request, false);
+				log.debug("Sending verification email with registrationCode : {} ", url);
+				sendVerificationMail(user.getUsername(), user.getEmail(), url);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return registrationCode;
+		}
+
+		return null;
 	}
 
 	RegistrationCode register(String email) {
@@ -225,6 +188,35 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 			throw e;
 		}
 		return null;
+	}
+
+	void sendVerificationMail(String username, String email, String url) {
+		String domain = config.getString("siteName");
+
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("username", Utils.capitalize(username));
+		params.put("url", url);
+		params.put("domain", domain);
+
+		try {
+			// mailService.sendMail(email, sub, body);
+			List<User> allBccs = registerMailingService.getAllBccPeople();
+			for (User bcc : allBccs) {
+				HtmlEmail emailToBcc = registerMailingService.buildActivationMailMessage(bcc.getEmail(), params);
+			}
+
+			HtmlEmail emailToPostingUser = registerMailingService.buildActivationMailMessage(email, params);
+
+			if (!registerMailingService.isAnyThreadActive()) {
+				System.out.println("no thread is active currently");
+				Thread th = new Thread(registerMailingService);
+				th.start();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error(e.getMessage());
+		}
 	}
 
 	void sendWelcomeMail(User user, HttpServletRequest request) {
@@ -256,75 +248,22 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 
 		try {
-//			mailService.sendMail(email, sub, body);
+			// mailService.sendMail(email, sub, body);
 			List<User> allBccs = registerMailingService.getAllBccPeople();
-			for(User bcc : allBccs){
+			for (User bcc : allBccs) {
 				HtmlEmail emailToBcc = registerMailingService.buildWelcomeMailMessage(bcc.getEmail(), params);
 			}
-			
+
 			HtmlEmail emailToPostingUser = registerMailingService.buildWelcomeMailMessage(user.getEmail(), params);
-			
-			if(!registerMailingService.isAnyThreadActive()){
+
+			if (!registerMailingService.isAnyThreadActive()) {
 				System.out.println("no thread is active currently");
 				Thread th = new Thread(registerMailingService);
 				th.start();
 			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error(e.getMessage());
-		}
-	}
-	
-	RegistrationCode registerAndEmail(User user, HttpServletRequest request) {
 
-		RegistrationCode registrationCode = register(user.getEmail());
-
-		log.debug("Got {} ", registrationCode);
-
-		if (registrationCode != null) {
-			Map<String, String> linkParams = new HashMap<String, String>();
-			linkParams.put("t", registrationCode.getToken());
-			String url;
-			try {
-				url = Utils.generateLink("register", "verifyRegistration", linkParams, request);
-				log.debug("Sending verification email with registrationCode : {} ", url);
-				sendVerificationMail(user.getUsername(), user.getEmail(), url);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return registrationCode;
-		}
-
-		return null;
-	}
-
-	void sendVerificationMail(String username, String email, String url) {
-		String domain = config.getString("siteName");
-
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("username", Utils.capitalize(username));
-		params.put("url", url);
-		params.put("domain", domain);
-
-		try {
-//			mailService.sendMail(email, sub, body);
-			List<User> allBccs = registerMailingService.getAllBccPeople();
-			for(User bcc : allBccs){
-				HtmlEmail emailToBcc = registerMailingService.buildActivationMailMessage(bcc.getEmail(), params);
-			}
-			
-			HtmlEmail emailToPostingUser = registerMailingService.buildActivationMailMessage(email, params);
-			
-			if(!registerMailingService.isAnyThreadActive()){
-				System.out.println("no thread is active currently");
-				Thread th = new Thread(registerMailingService);
-				th.start();
-			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error(e.getMessage());
@@ -342,7 +281,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 			log.debug("registrationCode {}", registrationCode);
 			if (registrationCode == null) {
 				result.put("success", false);
-				result.put("message", "Bad registration code");
+				result.put("msg", "Registration code is already validated or got deleted. Please use forgot password link to reset password and reactivate account.");
 				return result;
 			}
 
@@ -356,19 +295,19 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 				registerDao.delete(registrationCode);
 
 				result.put("success", true);
-				result.put("message", "Registration complete. Welcome!!!");
+				result.put("msg", "Registration is complete. Welcome!!! Please login to contribute.");
 				sendWelcomeMail(user, request);
 			} catch (NotFoundException e) {
 				e.printStackTrace();
 				result.put("success", false);
-				result.put("message", "Error in verifying registration for user with email : "
+				result.put("msg", "Error in verifying registration for user with email : "
 						+ registrationCode.getUsername() + ".  Error Message : " + e.getMessage());
 				return result;
 			}
 
 		} else {
 			result.put("success", false);
-			result.put("message", "Bad token");
+			result.put("msg", "Bad token");
 		}
 		return result;
 	}

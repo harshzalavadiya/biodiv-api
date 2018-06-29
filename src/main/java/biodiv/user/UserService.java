@@ -92,5 +92,9 @@ public class UserService extends AbstractService<User> {
 		}				
 	}
 
+	@Transactional
+	public void save(User user) {
+		userDao.save(user);
+	}
 
 }

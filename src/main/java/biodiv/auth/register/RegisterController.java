@@ -100,7 +100,7 @@ public class RegisterController {
 	}
 
 	@GET
-	//@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/verifyRegistration")
 	public Response verifyRegistration(@QueryParam("t") String token, @Context HttpServletRequest request, @Pac4JProfile Optional<CommonProfile> profile) {
 		if (profile.isPresent()) {
@@ -110,29 +110,28 @@ public class RegisterController {
 
 		Map<String, Object> result = registerService.verifyRegistration(token, request);
 		log.debug(result.toString());
-		URI url = null;
-		
+		/*URI url = null;
 		try {
-			url = new URI(config.getString("serverUrl"));
-		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			url = null;
+			String contextPath = request.getContextPath();
+			url = new URI(Utils.generateLink("login", "auth", new HashMap(), request).replace(contextPath, ""));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
-		
+		result.put("redirect_url", url);
+		*/
 		if ((boolean) result.get("success") == true) {
-			try {
-				String contextPath = request.getContextPath();
-				url = new URI(Utils.generateLink("login", "auth", new HashMap(), request).replace(contextPath, ""));
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-			//return Response.ok(result).build();
-			return Response.temporaryRedirect(url).build();
+			return Response.ok(result).entity(result).build();
 		} else {
+//			try {
+//				url = new URI(config.getString("serverUrl"));
+//			} catch (URISyntaxException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//				url = null;
+//			}
 			//ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, (String) result.get("message"));
 			//return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
-			return Response.temporaryRedirect(url).build();
+			return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
 		}
 	}
 

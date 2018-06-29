@@ -38,7 +38,6 @@ public class UserDao extends AbstractDao<User, Long> implements DaoInterface<Use
         try {
             user = (User) q.getSingleResult();
         } catch(NoResultException e ) {
-            e.printStackTrace();
             throw new NotFoundException(e);
 
         }
