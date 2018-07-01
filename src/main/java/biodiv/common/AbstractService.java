@@ -20,11 +20,7 @@ public abstract class  AbstractService<T> {
 	public void save(T entity) {
 		log.debug("persisting " + entity.getClass() + " instance " + entity);
 		try {
-			//this.dao.openCurrentSessionWithTransaction();
-			//HibernateUtil.getSessionFactory().getCurrentSession().getTransaction();   		
-			//HibernateUtil.getSessionFactory().getCurrentSession();
 			this.dao.save(entity);
-			//this.dao.closeCurrentSessionWithTransaction();
 			log.debug("save successful");
 		} catch (RuntimeException re) {
 			log.error("persist failed", re);
@@ -47,10 +43,8 @@ public abstract class  AbstractService<T> {
 	public void delete(Long id) {
 		log.debug("deleting " + id);
 		try {
-			//this.dao.openCurrentSessionWithTransaction();
 			T entity = (T) this.dao.findById(id);
 			this.dao.delete(entity);
-			//this.dao.closeCurrentSessionWithTransaction();
 			log.debug("delete successful");
 		} catch (RuntimeException re) {
 			log.error("delete failed", re);
@@ -61,12 +55,7 @@ public abstract class  AbstractService<T> {
 	public T findById(Long id) {
 		log.debug("findById " + id);
 		try {
-			//System.out.println("inside findbyid");
-			//HibernateUtil.getSessionFactory().getCurrentSession();
-			//this.dao.openCurrentSession();
 			T entity = (T) this.dao.findById(id);
-			//this.dao.closeCurrentSession();
-			
 			return entity;
 		} catch (RuntimeException re) {
 			log.error("findById failed", re);
@@ -76,11 +65,8 @@ public abstract class  AbstractService<T> {
 
 	public List<T> findAll(int limit, int offset) {
 		log.debug("findAll");
-		System.out.println("findALL");
 		try {
-			//this.dao.openCurrentSession();
 			List<T> entities = this.dao.findAll(limit, offset);
-			//this.dao.closeCurrentSession();
 			return entities;
 		} catch (RuntimeException re) {
 			log.error("persist failed", re);
@@ -92,9 +78,7 @@ public abstract class  AbstractService<T> {
 		
 		log.debug("findAll");
 		try {
-			//this.dao.openCurrentSession();
 			List<T> entities = this.dao.findAll();
-			//this.dao.closeCurrentSession();
 			return entities;
 		} catch (RuntimeException re) {
 			log.error("persist failed", re);

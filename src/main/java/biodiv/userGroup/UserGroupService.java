@@ -17,6 +17,8 @@ import org.apache.commons.mail.HtmlEmail;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.Permission;
 
 import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
@@ -30,6 +32,9 @@ import biodiv.user.Role;
 import biodiv.user.RoleService;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import biodiv.userGroup.userGroupMemberRole.UserGroupMemberRole;
+import biodiv.userGroup.userGroupMemberRole.UserGroupMemberRole.UserGroupMemberRoleType;
+import biodiv.userGroup.userGroupMemberRole.UserGroupMemberRoleService;
 import net.minidev.json.JSONObject;
 
 public class UserGroupService extends AbstractService<UserGroup> {
@@ -58,7 +63,13 @@ public class UserGroupService extends AbstractService<UserGroup> {
 	private UserGroupMailingService userGroupMailingService;
 	
 	@Inject
+	private UserGroupMemberRoleService userGroupMemberRoleService;
+	
+	@Inject
 	private FollowService followService;
+	
+	@Inject
+	private AclUtilService aclUtilService;
 	
 	@Inject
 	Configuration config;
@@ -444,7 +455,7 @@ public class UserGroupService extends AbstractService<UserGroup> {
 	public Boolean isFounder(UserGroup ug, Long userId) {
 
 		try {
-			Role role = roleService.findRoleByAuthority("ROLE_USERGROUP_FOUNDER");
+			Role role = roleService.findRoleByAuthority(UserGroupMemberRole.UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value());
 			Boolean founder = userGroupDao.isFounder(ug.getId(), userId, role.getId());
 			return founder;
 		} catch (Exception e) {
@@ -453,4 +464,112 @@ public class UserGroupService extends AbstractService<UserGroup> {
 
 		}
 	}
+	
+	public List<User> getFounders(UserGroup ug) {
+		try {
+			Role role = roleService.findRoleByAuthority(UserGroupMemberRole.UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value());
+			List<User> founders = userGroupDao.getMembersWithRole(ug.getId(), role.getId());
+			return founders;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+
+		}
+	}
+	
+	@Transactional
+	public boolean addMember(String webaddress, User user) {
+		if(webaddress != null && !webaddress.isEmpty()) { 
+            //trigger joinUs  
+            UserGroup userGroupInstance = findByName(webaddress);
+            if(userGroupInstance != null) {
+                if(userGroupInstance.isAllowUsersToJoin() == true) {
+                    User founder = getFounders(userGroupInstance).get(0);
+                    log.debug("Adding {} to the group {} using founder {} authorities ", user, userGroupInstance, founder);
+                	aclUtilService.initializeSecurityContextHolder(founder);
+                    return addMember(userGroupInstance, user);
+                }
+            } else {
+                log.error("Cannot find usergroup with webaddress {} ", webaddress);
+            }
+        }
+		return false;
+    }
+	
+	@Transactional
+	public boolean addMember(UserGroup ug, User user) {
+        if(user != null) {
+            Role memberRole = roleService.findRoleByAuthority(UserGroupMemberRole.UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value());
+            List<Permission> permissions = new ArrayList<Permission>();
+            permissions.add(BasePermission.WRITE);
+            return addMemberWithRole(ug, user, memberRole, permissions);
+        }
+        return false;
+    }
+	
+	@Transactional
+	private boolean addMemberWithRole(UserGroup ug, User user, Role role, List<Permission> permissions) {
+        //User founder = getFounders(ug).get(0);
+        //log.debug("Adding {} to the group {} using founder {} authorities ", user, ug, founder);
+
+		 log.debug("Adding member {} with role {} to group {}", user, role, ug);
+         log.debug("Granting permissions {}", permissions);
+         UserGroupMemberRole userMemberRole = userGroupMemberRoleService.getUserGroupMemberRole(user, ug);
+         if(userMemberRole == null) {
+        	 userMemberRole = userGroupMemberRoleService.addUserGroupMemberRole(ug, user, role);
+             if(userMemberRole != null) {
+             	for(int i =0; i<permissions.size(); i++) {
+                     aclUtilService.addPermission(ug, user, permissions.get(i));
+                 } 
+                 //TODO:activityFeedService.addActivityFeed(userGroup, user, user, activityFeedService.MEMBER_JOINED);
+             }
+             return true;
+         } else {
+             log.debug("{} is already a member of {}", user, ug);
+             if(userMemberRole.getRole().getId() != role.getId()) {
+                 log.debug("Assigning a new role {}", role);
+                 Role prevRole = userMemberRole.getRole();
+                 if(userGroupMemberRoleService.updateRole(ug, user, role) > 0) {
+                     deletePermissionsAsPerRole(ug, user, prevRole);
+                     for(int i =0; i<permissions.size(); i++) {
+                    	 aclUtilService.addPermission(ug, user, permissions.get(i));
+                     }
+                     log.debug("Updated permissions as per new role");
+                     //TODO:activityFeedService.addActivityFeed(userGroup, user, user, activityFeedService.MEMBER_ROLE_UPDATED);
+                     return true;
+                 } else {
+                 	log.error("error while updating role for {}",userMemberRole);
+                 }
+             }
+             return false;
+         }
+	}
+	
+	@Transactional
+	 //TODO:need to make this better by providing a mapping between this role and associated permissions
+    private boolean deletePermissionsAsPerRole(UserGroup ug, User user, Role role) {
+        log.debug("Deleting permissions for member {} who had role {} in group {}", user, role, ug);
+        Role founderRole = roleService.findRoleByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value());
+        Role expertRole = roleService.findRoleByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value());
+        Role memberRole = roleService.findRoleByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value());
+        if(role.getId() == founderRole.getId()) {
+                log.debug("Deleting admin permission for member {} who had role {} in group {}", user, role, ug);
+            	aclUtilService.deletePermission(ug, user, BasePermission.ADMINISTRATION);
+                log.debug("Deleting write permission for member {} who had role {} in group {}",  user, role, ug);
+                aclUtilService.deletePermission(ug, user, BasePermission.WRITE);
+        } else if(role.getId() == memberRole.getId()) {
+                log.debug("Deleting write permission for member {} who had role {} in group {}", user, role, ug);
+            	aclUtilService.deletePermission(ug, user, BasePermission.WRITE);
+        } else if(role.getId() == expertRole.getId()) {
+            	log.debug("Deleting write permission for member {} who had role {} in group {}", user, role, ug);
+            	aclUtilService.deletePermission(ug, user, BasePermission.WRITE);
+        } else {
+                log.error("Prev role is invalid ${role}");
+                return false;
+        }
+        return true;
+    }
+
+
+
 }

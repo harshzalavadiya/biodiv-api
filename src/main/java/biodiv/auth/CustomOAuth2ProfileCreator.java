@@ -86,6 +86,7 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 				if (user != null) {
 					userService.updateUserProfile(oAuthProfile, user);
 				}
+				//TODO: merge details from oauthProfile to user and save user 
                 
             	Map<String, Object> result = tokenService.buildTokenResponse(oAuthProfile, user, true);
 
@@ -132,12 +133,11 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 					if (fbProfile.getLocation() != null)
 						p.put("location", fbProfile.getLocation());
 					
-					p.put("facebookUser", "true");
+					p.put("facebookUser", fbProfile.getId());
+					p.put("openId", fbProfile.getId());
 					
-					// p.put("openId", fbProfile.getId());
-					
-					if (fbProfile.getGender() != null)
-						p.put("sexType", fbProfile.getGender().toString());
+					//if (fbProfile.getGender() != null)
+					//	p.put("sexType", fbProfile.getGender().toString());
 						
 					if (fbProfile.getProfileUrl() != null)
 						p.put("link", fbProfile.getProfileUrl().toString());
@@ -154,7 +154,9 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 
 					if (gProfile.getDisplayName() != null)
 						p.put("name", gProfile.getDisplayName());
-
+					else
+						p.put("name", gProfile.getEmail().split("@")[0]);
+					
 					if (gProfile.getProfileUrl() != null)
 						p.put("website", gProfile.getProfileUrl().toString());
 
@@ -168,10 +170,12 @@ public class CustomOAuth2ProfileCreator<C extends OAuthCredentials, U extends Co
 					if (gProfile.getLocation() != null)
 						p.put("location", gProfile.getLocation());
 
-					// p.put("openId", gProfile.getId());
+					p.put("googleUser", gProfile.getId());
+					p.put("openId", gProfile.getId());
+					p.put("openId", gProfile.getId());
 
-					if (gProfile.getGender() != null)
-						p.put("sexType", gProfile.getGender().toString());
+					//if (gProfile.getGender() != null)
+					//	p.put("sexType", gProfile.getGender().toString());
 
 					if (gProfile.getProfileUrl() != null)
 						p.put("link", gProfile.getProfileUrl().toString());

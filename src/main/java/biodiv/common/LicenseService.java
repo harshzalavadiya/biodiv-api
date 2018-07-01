@@ -14,7 +14,7 @@ public class LicenseService extends AbstractService<License> {
 	@Inject
 	public LicenseService(LicenseDao licenseDao) {
 		super(licenseDao);
-		this.licenseDao = new LicenseDao();
+		this.licenseDao = licenseDao;
 	}
 
 	public License findByName(String name) {

@@ -79,6 +79,7 @@ dependencies {
 
 	compile "org.glassfish.jersey.containers:jersey-container-servlet:2.25", excludeStuff
 	compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.25'
+	compile group: 'org.glassfish.jersey.ext', name: 'jersey-bean-validation', version: '2.25'
 	compile "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.9.0"
 	compile group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
@@ -106,7 +107,10 @@ dependencies {
 	compile group:'com.google.inject.extensions', name:'guice-servlet', version:'4.1.0'
 	compile group:'com.google.inject.extensions', name:'guice-persist', version:'4.1.0'
 	compile group:'com.google.inject.extensions', name:'guice-assistedinject', version:'4.1.0'
-	compile group: 'org.glassfish.hk2', name: 'guice-bridge', version: '2.2.0-b14'
+	//compile group: 'org.glassfish.hk2', name: 'guice-bridge', version: '2.2.0-b14'
+	// https://mvnrepository.com/artifact/org.glassfish.hk2/guice-bridge
+	compile group: 'org.glassfish.hk2', name: 'guice-bridge', version: '2.5.0-b30'
+	
 	
 	// https://mvnrepository.com/artifact/org.json/json
 	compile group: 'org.json', name: 'json', version: '20160810'
@@ -132,6 +136,18 @@ dependencies {
 	compile group: 'org.redisson', name: 'redisson', version: '3.6.4'
 	compile group: 'de.ruedigermoeller', name: 'fst', version: '2.57'
 	compile group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.7.1'
+	
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-acl
+	compile group: 'org.springframework.security', name: 'spring-security-acl', version: '5.0.6.RELEASE'
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-config
+	compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.0.6.RELEASE'
+	// https://mvnrepository.com/artifact/org.springframework/spring-context-support
+	compile group: 'org.springframework', name: 'spring-context-support', version: '5.0.6.RELEASE'
+	// https://mvnrepository.com/artifact/net.sf.ehcache/ehcache-core
+	compile group: 'net.sf.ehcache', name: 'ehcache-core', version: '2.6.11'
+	
+	
+	
 }
 
 

@@ -16,7 +16,6 @@ public class ResourceInterceptor implements MethodInterceptor {
 	private SessionFactory sessionFactory;
 
 	ResourceInterceptor() {
-		log.debug("ResourceInterceptor constructor");
 	}
 	
     @Override
@@ -50,7 +49,7 @@ public class ResourceInterceptor implements MethodInterceptor {
     		
     	}
     	catch(Throwable e){
-    		e.printStackTrace();
+    		//e.printStackTrace();
     		try {  
                 log.warn("Trying to rollback database transaction after exception");  
                 sessionFactory.getCurrentSession().getTransaction().rollback();  

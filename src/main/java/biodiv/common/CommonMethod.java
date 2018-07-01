@@ -7,23 +7,25 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CommonMethod<T> implements GenericModel<T> {
 	
-	private static final Logger log = LoggerFactory.getLogger(CommonMethod.class);
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	@Inject
 	private SessionFactory sessionFactory;
+	
+	public CommonMethod() {
+	}
+	
+/*	protected CommonMethod(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}*/
 	
 	@Override
 	public T get(long Id) {
-		//	Class<? extends CommonMethod> entity=this.getClass();
-		//System.out.println(entity);
 		T instance = (T) sessionFactory.getCurrentSession().get(this.getClass(), Id);
 		return instance;
 	}
@@ -37,29 +39,23 @@ public class CommonMethod<T> implements GenericModel<T> {
 
 	@Override
 	public T load(long obvId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	
 	@Override
 	public void update(boolean flush) {
-		System.out.println("Object to update : " + this);
 		try{
 			sessionFactory.getCurrentSession().update(this);
-			log.debug("update  successful");
+			log.debug("update successful");
 		}catch(RuntimeException re){
 			log.error("update  failed", re);
 			throw re;
 		}
-		
-		
 	}
 
 	@Override
 	public void delete() {
-		// TODO Auto-generated method stub
-		System.out.println("Object to delete : " + this);
 		try{
 			sessionFactory.getCurrentSession().delete(this);
 			log.debug("delete  successful");
