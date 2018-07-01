@@ -30,6 +30,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import biodiv.auth.MessageDigestPasswordEncoder;
 import biodiv.auth.token.Token;
 import biodiv.common.CommonMethod;
 import biodiv.common.Language;

@@ -10,6 +10,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -24,6 +25,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.http.HttpStatus;
+import org.hibernate.validator.constraints.Email;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -102,7 +104,7 @@ public class RegisterController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/verifyRegistration")
-	public Response verifyRegistration(@QueryParam("t") String token, @Context HttpServletRequest request, @Pac4JProfile Optional<CommonProfile> profile) {
+	public Response verifyRegistration(@NotNull @QueryParam("t") String token, @Context HttpServletRequest request, @Pac4JProfile Optional<CommonProfile> profile) {
 		if (profile.isPresent()) {
 			throw new WebApplicationException(400);
         } 
@@ -110,29 +112,59 @@ public class RegisterController {
 
 		Map<String, Object> result = registerService.verifyRegistration(token, request);
 		log.debug(result.toString());
-		/*URI url = null;
-		try {
-			String contextPath = request.getContextPath();
-			url = new URI(Utils.generateLink("login", "auth", new HashMap(), request).replace(contextPath, ""));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		result.put("redirect_url", url);
-		*/
+		
 		if ((boolean) result.get("success") == true) {
 			return Response.ok(result).entity(result).build();
 		} else {
-//			try {
-//				url = new URI(config.getString("serverUrl"));
-//			} catch (URISyntaxException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//				url = null;
-//			}
-			//ResponseModel responseModel = new ResponseModel(Response.Status.FORBIDDEN, (String) result.get("message"));
-			//return Response.status(Response.Status.FORBIDDEN).entity(responseModel).build();
 			return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
 		}
 	}
 
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/forgotPassword")
+	public Response forgotPassword(@NotNull @Email @FormParam("email") String email, @NotNull @FormParam("g-recaptcha-response") String recaptchaResponse, @Context HttpServletRequest request, @Pac4JProfile Optional<CommonProfile> profile) {
+		if (profile.isPresent()) {
+			throw new WebApplicationException(400);
+        } 
+		log.debug("Forgot Password flow for : {}", email);
+		try {
+			if (googleRecaptchaCheck.isRobot(recaptchaResponse)) {
+				return Response.status(HttpStatus.SC_FORBIDDEN).build();
+			} else {
+
+				Map<String, Object> result = registerService.forgotPassword(email, request);
+				log.debug(result.toString());
+
+				if ((boolean) result.get("success") == true) {
+					return Response.ok(result).entity(result).build();
+				} else {
+					return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
+				}
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			return Response.serverError().build();
+		}
+
+	}
+	
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/resetPassword")
+	public Response resetPassword(@Valid @BeanParam ResetPasswordCommand resetPasswordCommand, @Context HttpServletRequest request, @Pac4JProfile Optional<CommonProfile> profile) {
+		if (profile.isPresent()) {
+			throw new WebApplicationException(400);
+        } 
+		log.debug("Reset Password flow for : {}", resetPasswordCommand.token);
+
+		Map<String, Object> result = registerService.resetPassword(resetPasswordCommand, request);
+		log.debug(result.toString());
+		
+		if ((boolean) result.get("success") == true) {
+			return Response.ok(result).entity(result).build();
+		} else {
+			return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
+		}
+	}
 }

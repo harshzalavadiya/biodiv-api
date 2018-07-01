@@ -150,7 +150,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	}
 
 	@Transactional
-	RegistrationCode registerAndEmail(User user, HttpServletRequest request) {
+	private RegistrationCode registerAndEmail(User user, HttpServletRequest request) {
 
 		RegistrationCode registrationCode = register(user.getEmail());
 
@@ -173,7 +173,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		return null;
 	}
 
-	RegistrationCode register(String email) {
+	private RegistrationCode register(String email) {
 		if (email == null)
 			return null;
 		try {
@@ -190,7 +190,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		return null;
 	}
 
-	void sendVerificationMail(String username, String email, String url) {
+	private void sendVerificationMail(String username, String email, String url) {
 		String domain = config.getString("siteName");
 
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -219,7 +219,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		}
 	}
 
-	void sendWelcomeMail(User user, HttpServletRequest request) {
+	private void sendWelcomeMail(User user, HttpServletRequest request) {
 		String domain = config.getString("siteName");
 
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -272,10 +272,8 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 
 	@Transactional
 	Map<String, Object> verifyRegistration(String token, HttpServletRequest request) {
-
 		Map<String, Object> result = new HashMap<String, Object>();
 		log.debug("Verifying registration code {} ", token);
-		log.debug("registerDao {}", registerDao);
 		if (token != null) {
 			RegistrationCode registrationCode = registerDao.findByPropertyWithCondition("token", token, "=");
 			log.debug("registrationCode {}", registrationCode);
@@ -298,10 +296,130 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 				result.put("msg", "Registration is complete. Welcome!!! Please login to contribute.");
 				sendWelcomeMail(user, request);
 			} catch (NotFoundException e) {
-				e.printStackTrace();
+				log.error(e.getMessage());
 				result.put("success", false);
-				result.put("msg", "Error in verifying registration for user with email : "
-						+ registrationCode.getUsername() + ".  Error Message : " + e.getMessage());
+				result.put("msg", "User account with email "+registrationCode.getUsername()+" doesnot exist. Please register.");
+				return result;
+			}
+
+		} else {
+			result.put("success", false);
+			result.put("msg", "Bad token");
+		}
+		return result;
+	}
+
+	@Transactional
+	Map<String, Object> forgotPassword(String email, HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		log.debug("Forgot password for {} ", email);
+		if(email == null || email.isEmpty()) {
+			result.put("success", false);
+			result.put("msg", "Please provide email address for the account for which you would like to reset password.");
+			return result;
+		}
+		
+	    email = email.toLowerCase().trim();
+		
+	    User user;
+		
+	    try {
+	    	user = userService.findByEmail(email);
+	    	if(user == null) {
+	    		result.put("success", false);
+				result.put("msg", "User account with email "+email+" doesnot exist. Please register.");
+				return result;
+	    	} else {
+		        RegistrationCode registrationCode = register(email);
+		        log.debug("Got {} ", registrationCode);
+
+				if (registrationCode != null) {
+					Map<String, String> linkParams = new HashMap<String, String>();
+					linkParams.put("t", registrationCode.getToken());
+					String url;
+					try {
+						url = Utils.generateLink("register", "resetPassword", linkParams, request, false);
+						log.debug("Sending forgotpassword email with registrationCode : {} ", url);
+						sendForgotPasswordMail(user.getUsername(), user.getEmail(), url);
+						result.put("success", true);
+						result.put("msg", "An email as been sent to your registered email account. Please click on the provided link to reset your password.");
+						return result;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				result.put("success", false);
+				result.put("msg", "There seems to be some problem in serving your request. We will get back to you shortly.");
+				return result;
+	    	}
+		} catch (NotFoundException e) {
+			log.error(e.getMessage());
+			result.put("success", false);
+			result.put("msg", "User account with email "+email+" doesnot exist. Please register.");
+			return result;
+		}
+	}
+	
+	private void sendForgotPasswordMail(String username, String email, String url) {
+		String domain = config.getString("siteName");
+
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("username", Utils.capitalize(username));
+		params.put("url", url);
+		params.put("domain", domain);
+
+		try {
+			// mailService.sendMail(email, sub, body);
+			List<User> allBccs = registerMailingService.getAllBccPeople();
+			for (User bcc : allBccs) {
+				HtmlEmail emailToBcc = registerMailingService.buildResetPasswordMailMessage(bcc.getEmail(), params);
+			}
+
+			HtmlEmail emailToPostingUser = registerMailingService.buildResetPasswordMailMessage(email, params);
+
+			if (!registerMailingService.isAnyThreadActive()) {
+				System.out.println("no thread is active currently");
+				Thread th = new Thread(registerMailingService);
+				th.start();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error(e.getMessage());
+		}
+	}
+	   
+	@Transactional
+	Map<String, Object> resetPassword(ResetPasswordCommand command, HttpServletRequest request) {
+		String token = command.token;
+		Map<String, Object> result = new HashMap<String, Object>();
+		log.debug("Verifying forgot password code {} ", token);
+		if (token != null) {
+			RegistrationCode registrationCode = registerDao.findByPropertyWithCondition("token", token, "=");
+			log.debug("forgotPasswordCode {}", registrationCode);
+			if (registrationCode == null) {
+				result.put("success", false);
+				result.put("msg", "Reset password code is already validated or got deleted. Please use forgot password link to reset password again.");
+				return result;
+			}
+
+			User user;
+
+			try {
+				user = userService.findByEmail(registrationCode.getUsername());
+				MessageDigestPasswordEncoder passwordEncoder = new MessageDigestPasswordEncoder("MD5");
+				user.setPassword(passwordEncoder.encodePassword(command.password, null));
+				user.setAccountLocked(false);
+				userService.setDefaultRoles(user);
+				userService.save(user);
+				registerDao.delete(registrationCode);
+
+				result.put("success", true);
+				result.put("msg", "Password has been reset. Please login to contribute.");
+			} catch (NotFoundException e) {
+				log.error(e.getMessage());
+				result.put("success", false);
+				result.put("msg", "User account with email "+registrationCode.getUsername()+" doesnot exist. Please register.");
 				return result;
 			}
 

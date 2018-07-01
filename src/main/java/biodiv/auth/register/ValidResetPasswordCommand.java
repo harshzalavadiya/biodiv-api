@@ -12,13 +12,13 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 @Target({ TYPE_USE, ANNOTATION_TYPE })
-@Retention (RUNTIME)
-@Constraint(validatedBy = { ValidRegisterCommandValidator.class })
+@Retention(RUNTIME)
+@Constraint(validatedBy = { ValidResetPasswordCommandValidator.class })
 @Documented
-public @interface ValidRegisterCommand {
-	  String message() default "{user.register.command.invalid}";
+public @interface ValidResetPasswordCommand {
+	String message() default "{user.reset.password.command.invalid}";
 
-	    Class<?>[] groups() default { };
+	Class<?>[] groups() default {};
 
-	    Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default {};
 }

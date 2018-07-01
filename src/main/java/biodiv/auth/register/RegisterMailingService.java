@@ -30,24 +30,13 @@ public class RegisterMailingService extends AbstractHtmlMailingService {
 	@Inject
 	public RegisterMailingService(Configuration config, MailProvider mailProvider) throws EmailException {
 		super(mailProvider, config, "mail.register.subject", "mail.register.message");
-		System.out.println("****************************************************8 " + config);
-		System.out.println("****************************************************8 " + mailProvider);
 	}
 
 	public HtmlEmail buildActivationMailMessage(String toEmail, Map<String, Object> params) throws Exception {
 
 		try {
 			String sub = "Activate your account with "+params.get("domain");
-			log.debug(sub);
-//			String body = messageService.getMessage("register.emailBody", params);
-//			log.debug(body);
-
 			freemarker.template.Template temp = cfg.getTemplate("activationMail.ftlh");
-			
-			//RegistrationActivationMailDataModel dm = new RegistrationActivationMailDataModel(params);
-			
-			//Map<String, Object> root = dm.getRoot();
-			
 			HtmlEmail email = buildMessage(sub, this.message, toEmail, temp, params);
 			
 			return email;
@@ -60,18 +49,19 @@ public class RegisterMailingService extends AbstractHtmlMailingService {
 
 		try {
 			String sub = "Welcome to "+params.get("domain");
-			log.debug(sub);
-//			String body = messageService.getMessage("register.emailBody", params);
-//			log.debug(body);
-
 			freemarker.template.Template temp = cfg.getTemplate("welcomeMail.ftlh");
-			
-			//RegistrationActivationMailDataModel dm = new RegistrationActivationMailDataModel(params);
-			
-			//Map<String, Object> root = dm.getRoot();
-			
 			HtmlEmail email = buildMessage(sub, this.message, toEmail, temp, params);
-			
+			return email;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	public HtmlEmail buildResetPasswordMailMessage(String toEmail, Map<String, Object> params) throws Exception {
+		try {
+			String sub = "Reset password with "+params.get("domain");
+			freemarker.template.Template temp = cfg.getTemplate("resetPasswordMail.ftlh");
+			HtmlEmail email = buildMessage(sub, this.message, toEmail, temp, params);
 			return email;
 		} catch (Exception e) {
 			throw e;
