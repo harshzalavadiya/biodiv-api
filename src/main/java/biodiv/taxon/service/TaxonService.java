@@ -17,6 +17,7 @@ import biodiv.species.AcceptedSynonymService;
 import biodiv.taxon.dao.TaxonDao;
 import biodiv.taxon.datamodel.dao.Classification;
 import biodiv.taxon.datamodel.dao.Taxon;
+import biodiv.taxon.datamodel.dao.TaxonomyRegistry;
 import biodiv.taxon.datamodel.ui.TaxonRelation;
 import biodiv.taxon.search.SearchTaxon;
 
@@ -311,6 +312,13 @@ public class TaxonService extends AbstractService<Taxon> {
 		if(acceptedList !=null && (acceptedList.size()==1)){
 			return (Taxon) acceptedList.get(0);
 		}
+		return null;
+	}
+
+	public TaxonomyRegistry getTaxonRegistryWithTaxonConceptId(Long taxonId2) {
+		// TODO Auto-generated method stub
+		
+		TaxonomyRegistry taxonomyRegistry= taxonDao.getTaxonRegistryWithTaxonConceptId(taxonId2);
 		return null;
 	}
 

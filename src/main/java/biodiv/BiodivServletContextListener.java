@@ -53,10 +53,13 @@ import biodiv.customField.CustomFieldModule;
 import biodiv.dataTable.DataTableModule;
 import biodiv.dataset.DatasetModule;
 import biodiv.esclient.ElasticSearchClient;
+import biodiv.flag.FlagModule;
 import biodiv.follow.FollowModule;
 import biodiv.mail.MailModule;
 import biodiv.maps.MapModule;
 import biodiv.observation.ObservationModule;
+import biodiv.rating.RatingLinkModule;
+import biodiv.rating.RatingModule;
 import biodiv.scheduler.SchedulerModule;
 import biodiv.species.AcceptedSynonymModule;
 import biodiv.speciesPermission.SpeciesPermissionModule;
@@ -189,7 +192,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 				new DataTableModule(), new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(), 
 				new UserGroupModule(), new AdminModule(), new SchedulerModule(), new MailModule(),
 				new SpeciesPermissionModule(), new AllSearchModule(), new SearchTaxonModule(),new ChecklistsModule(),
-				new AcceptedSynonymModule());
+				new AcceptedSynonymModule(),new RatingModule(),new RatingLinkModule(),new FlagModule());
 	}
 
 	private static List<Class<?>> getEntityClassesFromPackage(String packageName)

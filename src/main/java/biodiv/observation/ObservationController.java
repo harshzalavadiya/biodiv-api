@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
 import biodiv.customField.CustomField;
+import biodiv.user.User;
 import biodiv.userGroup.UserGroup;
 
 @Path("/observation")
@@ -150,4 +151,22 @@ public class ObservationController {
 		String msg = observationService.addRecommendationVote(obvIds,commonName,languageName,recoName,recoId,recoComment,Long.parseLong(profile.getId()));
 		return msg;
 	}
+	
+	
+	@GET
+	@Path("/findWhoLiked")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<User> findWhoLiked (@QueryParam("obvId") long obvId) {
+		List<User> usrGrps = observationService.findWhoLiked(obvId);
+		return usrGrps;
+	}
+	
+//	@GET
+//	@Path("/olderFlags")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public List<User> fetchOlderFlags (@QueryParam("obvId") long obvId) {
+//		List<User> usrGrps = observationService.findWhoLiked(obvId);
+//		return usrGrps;
+//	}
+	
 }

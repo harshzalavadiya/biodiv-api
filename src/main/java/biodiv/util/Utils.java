@@ -82,7 +82,7 @@ public class Utils {
 		if(name == null){
 			return null;
 		}
-		name = name.replaceAll("/<.*?>/", "").replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").replaceAll("\\*", "").trim();
+		name = name.replaceAll("<.*?>", "").replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").replaceAll("\\*", "").trim();
 		System.out.println("cleaning of name");
 		System.out.println("cleaning of name");
 		System.out.println("cleaning of name");
@@ -132,7 +132,7 @@ public class Utils {
 		String cleanSciName = cleanName(sciName);
 		
 //		if(cleanSciName =~ /s\.\s*str\./) {
-//            cleanSciName = cleanSciName.replaceFirst(/s\.\s*str\./, cleanSciName.split()[0]);
+//            cleanSciName = cleanSciName.replaceFirst("s\.\s*str\.", cleanSciName.split("\s")[0]);
 //        }
 		
 		if(cleanSciName.indexOf(" ") == -1) {

@@ -32,10 +32,13 @@ import biodiv.customField.CustomField;
 import biodiv.customField.CustomFieldService;
 import biodiv.dataTable.DataTableService;
 import biodiv.observation.RecommendationVote.ConfidenceType;
+import biodiv.rating.RatingLinkService;
 import biodiv.speciesPermission.SpeciesPermission;
 import biodiv.speciesPermission.SpeciesPermission.PermissionType;
 import biodiv.speciesPermission.SpeciesPermissionService;
 import biodiv.taxon.datamodel.dao.Taxon;
+import biodiv.taxon.datamodel.dao.TaxonomyRegistry;
+import biodiv.taxon.service.TaxonService;
 import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.userGroup.UserGroup;
@@ -88,6 +91,14 @@ public class ObservationService extends AbstractService<Observation> {
 	
 	@Inject
 	DataTableService dataTableService;
+	
+	@Inject
+	RatingLinkService ratingLinkService;
+	
+	@Inject
+	TaxonService taxonService;
+	
+
 
 	@Inject
 	ObservationService(ObservationDao observationDao) {
@@ -605,6 +616,7 @@ public class ObservationService extends AbstractService<Observation> {
 						//calculate maxVotedSpeciesName
 						Map<String,Object> maxVotedMap = calculateMaxVotedSpeciesName(obv);
 						Long maxVotedRecoId = (Long) maxVotedMap.get("reco");
+						
 						Recommendation maxVotedReco = recommendationService.findById(maxVotedRecoId);
 						if(maxVotedReco !=null){
 							obv.setMaxVotedReco(maxVotedReco);
@@ -622,6 +634,43 @@ public class ObservationService extends AbstractService<Observation> {
 						}
 						//have to save obv
 						save(obv);
+						
+						//elastic
+						Long taxonId=maxVotedReco.getTaxonConcept().getId();
+						TaxonomyRegistry taxonomyRegistry=taxonService.getTaxonRegistryWithTaxonConceptId(taxonId);
+
+						String observationmName=maxVotedReco.getTaxonConcept().getNormalizedForm();
+						String lastrevised=obv.getLastRevised().toString();
+						String maxvotedrecoid=obv.getMaxVotedReco().toString();
+						String noofidentifications=String.valueOf(obv.getNoOfIdentifications());
+						String taxonconceptid=String.valueOf(maxVotedReco.getTaxonConcept().getId());
+						String acceptednameid=String.valueOf(maxVotedReco.getAcceptedName().getId());
+						String taxonomycanonicalform=maxVotedReco.getTaxonConcept().getCanonicalForm();
+						String status=maxVotedReco.getTaxonConcept().getStatus();
+						String position=maxVotedReco.getTaxonConcept().getPosition();
+						String rank=String.valueOf(maxVotedReco.getTaxonConcept().getRank());
+						String path=taxonomyRegistry.getPath();
+						String classificationid=String.valueOf(taxonomyRegistry.getClassificationId());
+						
+						JSONObject obj = new JSONObject();
+						
+						
+						obj.put("name", observationmName);
+						obj.put("lastrevised", lastrevised);
+						obj.put("maxvotedrecoid", maxvotedrecoid);
+						obj.put("noofidentifications", noofidentifications);
+						obj.put("taxonconceptid", taxonconceptid);
+						obj.put("acceptednameid", acceptednameid);
+						obj.put("taxonomycanonicalform", taxonomycanonicalform);
+						obj.put("status", status);
+						obj.put("position", position);
+						obj.put("rank", rank);
+						obj.put("path", path);
+						obj.put("classificationid", classificationid);
+						observationListService.update("observation", "observation",obv.getId().toString(),obj.toString());
+
+						
+						//elastic
 						
 						
 						
@@ -649,6 +698,7 @@ public class ObservationService extends AbstractService<Observation> {
 						activityFeedService.addActivityFeed(author, afNew, obv, (String) afNew.get("rootHolderType"));
 						//activityFeed
 					}
+					
 					if (i % 50 == 0) {
 						sessionFactory.getCurrentSession().flush();
 						sessionFactory.getCurrentSession().clear();
@@ -905,6 +955,11 @@ public class ObservationService extends AbstractService<Observation> {
 			
 		}
 		
+	}
+
+	public List<User> findWhoLiked(long obvId) {
+		List<User> userList = ratingLinkService.findWhoLiked("observation",obvId);
+		return userList;
 	}
 	
 	
