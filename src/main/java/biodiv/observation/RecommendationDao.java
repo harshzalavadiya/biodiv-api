@@ -5,24 +5,31 @@ import java.util.Map;
 
 import javax.persistence.Query;
 
+import javax.inject.Inject;
+
+import org.hibernate.SessionFactory;
+
+
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 
 public class RecommendationDao extends AbstractDao<Recommendation, Long> implements DaoInterface<Recommendation, Long>{
 
-	public RecommendationDao() {
-		System.out.println("RecommendationDao constructor");
-	}
 	
+	@Inject
+	protected RecommendationDao(SessionFactory sessionFactory) {
+		super(sessionFactory);
+	}
+
 	@Override
 	public Recommendation findById(Long id) {
-		Recommendation entity = (Recommendation) getCurrentSession().get(Recommendation.class, id);
+		Recommendation entity = (Recommendation) sessionFactory.getCurrentSession().get(Recommendation.class, id);
 		return entity;
 	}
 
 	public List<Recommendation> fetchthisList(String hql, Map<String, Object> data) {
 		
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		if(data.containsKey("isScientificName")){
 			query.setParameter("isScientificName", data.get("isScientificName"));
 		}

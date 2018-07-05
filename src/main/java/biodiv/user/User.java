@@ -30,6 +30,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import biodiv.auth.MessageDigestPasswordEncoder;
 import biodiv.auth.token.Token;
 import biodiv.common.CommonMethod;
 import biodiv.common.Language;
@@ -52,7 +53,7 @@ public class User extends CommonMethod implements Principal {
 	private Double latitude;
 	private Double longitude;	
 	private Language language;
-	private Float timezone;
+	private float timezone = 0;
 	private String website;
 	private String aboutMe;
 	
@@ -256,11 +257,11 @@ public class User extends CommonMethod implements Principal {
 	}
 
 	@Column(name = "timezone", precision = 8, scale = 8)
-	public Float getTimezone() {
+	public float getTimezone() {
 		return this.timezone;
 	}
 
-	public void setTimezone(Float timezone) {
+	public void setTimezone(float timezone) {
 		this.timezone = timezone;
 	}
 
@@ -365,7 +366,12 @@ public class User extends CommonMethod implements Principal {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
-
+	
+	public void addRole(Role role) {
+		if(this.roles == null) this.roles = new HashSet<Role>(0);
+		this.roles.add(role);
+	}
+	
 	public boolean hasRole(String role) {
 		for (Role r : this.roles) {
 			if (r.getAuthority().equalsIgnoreCase(role)) {

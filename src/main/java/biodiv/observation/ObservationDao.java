@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,20 +32,21 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 	@Context
 	private ResourceContext resourceContext;
 
-	protected ObservationDao() {
-		System.out.println("ObservationDao constructor");
+	@Inject
+	public ObservationDao(SessionFactory sessionFactory) {
+		super(sessionFactory);
 	}
 
 	@Override
 	public Observation findById(Long id) {
-		Observation entity = (Observation) getCurrentSession().get(Observation.class, id);
+		Observation entity = (Observation) sessionFactory.getCurrentSession().get(Observation.class, id);
 		System.out.println(entity);
 		return entity;
 	}
 
 	public List<UserGroup> obvUserGroups(long id) {
 		String hql = "select obv.userGroups from Observation obv where obv.id =:id";
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		query.setParameter("id", id);
 		List<UserGroup> listResult = query.getResultList();
 		System.out.println(listResult);
@@ -54,7 +56,7 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 	public List<ObservationResource> getResource(long id) {
 		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession()
+		q = sessionFactory.getCurrentSession()
 				.createQuery("select obvr.resourceId from ObservationResource  as obvr where obvr.observationId.id=:id")
 				.setParameter("id", id);
 		List<ObservationResource> observationResources = q.getResultList();
@@ -92,7 +94,7 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		// LongStream obvs =
 		// Arrays.asList(allObvs.split(",")).stream().map(String::trim).mapToLong(Long::parseLong);
 		// List<Long> obvs = Arrays.asList(allObvs.split(","));
-		Query query = getCurrentSession().createSQLQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(hql);
 		if (singleObv == true) {
 			query.setParameter("obvId", obvId);
 		} else {
@@ -109,7 +111,7 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		
 		String hql = "select rv.recommendationByRecommendationId.id AS reco , count(rv.recommendationByRecommendationId) AS voteCount from RecommendationVote rv where "
 				+"rv.observation.id =:obvId GROUP BY rv.recommendationByRecommendationId.id ORDER BY voteCount DESC";
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		query.setParameter("obvId",obv.getId());
 		//System.out.println("query "+query);
 		List<Object[]> recos = query.getResultList();
@@ -147,7 +149,7 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		//if more than one max_voted,getting the latest one
 		
 		hql = "from RecommendationVote rv where rv.observation =:obv and rv.recommendationByRecommendationId.id in (:ids) order by rv.votedOn desc";
-		Query query1 =  getCurrentSession().createQuery(hql);
+		Query query1 =  sessionFactory.getCurrentSession().createQuery(hql);
 		query1.setParameter("obv",obv);
 		query1.setParameter("ids",recoIds);
 		List<RecommendationVote> lrr =  query1.getResultList();

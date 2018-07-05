@@ -1,19 +1,30 @@
 package biodiv;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Singleton;
+import javax.validation.ParameterNameProvider;
+import javax.validation.Validation;
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.ContextResolver;
 
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
+import org.glassfish.jersey.server.validation.ValidationConfig;
+import org.glassfish.jersey.server.validation.internal.InjectingConstraintValidatorFactory;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
@@ -131,6 +142,7 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 				// Different from default so you can test it :)
 				// objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
 
+				
 				// create JsonProvider to provide custom ObjectMapper
 				JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
 				provider.setMapper(objectMapper);
@@ -140,10 +152,15 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 				newRC.register(org.glassfish.jersey.jackson.JacksonFeature.class);
 				newRC.register(biodiv.CustomLoggingFilter.class);
 				
+				newRC.property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
+				newRC.register(ValidationConfigurationContextResolver.class);
+
 				log.debug("Reloading servletContainer with new resourceconfig");
 				servletContainer.reload(newRC);
 
 				log.debug("Initializing guicebridge with servicelocator");
+				//InjectionManager im = container.getApplicationHandler().getInjectionManager();
+				//ServiceLocator serviceLocator = im.getInstance(ServiceLocator.class);
 				ServiceLocator serviceLocator = container.getApplicationHandler().getServiceLocator();
 
 				GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
@@ -223,5 +240,50 @@ public class BiodivApplication extends ResourceConfig {// javax.ws.rs.core.Appli
 	public void setGetConfig(Map<String, Object> getConfig) {
 		this.getConfig = getConfig;
 	}
+	/**
+     * Custom configuration of validation. This configuration defines custom:
+     * <ul>
+     *     <li>ConstraintValidationFactory - so that validators are able to inject Jersey providers/resources.</li>
+     *     <li>ParameterNameProvider - if method input parameters are invalid, this class returns actual parameter names
+     *     instead of the default ones ({@code arg0, arg1, ..})</li>
+     * </ul>
+     */
+    public static class ValidationConfigurationContextResolver implements ContextResolver<ValidationConfig> {
 
+        @Context
+        private ResourceContext resourceContext;
+
+        @Override
+        public ValidationConfig getContext(final Class<?> type) {
+            return new ValidationConfig()
+                    .constraintValidatorFactory(resourceContext.getResource(InjectingConstraintValidatorFactory.class))
+                    .parameterNameProvider(new CustomParameterNameProvider());
+        }
+
+        /**
+         * See ContactCardTest#testAddInvalidContact.
+         */
+        private class CustomParameterNameProvider implements ParameterNameProvider {
+
+            private final ParameterNameProvider nameProvider;
+
+            public CustomParameterNameProvider() {
+                nameProvider = Validation.byDefaultProvider().configure().getDefaultParameterNameProvider();
+            }
+
+            @Override
+            public List<String> getParameterNames(final Constructor<?> constructor) {
+                return nameProvider.getParameterNames(constructor);
+            }
+
+            @Override
+            public List<String> getParameterNames(final Method method) {
+                // See ContactCardTest#testAddInvalidContact.
+                //if ("addContact".equals(method.getName())) {
+                //    return Arrays.asList("contact");
+                //}
+                return nameProvider.getParameterNames(method);
+            }
+        }
+    }
 }

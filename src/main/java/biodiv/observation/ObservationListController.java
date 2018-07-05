@@ -112,7 +112,7 @@ public class ObservationListController {
 			@QueryParam("left") Double left, @QueryParam("right") Double right, @QueryParam("top") Double top,
 			@QueryParam("bottom") Double bottom, @QueryParam("recom") String maxvotedrecoid,
 			@QueryParam("onlyFilteredAggregation") Boolean onlyFilteredAggregation,
-
+			@QueryParam("termsAggregationField") String termsAggregationField,
 			@Context UriInfo uriInfo, String allParams
 
 	) {
@@ -151,7 +151,7 @@ public class ObservationListController {
 				createdOnMinDate, status, taxonId, recoName);
 
 		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery, geoAggregationField,
-				geoAggegationPrecision, onlyFilteredAggregation);
+				geoAggegationPrecision, onlyFilteredAggregation, termsAggregationField);
 
 		return mapResponse;
 	}

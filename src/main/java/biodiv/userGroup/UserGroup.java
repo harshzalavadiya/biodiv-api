@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -24,6 +25,8 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.validator.constraints.NotBlank;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -134,9 +137,17 @@ public class UserGroup implements java.io.Serializable {
 	}
 
 	@Id
-
+	@GenericGenerator(
+	        name = "hibernate_generator",
+	        strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+	        parameters = {
+	                @Parameter(name = "sequence_name", value = "hibernate_sequence"),
+	                @Parameter(name = "increment_size", value = "1"),
+                    @Parameter(name = "optimizer", value = "hilo")
+	        }
+	)
+	@GeneratedValue(generator = "hibernate_generator")
 	@Column(name = "id", unique = true, nullable = false)
-	@NotBlank
 	public long getId() {
 		return this.id;
 	}
@@ -637,6 +648,14 @@ public class UserGroup implements java.io.Serializable {
 		return result;
 
 	}
+	
+
+	@Override
+	public String toString() {
+		return "UserGroup [id=" + id + ", domainName=" + domainName + ", name=" + name + ", webaddress=" + webaddress
+				+ "]";
+	}
+
 
 }
 

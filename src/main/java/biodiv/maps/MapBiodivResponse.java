@@ -10,13 +10,17 @@ public class MapBiodivResponse {
 	public long totalDocuments;
 	public String geohashAggregation;
 	public String viewFilteredGeohashAggregation;
-	
-	public MapBiodivResponse(List<ObservationListMapper> documents, long totalDocuments, String geohashAggregation, String viewFilteredGeohashAggregation) {
+	public String termsAggregation;
+
+	public MapBiodivResponse() {}
+
+	public MapBiodivResponse(List<ObservationListMapper> documents, long totalDocuments, String geohashAggregation, String viewFilteredGeohashAggregation, String termsAggregation) {
 		super();
 		this.documents = documents;
 		this.totalDocuments = totalDocuments;
 		this.geohashAggregation = geohashAggregation;
 		this.viewFilteredGeohashAggregation = viewFilteredGeohashAggregation;
+		this.termsAggregation = termsAggregation;
 	}
 
 }

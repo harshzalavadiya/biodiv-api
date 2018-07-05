@@ -1,7 +1,5 @@
 package biodiv.auth;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -16,11 +14,9 @@ import javax.ws.rs.ext.Providers;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
-import org.pac4j.core.engine.DefaultLogoutLogic;
 import org.pac4j.core.engine.LogoutLogic;
 import org.pac4j.core.http.HttpActionAdapter;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.pac4j.jax.rs.filters.JaxRsHttpActionAdapter;
 import org.pac4j.jax.rs.pac4j.JaxRsContext;
@@ -75,7 +71,7 @@ public class LogoutController {
 			//Config config = AuthUtils.getConfig();
 			log.debug(config.toString());
 			LogoutLogic<Object, JaxRsContext> ll = config.getLogoutLogic();
-			log.debug(ll.toString());
+			//log.debug(ll.toString());
             //new BiodivLogoutLogic<Object, JaxRsContext>();
             //ll.setProfileManagerFactory();
 

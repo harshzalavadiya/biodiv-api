@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.maps.MapBiodivResponse;
+import biodiv.maps.MapDocument;
+import biodiv.common.NakshaUrlService;
 import biodiv.maps.MapAndBoolQuery;
 import biodiv.maps.MapHttpResponse;
 import biodiv.maps.MapIntegrationService;
@@ -28,6 +30,11 @@ public class ObservationListService implements MapService {
     @Inject
 	Configuration config;
 
+    @Inject
+    NakshaUrlService nakshaUrlService;
+
+    @Inject
+	MapIntegrationService mapIntegrationService;
 
 	@Override
 	public MapResponse create(String index, String type, String documentId, String document) {
@@ -128,25 +135,28 @@ public class ObservationListService implements MapService {
 	
 
 	@Override
-	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, String geoAggregationField, Integer geoAggegationPrecision, Boolean onlyFilteredAggregation) {
+	public MapBiodivResponse search(String index, String type, MapSearchQuery querys, String geoAggregationField, Integer geoAggegationPrecision, Boolean onlyFilteredAggregation, String termsAggregationField) {
 		String newurl= config.getString("nakshaUrl")+"/services/search/" + index + "/" + type+"?geoAggregationField="+geoAggregationField +"&geoAggegationPrecision="+geoAggegationPrecision;
 		log.debug("Searching at : {}", newurl);
 		if(onlyFilteredAggregation != null && onlyFilteredAggregation == true) {
 			newurl += "&onlyFilteredAggregation=true";
 		}
+		if(termsAggregationField != null) {
+			newurl += "&termsAggregationField=" + termsAggregationField;
+		}
 		
-		MapIntegrationService mapIntegrationService = new MapIntegrationService();
-		MapBiodivResponse mapHttpResponse= mapIntegrationService.postSearch(newurl,querys);
-		
-		return mapHttpResponse;
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			ResponseModel responseModel = new ResponseModel(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage());
-//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseModel).build();
-//		}
+		return mapIntegrationService.postSearch(newurl,querys);
+
 	}
 
-	
+	@Override
+	public MapDocument termsAggregation(String index, String type, String field, String locationField, Integer size, MapSearchQuery mapSearchQuery) {
+		String url = nakshaUrlService.getTermsAggregationUrl(index, type, field, locationField, size);
+		MapHttpResponse mapHttpResponse = mapIntegrationService.postRequest(url, mapSearchQuery);
+		MapDocument mapDocument = new MapDocument();
+		mapDocument.setDocument(mapHttpResponse.getDocument().toString());
+		return mapDocument;
+	}
 	
 	public void uploadSettingsAndMappings(String index, String settingsAndMappings) {
 		// TODO Auto-generated method stub
