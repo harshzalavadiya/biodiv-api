@@ -9,6 +9,8 @@ import org.hibernate.SessionFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import biodiv.common.Language;
+import biodiv.user.User;
 
 public class CommentDao extends AbstractDao<Comment,Long> implements DaoInterface<Comment,Long>{
 
@@ -56,6 +58,31 @@ public class CommentDao extends AbstractDao<Comment,Long> implements DaoInterfac
 		System.out.println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 		System.out.println(count);
 		return count;
+	}
+
+	public Comment findByAuthorCommentHolderAndRootHolder(Language lang, User user, String commentBody,
+			String commentHolderType, Long commentHolderId, String rootHolderType, Long rootHolderId) {
+		
+		String hql = "from Comment c where c.language.id =:languageId and c.rootHolderType =:rootHolderType and c.rootHolderId =:rootHolderId "
+				+ "and c.commentHolderType =:commentHolderType and c.commentHolderId =:commentHolderId and c.body =:commentBody";
+		
+		
+			Query query = sessionFactory.getCurrentSession().createQuery(hql);
+			query.setParameter("commentHolderType", commentHolderType);
+			query.setParameter("commentHolderId", commentHolderId);
+			query.setParameter("rootHolderType", rootHolderType);
+			query.setParameter("rootHolderId",rootHolderId);
+			query.setParameter("commentBody",commentBody);
+			query.setParameter("languageId",lang.getId());
+			
+			List<Comment> cl = query.getResultList();
+			if(cl.size()>0){
+				return cl.get(0);
+			}else{
+				return null;
+			}
+		
+		
 	}
 
 }

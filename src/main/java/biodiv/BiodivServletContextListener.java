@@ -42,6 +42,7 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 
+import biodiv.Checklists.ChecklistsModule;
 import biodiv.activityFeed.ActivityFeedModule;
 import biodiv.admin.AdminModule;
 import biodiv.allsearch.AllSearchModule;
@@ -49,19 +50,25 @@ import biodiv.auth.AuthModule;
 import biodiv.comment.CommentModule;
 import biodiv.common.BiodivCommonModule;
 import biodiv.customField.CustomFieldModule;
+import biodiv.dataTable.DataTableModule;
 import biodiv.dataset.DatasetModule;
 import biodiv.esclient.ElasticSearchClient;
+import biodiv.flag.FlagModule;
 import biodiv.follow.FollowModule;
 import biodiv.mail.MailModule;
 import biodiv.maps.MapModule;
 import biodiv.observation.ObservationModule;
+import biodiv.rating.RatingLinkModule;
+import biodiv.rating.RatingModule;
 import biodiv.scheduler.SchedulerModule;
+import biodiv.species.AcceptedSynonymModule;
 import biodiv.speciesPermission.SpeciesPermissionModule;
 import biodiv.taxon.TaxonModule;
 import biodiv.taxon.search.SearchTaxonModule;
 import biodiv.traits.TraitModule;
 import biodiv.user.UserModule;
 import biodiv.userGroup.UserGroupModule;
+
 
 public class BiodivServletContextListener extends GuiceServletContextListener {
 
@@ -182,9 +189,10 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 			}
 		}, new BiodivCommonModule(), new ActivityFeedModule(), new AuthModule(), new CommentModule(),
 				new CustomFieldModule(), new DatasetModule(), new FollowModule(), new MapModule(),
-				new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(), 
+				new DataTableModule(), new ObservationModule(), new TaxonModule(), new TraitModule(), new UserModule(), 
 				new UserGroupModule(), new AdminModule(), new SchedulerModule(), new MailModule(),
-				new SpeciesPermissionModule(), new AllSearchModule(), new SearchTaxonModule());
+				new SpeciesPermissionModule(), new AllSearchModule(), new SearchTaxonModule(),new ChecklistsModule(),
+				new AcceptedSynonymModule(),new RatingModule(),new RatingLinkModule(),new FlagModule());
 	}
 
 	private static List<Class<?>> getEntityClassesFromPackage(String packageName)

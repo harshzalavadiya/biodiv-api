@@ -15,6 +15,7 @@ import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 import biodiv.taxon.datamodel.dao.Classification;
 import biodiv.taxon.datamodel.dao.Taxon;
+import biodiv.taxon.datamodel.dao.TaxonomyRegistry;
 
 public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<Taxon, Long> {
 
@@ -235,6 +236,18 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 				
 		List<Taxon> result=q.getResultList();
 		return result;
+	}
+
+	public TaxonomyRegistry getTaxonRegistryWithTaxonConceptId(Long id) {
+		// TODO Auto-generated method stub
+		Query q;
+		q = sessionFactory.getCurrentSession().createQuery("From TaxonomyRegistry where taxonDefinitionId=:id");
+		q.setParameter("id", id);
+		List<TaxonomyRegistry> result=q.getResultList();
+		if(result.size()>0){
+			return result.get(0);
+		}
+		return null;
 	}
 
 }
