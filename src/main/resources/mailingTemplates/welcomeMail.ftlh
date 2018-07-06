@@ -107,13 +107,13 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </td>
 </tr>
 <tr>
-    <td id="header" class="w640" align="center" bgcolor="#ffffff" width="640"><a href="${serverUrl}/"><img src="${serverUrl+'whatsnewbanner_3.gif'}" alt="${siteName}" style="border: 0px solid ; width: 639px; height: 53px;"></a></td>
+    <td id="header" class="w640" align="center" bgcolor="#ffffff" width="640"><a href="${serverUrl}/"><img src="${serverUrl+'/biodiv/assets/all/whatsnewbanner_3.gif'}" alt="${siteName}" style="border: 0px solid ; width: 639px; height: 53px;"></a></td>
 </tr>
 <tr>
 <td class="w580" style="width: 580px; height: 10px; background-color: white;"></td>
 </tr>
 <tr align="center">
-    <td class="w640" bgcolor="#ffffff" height="30" width="640"><a href="${serverUrl+'/observation/list'}"><img src="${serverUrl+'/all/'+'picturebanner.png'}" alt="" style="border: 0px solid ; width: 600px; height: 101px;"></a></td>
+    <td class="w640" bgcolor="#ffffff" height="30" width="640"><a href="${serverUrl+'/observation/list'}"><img src="${serverUrl+'/biodiv/assets/all/picturebanner.png'}" alt="" style="border: 0px solid ; width: 600px; height: 101px;"></a></td>
 </tr>
 <tr id="simple-content-row">
 <td class="w640" bgcolor="#ffffff" width="640">
@@ -148,7 +148,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-<td class="w30" width="15"><a href="${serverUrl+'/observation/list'}"><img src="${serverUrl+'/all/'+'observations_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Observations" hspace="5"></a></td>
+<td class="w30" width="15"><a href="${serverUrl+'/observation/list'}"><img src="${serverUrl+'/biodiv/assets/all/observations_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Observations" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
@@ -166,7 +166,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <table align="right" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-    <td class="w30" height="5" width="15"><a href="${serverUrl+'/map'}"><img src="${serverUrl+'/all/'+'maps_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Maps" hspace="5"></a></td>
+    <td class="w30" height="5" width="15"><a href="${serverUrl+'/map'}"><img src="${serverUrl+'/biodiv/assets/all/maps_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Maps" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
@@ -191,7 +191,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-    <td class="w30" width="15"><a href="${serverUrl+'document/list'}"><img src="${serverUrl+'/all/'+'documents_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Documents" hspace="5"></a></td>
+    <td class="w30" width="15"><a href="${serverUrl+'document/list'}"><img src="${serverUrl+'/biodiv/assets/all/documents_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Documents" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
@@ -209,7 +209,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <table align="right" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-    <td class="w30" height="5" width="15"><a href="${serverUrl+'/species/list'}"><img src="${serverUrl+'/all/'+'species_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Species" hspace="5"></a></td>
+    <td class="w30" height="5" width="15"><a href="${serverUrl+'/species/list'}"><img src="${serverUrl+'/biodiv/assets/all/species_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Species" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
@@ -228,7 +228,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-    <td class="w30" width="15"><a href="${serverUrl+'/group/list'}"><img src="${serverUrl+'/all/'+'groups_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Groups" hspace="5"></a></td>
+    <td class="w30" width="15"><a href="${serverUrl+'/group/list'}"><img src="${serverUrl+'/biodiv/assets/all/groups_cr.png'}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Groups" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>
