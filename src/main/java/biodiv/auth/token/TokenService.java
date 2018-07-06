@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.pac4j.core.context.Pac4jConstants;
+import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.definition.CommonProfileDefinition;
 import org.pac4j.core.profile.jwt.JwtClaims;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
 import biodiv.auth.Constants;
+import biodiv.auth.SimpleUsernamePasswordAuthenticator;
 import biodiv.auth.token.Token.TokenType;
 import biodiv.common.AbstractService;
 import biodiv.user.User;
@@ -37,6 +39,9 @@ public class TokenService extends AbstractService<Token> {
 	private UserService userService;
 
 	@Inject
+	private SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator;
+
+	@Inject
 	TokenService(TokenDao tokenDao) {
 		super(tokenDao);
 		this.tokenDao = tokenDao;
@@ -44,6 +49,30 @@ public class TokenService extends AbstractService<Token> {
 
 	public TokenDao getDao() {
 		return tokenDao;
+	}
+
+	/**
+	 * 
+	 * @param username
+	 *            username
+	 * @param password
+	 *            password
+	 * @return is valid or not
+	 * @throws Exception
+	 *             Possible error
+	 */
+	@Transactional
+	public CommonProfile authenticate(String username, String password) throws Exception {
+		// Authenticate the user using the credentials provided
+		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password, "");
+		usernamePasswordAuthenticator.validate(credentials, null);
+		return credentials.getUserProfile();
+	}
+
+
+	@Transactional
+	public Map<String, Object> buildTokenResponse(CommonProfile profile, long userId, boolean getNewRefreshToken) {
+		return buildTokenResponse(profile, userService.findById(userId), getNewRefreshToken);
 	}
 
 	/**
@@ -58,6 +87,7 @@ public class TokenService extends AbstractService<Token> {
 	 *            dummy
 	 * @return dummy
 	 */
+	@Transactional
 	public Map<String, Object> buildTokenResponse(CommonProfile profile, User user, boolean getNewRefreshToken) {
 		try {
 			log.debug("Building token response for " + user);

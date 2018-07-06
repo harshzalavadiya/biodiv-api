@@ -51,8 +51,6 @@ public class SimpleUsernamePasswordAuthenticator implements Authenticator<Userna
 		} catch(NotFoundException e ) {
 			log.error("No user with email {}", username);
 		}
-		System.out.println(user.getPassword());
-		System.out.println(password);
 		if (user == null) {
 			throwsException("Not a valid user");
 		}

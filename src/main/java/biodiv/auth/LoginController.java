@@ -43,9 +43,6 @@ public class LoginController {
 	private UserService userService;
 
 	@Inject
-	private SimpleUsernamePasswordAuthenticator usernamePasswordAuthenticator;
-
-	@Inject
 	Configuration config;
 
 	@Inject
@@ -65,13 +62,12 @@ public class LoginController {
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
 	@Path("/auth")
 	public Response auth(@FormParam("username") String username, @FormParam("password") String password) {
 
 		try {
 			// validate credentials
-			CommonProfile profile = authenticate(username, password);
+			CommonProfile profile = tokenService.authenticate(username, password);
 
 			// Issue a token for the user
 
@@ -80,8 +76,8 @@ public class LoginController {
 
 			// Create a proxy object for logged in user
 
-			User user = userService.findById(Long.parseLong(profile.getId()));
-			Map<String, Object> result = tokenService.buildTokenResponse(profile, user, true);
+			
+			Map<String, Object> result = tokenService.buildTokenResponse(profile, Long.parseLong(profile.getId()), true);
 
 			// TODO When responding with an access token, the server must also
 			// include the additional Cache-Control: no-store and Pragma:
@@ -97,23 +93,7 @@ public class LoginController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param username
-	 *            username
-	 * @param password
-	 *            password
-	 * @return is valid or not
-	 * @throws Exception
-	 *             Possible error
-	 */
-	private CommonProfile authenticate(String username, String password) throws Exception {
-		// Authenticate the user using the credentials provided
-		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password, "");
-		usernamePasswordAuthenticator.validate(credentials, null);
-		return credentials.getUserProfile();
-	}
-
+	
 	/**
 	 * 
 	 * @param profile
