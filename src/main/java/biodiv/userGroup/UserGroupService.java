@@ -522,6 +522,17 @@ public class UserGroupService extends AbstractService<UserGroup> {
                      aclUtilService.addPermission(ug, user, permissions.get(i));
                  } 
                  //TODO:activityFeedService.addActivityFeed(userGroup, user, user, activityFeedService.MEMBER_JOINED);
+
+    			String activityDescription = "";
+    			Long activityHolderId = user.getId();
+    			Date dateCreated = new java.util.Date();
+    			Date lastUpdated = dateCreated;
+    			Map<String, Object> afNew = activityFeedService.createMapforAf("Object", ug.getId(), ug,
+    					"species.groups.UserGroup", "species.auth.SUser", user.getId(), "Joined group",
+    					"Joined group", activityDescription, activityDescription, null, null, null, true, null,
+    					dateCreated, lastUpdated);
+    			activityFeedService.addActivityFeed(user, afNew, null, (String) afNew.get("rootHolderType"));
+
              }
              return true;
          } else {
@@ -536,6 +547,17 @@ public class UserGroupService extends AbstractService<UserGroup> {
                      }
                      log.debug("Updated permissions as per new role");
                      //TODO:activityFeedService.addActivityFeed(userGroup, user, user, activityFeedService.MEMBER_ROLE_UPDATED);
+
+         			String activityDescription = "";
+         			Long activityHolderId = user.getId();
+         			Date dateCreated = new java.util.Date();
+         			Date lastUpdated = dateCreated;
+         			Map<String, Object> afNew = activityFeedService.createMapforAf("Object", ug.getId(), ug,
+         					"species.groups.UserGroup", "species.auth.SUser", user.getId(), "Role updated",
+         					"Role updated", activityDescription, activityDescription, null, null, null, true, null,
+         					dateCreated, lastUpdated);
+         			activityFeedService.addActivityFeed(user, afNew, null, (String) afNew.get("rootHolderType"));
+
                      return true;
                  } else {
                  	log.error("error while updating role for {}",userMemberRole);

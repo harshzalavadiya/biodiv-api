@@ -83,6 +83,7 @@ public class UserService extends AbstractService<User> {
 		return author;
 	}
 
+	@Transactional
 	public void setDefaultRoles(User user) {
 		String[] defaultRoleNames = config.getStringArray("user.defaultRoleNames");
 		log.debug("setDefaultRoles {}", defaultRoleNames.toString());
