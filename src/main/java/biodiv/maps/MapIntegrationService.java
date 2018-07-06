@@ -195,7 +195,7 @@ public class MapIntegrationService {
 					result.add(mapper.readValue(String.valueOf(o.getDocument()), ObservationListMapper.class));
 				}
 
-				return new MapBiodivResponse(result, myObject.getTotalDocuments(), myObject.getGeohashAggregation(), myObject.getViewFilteredGeohashAggregation());
+				return new MapBiodivResponse(result, myObject.getTotalDocuments(), myObject.getGeohashAggregation(), myObject.getViewFilteredGeohashAggregation(), myObject.getTermsAggregation());
 
 			} catch (IOException e) {
 				e.printStackTrace();

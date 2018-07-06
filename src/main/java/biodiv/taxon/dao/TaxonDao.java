@@ -6,18 +6,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.persistence.Query;
+
+import org.hibernate.SessionFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 import biodiv.taxon.datamodel.dao.Classification;
 import biodiv.taxon.datamodel.dao.Taxon;
+import biodiv.taxon.datamodel.dao.TaxonomyRegistry;
 
 public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<Taxon, Long> {
 
+	@Inject
+	public TaxonDao(SessionFactory sessionFactory) {
+		super(sessionFactory);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public Taxon findById(Long id) {
-		Taxon entity = (Taxon) getCurrentSession().get(Taxon.class, id);
+		Taxon entity = (Taxon) sessionFactory.getCurrentSession().get(Taxon.class, id);
 
 		return entity;
 	}
@@ -34,7 +44,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 			}
 		}
 		if ((parent == null && taxonIds == null)) {
-			q = getCurrentSession().createQuery(
+			q = sessionFactory.getCurrentSession().createQuery(
 					"select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent,t.position,t.speciesId"
 							+ " from Taxon as t, TaxonomyRegistry as tR" + " where t.id=tR.taxonDefinitionId"
 							+ " and t.isDeleted=false" + " and tR.classificationId=:classificationId"
@@ -44,7 +54,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 		}
 
 		if (parent != null) {
-			q = getCurrentSession().createQuery(
+			q = sessionFactory.getCurrentSession().createQuery(
 					"select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent,t.position,t.speciesId"
 							+ " from Taxon as t, TaxonomyRegistry as tR" + " where t.id=tR.taxonDefinitionId" + "  "
 							+ " and tR.classificationId=:classificationId"
@@ -73,7 +83,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 			queryForLike = queryForLike + local;
 		}
 		queryForLike = queryForLike + " or t.rank=0";
-		q = getCurrentSession()
+		q = sessionFactory.getCurrentSession()
 				.createQuery("select t.id,t.name, t.rank, tR.path, tR.classificationId,tR.parent,t.position,t.speciesId"
 						+ " from Taxon as t, TaxonomyRegistry as tR" + " where t.id=tR.taxonDefinitionId" + ""
 						+ " and tR.classificationId=:classificationId and t.isDeleted=false and" + "(" + queryForLike
@@ -102,7 +112,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 		Query q;
 		for (String s : initialIds) {
 			Long tId = Long.parseLong(s);
-			q = getCurrentSession().createQuery("select tR.path " + "from TaxonomyRegistry as tR where "
+			q = sessionFactory.getCurrentSession().createQuery("select tR.path " + "from TaxonomyRegistry as tR where "
 					+ "tR.taxonDefinitionId=:tId " + "and tR.classificationId=:classificationId");
 			path = q.setParameter("tId", tId).setParameter("classificationId", classificationId).getResultList();
 			paths = path.get(0);
@@ -127,7 +137,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 	public List<Object[]> search(String term) {
 		List<Object[]> results = new ArrayList<Object[]>();
 		Query q;
-		q = getCurrentSession()
+		q = sessionFactory.getCurrentSession()
 				.createQuery(
 						"select t.name,t.status,t.position,t.id,t.rank from Taxon as t where lower(t.name) like :term order by t.name")
 				.setMaxResults(10);
@@ -141,12 +151,12 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 		List<Object[]> results = new ArrayList<Object[]>();
 		Query q;
 		if (taxonid != null) {
-			q = getCurrentSession().createQuery(
+			q = sessionFactory.getCurrentSession().createQuery(
 					"select t.id,t.status from Taxon as t where t.id=:taxonid and lower(t.name) like lower ('" + term
 							+ "')");
 			q.setParameter("taxonid", taxonid);
 		} else {
-			q = getCurrentSession().createQuery(
+			q = sessionFactory.getCurrentSession().createQuery(
 					"select t.id,t.status from Taxon as t where lower(t.name) like lower ('" + term + "')");
 		}
 		results = q.getResultList();
@@ -160,7 +170,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 		initialIds.addAll(taxonIds);
 		for (String s : initialIds) {
 			Long tId = Long.parseLong(s);
-			q = getCurrentSession().createQuery("select acceptedId from AcceptedSynonyms where synonymId=:tId");
+			q = sessionFactory.getCurrentSession().createQuery("select acceptedId from AcceptedSynonyms where synonymId=:tId");
 			newIds = q.setParameter("tId", tId).getResultList();
 
 		}
@@ -175,7 +185,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 	public List<Classification> classification() {
 		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession().createQuery("from Classification");
+		q = sessionFactory.getCurrentSession().createQuery("from Classification");
 		List<Classification> results = q.getResultList();
 
 		return results;
@@ -185,7 +195,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 
 		Query q;
 
-		q = getCurrentSession().createQuery("from Classification where name=:name");
+		q = sessionFactory.getCurrentSession().createQuery("from Classification where name=:name");
 		List<Classification> results = q.setParameter("name", name).getResultList();
 
 		return results;
@@ -194,7 +204,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 	public List<Object[]> getTaxonData(Integer offset, Integer limit) {
 		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession().createQuery("select name,id,status,position,rank from Taxon order by id")
+		q = sessionFactory.getCurrentSession().createQuery("select name,id,status,position,rank from Taxon order by id")
 				.setFirstResult(offset).setMaxResults(limit);
 		List<Object[]> results = q.getResultList();
 		return results;
@@ -203,7 +213,7 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 	public List<Taxon> getAllByTaxonDefinitionId(long id) {
 		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession().createQuery("select path From TaxonomyRegistry where taxonDefinitionId=:id");
+		q = sessionFactory.getCurrentSession().createQuery("select path From TaxonomyRegistry where taxonDefinitionId=:id");
 		q.setParameter("id", id);
 			List<String> paths=q.getResultList();
 			Set<Long> idsa = new HashSet<Long>();
@@ -222,10 +232,22 @@ public class TaxonDao extends AbstractDao<Taxon, Long> implements DaoInterface<T
 		for(Long idsad:idsa){
 			System.out.println(idsad);
 		}
-		q=getCurrentSession().createQuery("from Taxon where id in (:idsa)").setParameter("idsa",idsa);
+		q=sessionFactory.getCurrentSession().createQuery("from Taxon where id in (:idsa)").setParameter("idsa",idsa);
 				
 		List<Taxon> result=q.getResultList();
 		return result;
+	}
+
+	public TaxonomyRegistry getTaxonRegistryWithTaxonConceptId(Long id) {
+		// TODO Auto-generated method stub
+		Query q;
+		q = sessionFactory.getCurrentSession().createQuery("From TaxonomyRegistry where taxonDefinitionId=:id");
+		q.setParameter("id", id);
+		List<TaxonomyRegistry> result=q.getResultList();
+		if(result.size()>0){
+			return result.get(0);
+		}
+		return null;
 	}
 
 }

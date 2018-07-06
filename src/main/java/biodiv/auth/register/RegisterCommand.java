@@ -1,19 +1,39 @@
 package biodiv.auth.register;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
+
+@ValidRegisterCommand
 public class RegisterCommand {
 	
+	@NotBlank
 	@FormParam("email")
+	@Email
+	@UniqueEmail
 	public String email;
 	
+	@NotBlank
 	@FormParam("password")
+	@Length(min = 6)
+	//blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 	public String password;
 	
+	@NotBlank
 	@FormParam("password2")
+	//@ValidPassword
 	public String password2;
 	
+	@NotBlank
 	@FormParam("name")
+	//@Min(value = 4, message = "{user.name.size.inValid}")
+	//blank: false, nullable: false,
 	public String name;
 	
 //	@FormParam("website")
@@ -24,13 +44,20 @@ public class RegisterCommand {
 //	@FormParam("aboutMe")
 //	public String aboutMe;
 	
+	@NotBlank
 	@FormParam("location")
 	public String location;
 	
+	@NotNull
 	@FormParam("latitude")
+	@DecimalMin(value="-90", inclusive=true, message="user.latitude.min")
+	@DecimalMax(value="90", inclusive=true, message="user.latitude.max")
 	public double latitude;
 	
+	@NotNull
 	@FormParam("longitude")
+	@DecimalMin(value="-180", inclusive=true, message="user.longitude.min")
+	@DecimalMax(value="180", inclusive=true, message="user.longitude.max")
 	public double longitude;
 	
 	@FormParam("profilePic")
@@ -51,49 +78,16 @@ public class RegisterCommand {
 	@FormParam("institutionType")
 	public String institutionType;
 
+	@FormParam("g-recaptcha-response")
+	@DefaultValue("")
+    public String recaptchaResponse;
+	
 	@Override
 	public String toString() {
-		return "RegisterCommand [email=" + email + ", password=" + password + ", password2=" + password2 + ", name="
+		return "RegisterCommand [email=" + email + ", password=XXXX, password2=XXXX" + ", name="
 				+ name + ", location=" + location + ", latitude=" + latitude + ", longitude=" + longitude
 				+ ", profilePic=" + profilePic + ", openId=" + openId + ", facebookUser=" + facebookUser + ", sexType="
 				+ sexType + ", occupationType=" + occupationType + ", institutionType=" + institutionType + "]";
 	}
 	
-	
-	// String g_recaptcha_response;
-	// String recaptcha_response_field;
-	// String recaptcha_challenge_field;
-	/*
-	 * String captcha_response;
-	 * 
-	 * def jcaptchaService; // def recaptchaService;
-	 * 
-	 * static constraints= { email email: true, blank: false, nullable:
-	 * false, validator: { value, command -> if (value) { def User =
-	 * command.grailsApplication.getDomainClass(
-	 * SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).
-	 * clazz if (User.findByEmail((value.toLowerCase()).trim())) { return
-	 * 'registerCommand.email.unique' } } } password blank: false, nullable:
-	 * false, validator: RegisterController.myPasswordValidator location
-	 * blank:false, nullable:false, validator :
-	 * RegisterController.locationValidator latitude blank:false,
-	 * nullable:false, validator : RegisterController.latitudeValidator
-	 * longitude blank:false, nullable:false, validator :
-	 * RegisterController.longitudeValidator password2 validator:
-	 * RegisterController.password2Validator captcha_response blank:false,
-	 * nullable:false, validator: { value, command -> def session =
-	 * RCH.requestAttributes.session def request =
-	 * RCH.requestAttributes.request try{ if
-	 * (!command.jcaptchaService.validateResponse("imageCaptcha",
-	 * session.id, command.captcha_response)) {
-	 * //if(!command.recaptchaService.verifyAnswer(session,
-	 * request.getRemoteAddr(),
-	 * ['g-recaptcha-response':command.g_recaptcha_response])) { return
-	 * 'reCaptcha.invalid.message' } }catch (Exception e) { // TODO: handle
-	 * exception e.printStackTrace() return 'reCaptcha.invalid.message' } }
-	 * }
-	 * 
-	 */
-
-
 }

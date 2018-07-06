@@ -33,16 +33,22 @@ public class MapResponse {
 	 */
 	private String viewFilteredGeohashAggregation;
 
+	/**
+	 * Terms Aggregation
+	 */
+	private String termsAggregation;
+
 	// empty constructor for json serialization/de-serialization
 	public MapResponse() {}
 	
 	public MapResponse(List<MapDocument> documents, long totalDocuments, String geohashAggregation,
-			String viewFilteredGeohashAggregation) {
+			String viewFilteredGeohashAggregation, String termsAggregation) {
 		super();
 		this.documents = documents;
 		this.totalDocuments = totalDocuments;
 		this.geohashAggregation = geohashAggregation;
 		this.viewFilteredGeohashAggregation = viewFilteredGeohashAggregation;
+		this.termsAggregation = termsAggregation;
 	}
 
 	public List<MapDocument> getDocuments() {
@@ -76,4 +82,13 @@ public class MapResponse {
 	public void setViewFilteredGeohashAggregation(String viewFilteredGeohashAggregation) {
 		this.viewFilteredGeohashAggregation = viewFilteredGeohashAggregation;
 	}
+
+	public String getTermsAggregation() {
+		return this.termsAggregation;
+	}
+
+	public void setTermsAggregation(String termsAggregation) {
+		this.termsAggregation = termsAggregation;
+	}
+
 }

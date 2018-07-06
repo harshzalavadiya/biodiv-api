@@ -11,6 +11,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.SessionFactory;
+
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.AssistedInject;
+
+import biodiv.common.AbstractObject;
+import biodiv.common.Metadata.LocationScale;
 import biodiv.user.Role;
 import biodiv.user.User;
 import biodiv.userGroup.UserGroup;
@@ -20,8 +27,41 @@ import biodiv.userGroup.UserGroup;
  */
 @Entity
 @Table(name = "user_group_member_role", schema = "public")
-public class UserGroupMemberRole implements java.io.Serializable {
+public class UserGroupMemberRole  extends AbstractObject implements java.io.Serializable {
+	
+	public enum UserGroupMemberRoleType {
+		ROLE_USERGROUP_FOUNDER("ROLE_USERGROUP_FOUNDER"),
+        ROLE_USERGROUP_EXPERT("ROLE_USERGROUP_EXPERT"),
+        ROLE_USERGROUP_MEMBER("ROLE_USERGROUP_MEMBER");
 
+		private String value;
+
+		UserGroupMemberRoleType(String value) {
+			this.value = value;
+		}
+
+		public String value() {
+			return this.value;
+		}
+		
+		static UserGroupMemberRoleType getEnum(String value){
+			if(value ==null || value.isEmpty()) return null;
+
+			value = value.toUpperCase().trim();
+
+			switch(value){
+				case "ROLE_USERGROUP_FOUNDER":
+					return UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER;
+				case "ROLE_USERGROUP_EXPERT":
+					return UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT;
+				case "ROLE_USERGROUP_MEMBER":
+					return UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER;
+				default:
+					return null;
+			}
+		}
+	}
+	
 	private UserGroupMemberRoleId id;
 	private User user;
 	private UserGroup userGroup;
@@ -29,16 +69,15 @@ public class UserGroupMemberRole implements java.io.Serializable {
 
 	public UserGroupMemberRole() {
 	}
-
-	public UserGroupMemberRole(UserGroupMemberRoleId id, User user, UserGroup userGroup, Role role) {
-		this.id = id;
+ 
+	public UserGroupMemberRole(UserGroup userGroup, User user, Role role) {
+		this.id = new UserGroupMemberRoleId(userGroup.getId(), role.getId(), user.getId());
 		this.user = user;
 		this.userGroup = userGroup;
 		this.role = role;
 	}
 
 	@EmbeddedId
-
 	@AttributeOverrides({
 			@AttributeOverride(name = "userGroupId", column = @Column(name = "user_group_id", nullable = false)),
 			@AttributeOverride(name = "roleId", column = @Column(name = "role_id", nullable = false)),

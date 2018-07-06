@@ -1,32 +1,40 @@
 package biodiv.userGroup;
 
+import java.security.Permission;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.persistence.Query;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
+import biodiv.user.Role;
 import biodiv.user.User;
 import biodiv.userGroup.userGroupMemberRole.UserGroupMemberRole;
 
 public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInterface<UserGroup, Long> {
 
+	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	UserGroupDao() {
-		log.trace("UserGroupDao constructor");
+	@Inject
+	public UserGroupDao(SessionFactory sessionFactory) {
+		super(sessionFactory);
 	}
+
 
 	@Override
 	public UserGroup findById(Long id) {
-		UserGroup entity = (UserGroup) getCurrentSession().get(UserGroup.class, id);
+		UserGroup entity = (UserGroup) sessionFactory.getCurrentSession().get(UserGroup.class, id);
 
 		return entity;
 	}
@@ -41,7 +49,7 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 			hql = " select ug from UserGroup ug inner join UserGroupMemberRole ugmr on ug = ugmr.userGroup where ugmr.user.id =:userId";
 
 		}
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		if(userId != 1L){
 			query.setParameter("userId", userId);
 		}
@@ -53,7 +61,7 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 
 	public List<User> userList(long groupId, long roleId) {
 		String hql = "select u from UserGroupMemberRole ugmr inner join User u on ugmr.user.id = u.id where ugmr.userGroup.id = :groupId and ugmr.role.id = :roleId";
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		query.setParameter("groupId", groupId);
 		query.setParameter("roleId", roleId);
 		List<User> listResult = query.getResultList();
@@ -62,7 +70,7 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 
 	public List<UserGroup> findAllByFilterRuleIsNotNull() {
 		String hql = "from UserGroup ug where ug.filterRule != null";
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		System.out.println(query);
 		List<UserGroup> listResult = query.getResultList();
 		return listResult;
@@ -116,7 +124,7 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 		// TODO Auto-generated method stub
 		Query q;
 		UserGroup results = null;
-		q = getCurrentSession().createQuery("from UserGroup where webaddress=:name").setParameter("name", name);
+		q = sessionFactory.getCurrentSession().createQuery("from UserGroup where webaddress=:name").setParameter("name", name);
 		try {
 			results = (UserGroup) q.getResultList().get(0);
 		} catch (IndexOutOfBoundsException e) {
@@ -130,7 +138,7 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 	public Boolean isFounder(Long ugId, Long userId, Long roleId) {
 
 		String hql = "from UserGroupMemberRole ugmr where ugmr.user.id =:userId and ugmr.role.id =:roleId and ugmr.userGroup.id =:ugId";
-		Query query = getCurrentSession().createQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		query.setParameter("userId", userId);
 		query.setParameter("roleId", roleId);
 		query.setParameter("ugId", ugId);
@@ -141,5 +149,31 @@ public class UserGroupDao extends AbstractDao<UserGroup, Long> implements DaoInt
 		else
 			return true;
 	}
+	
+	public List<User> getMembersWithRole(Long ugId, Long roleId) {
 
+		String hql = "from UserGroupMemberRole ugmr where ugmr.role.id =:roleId and ugmr.userGroup.id =:ugId";
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
+		query.setParameter("roleId", roleId);
+		query.setParameter("ugId", ugId);
+
+		List<UserGroupMemberRole> ugmr = query.getResultList();
+		List<User> membersWithRole = new ArrayList<User>();
+		for(int i =0; i<ugmr.size(); i++) {
+			membersWithRole.add(ugmr.get(i).getUser());
+		}
+		return membersWithRole;
+	}
+	
+	private UserGroupMemberRole getMemberRole(Long userId, Long ugId) {
+
+		String hql = "from UserGroupMemberRole ugmr where ugmr.user.id =:userId and ugmr.userGroup.id =:ugId";
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
+		query.setParameter("userId", userId);		
+		query.setParameter("ugId", ugId);
+
+		UserGroupMemberRole ugmr = (UserGroupMemberRole) query.getSingleResult();
+		return ugmr;
+	}
+	
 }

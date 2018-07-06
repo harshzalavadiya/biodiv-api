@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -32,12 +31,12 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.vividsolutions.jts.geom.Geometry;
 
 import biodiv.common.DataObject;
 import biodiv.common.LanguageService;
+import biodiv.dataTable.DataTable;
 import biodiv.resource.Resource;
 import biodiv.userGroup.UserGroup;
 
@@ -220,6 +219,10 @@ public class Observation extends DataObject implements java.io.Serializable{
 	// static belongsTo=[SUser,UserGroup,Checklists,Dataset]
 
 	private Long id;
+	
+	private DataTable dataTable;
+
+	
 
 	public String lis() {
 		System.out.println("hhhhhhhhhh");
@@ -493,6 +496,16 @@ public class Observation extends DataObject implements java.io.Serializable{
 
 	public void setAnnotations(Set<Annotation> annotations) {
 		this.annotations = annotations;
+	}
+	
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = DataTable.class)
+	@JoinColumn(name = "data_table_id", nullable = true)
+	public DataTable getDataTable() {
+		return this.dataTable;
+	}
+
+	public void setDataTable(DataTable dataTable) {
+		this.dataTable = dataTable;
 	}
 
 	@Override

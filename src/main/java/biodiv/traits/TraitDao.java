@@ -9,14 +9,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.persistence.Query;
 
+import org.hibernate.SessionFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 
 public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<Trait, Long> {
+
+	@Inject
+	public TraitDao(SessionFactory sessionFactory) {
+		super(sessionFactory);
+	}
 
 	@Override
 	public Trait findById(Long id) {
@@ -35,14 +42,13 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	 * @return dummy
 	 */
 	public List<TraitObject> list(Set<Long> traitIds, Boolean isNotObservationTrait, Boolean showInObservation) {
-		// TODO Auto-generated method stub
 		Query q;
 		List<TraitObject> objs = new ArrayList<TraitObject>();
 		for (Long id : traitIds) {
 			TraitObject obj = new TraitObject();
 			List<HashMap<String, Object>> values = new ArrayList<HashMap<String, Object>>();
 			List<Object[]> data1 = new ArrayList<Object[]>();
-			q = getCurrentSession().createQuery(
+			q = sessionFactory.getCurrentSession().createQuery(
 					"select name,traitTypes,description,icon,ontologyUrl,isParticipatory,id,showInObservation,isNotObservationTrait from Trait where isNotObservationTrait=:isNotObservationTrait and showInObservation=:showInObservation and id=:id");
 			data1 = q.setParameter("id", id).setParameter("isNotObservationTrait", isNotObservationTrait)
 					.setParameter("showInObservation", showInObservation).getResultList();
@@ -62,7 +68,7 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 
 			List<Object[]> data = new ArrayList<Object[]>();
 
-			q = getCurrentSession().createQuery(
+			q = sessionFactory.getCurrentSession().createQuery(
 					"select tv.id, tv.value,tv.description,tv.icon,tv.source from TraitValue as tv where tv.traitId=:id ");
 			data = q.setParameter("id", id).getResultList();
 			for (Object[] x : data) {
@@ -92,12 +98,10 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	 * @return dummy
 	 */
 	public List<Long> getTaxonIds(Long sGroup) {
-
-		// TODO Auto-generated method stub
-
 		List<Long> taxonIds = new ArrayList<Long>();
 		Query q;
-		q = getCurrentSession().createQuery("select taxonId from SpeciesGroupMapping where speciesId=:sGroup");
+		q = sessionFactory.getCurrentSession()
+				.createQuery("select taxonId from SpeciesGroupMapping where speciesId=:sGroup");
 		taxonIds = q.setParameter("sGroup", sGroup).getResultList();
 		taxonIds.removeAll(Collections.singleton(null));
 		return taxonIds;
@@ -117,7 +121,7 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 		Set<Long> taxonId = new HashSet<Long>();
 		String paths;
 		for (Long tId : taxonIds) {
-			q = getCurrentSession().createQuery("select tR.path " + "from TaxonomyRegistry as tR where "
+			q = sessionFactory.getCurrentSession().createQuery("select tR.path " + "from TaxonomyRegistry as tR where "
 					+ "tR.taxonDefinitionId=:tId " + "and tR.classificationId=:classificationId");
 			path = q.setParameter("tId", tId).setParameter("classificationId", classificationId).getResultList();
 			paths = path.get(0);
@@ -148,17 +152,16 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	 * @return dummy
 	 */
 	public Set<Long> getTraitId(Set<Long> allTaxonIds) {
-		// TODO Auto-generated method stub
 		Query q;
 		Set<Long> traitIds = new HashSet<Long>();
 		List<Long> id = new ArrayList<Long>();
 		List<Long> ids = new ArrayList<Long>();
-		q = getCurrentSession().createQuery(
+		q = sessionFactory.getCurrentSession().createQuery(
 				"select t.trait.id from TraitTaxonomyDefinition as t,Trait as tt where tt.id=t.trait.id and t.taxonomyDefinition.id in (:Ids)");
 		id = q.setParameter("Ids", allTaxonIds).getResultList();
 		traitIds.addAll(id);
 		traitIds.addAll(id);
-		q = getCurrentSession().createQuery(
+		q = sessionFactory.getCurrentSession().createQuery(
 				"select t.id from Trait  t left join TraitTaxonomyDefinition tt  on tt.trait.id=t.id where tt.taxonomyDefinition.id IS NULL");
 		ids = q.getResultList();
 		traitIds.addAll(ids);
@@ -176,7 +179,7 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	public List<Fact> getFact(Long id, String objectType) {
 		List<Fact> results = new ArrayList<Fact>();
 		Query q;
-		q = getCurrentSession()
+		q = sessionFactory.getCurrentSession()
 				.createQuery("from Fact where isDeleted=false and objectType=:objectType and objectId=:id");
 		results = q.setParameter("id", id).setParameter("objectType", objectType).getResultList();
 		return results;
@@ -194,7 +197,7 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	 */
 	public List<Fact> getFact(Long objectId, String objectType, Long traitId) {
 		Query q;
-		q = getCurrentSession()
+		q = sessionFactory.getCurrentSession()
 				.createQuery("from Fact where objectId=:objectId and objectType=:objectType and trait.id=:traitId")
 				.setParameter("objectId", objectId).setParameter("objectType", objectType)
 				.setParameter("traitId", traitId);
@@ -215,9 +218,8 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	 */
 
 	public int deleteFact(Long objectId, String objectType, Long trait) {
-		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession()
+		q = sessionFactory.getCurrentSession()
 				.createQuery("delete Fact where objectId=:objectId and trait.id=:trait and objectType=:objectType");
 		q.setParameter("objectId", objectId).setParameter("objectType", objectType).setParameter("trait", trait);
 		int result = q.executeUpdate();
@@ -226,9 +228,8 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	}
 
 	public TraitValue getTraitValue(Long traitId, Long value) {
-		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession().createQuery("from TraitValue where id=:value and traitId=:traitId");
+		q = sessionFactory.getCurrentSession().createQuery("from TraitValue where id=:value and traitId=:traitId");
 		q.setParameter("value", value).setParameter("traitId", traitId);
 		TraitValue results = null;
 		try {
@@ -241,9 +242,8 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	}
 
 	public List<Trait> listObservationTrait() {
-		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession().createQuery(
+		q = sessionFactory.getCurrentSession().createQuery(
 				"From Trait where showInObservation=true and isNotObservationTrait=false and isDeleted=false");
 		List<Trait> results = null;
 
@@ -253,9 +253,9 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	}
 
 	public List<TraitValue> getTraitValueWithTraitId(Long id) {
-		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession().createQuery("from TraitValue where traitId=:id");
+
+		q = sessionFactory.getCurrentSession().createQuery("from TraitValue where traitId=:id");
 		q.setParameter("id", id);
 		List<TraitValue> results = q.getResultList();
 		return results;
@@ -265,7 +265,7 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	public Map<String, Map<String, Object>> getAllTraitsWithValues(String traitsQuery) {
 		// TODO Auto-generated method stub
 		String hql = traitsQuery;
-		Query query = getCurrentSession().createSQLQuery(hql);
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(hql);
 
 		List result = query.getResultList();
 		if (result.size() == 0 || result.get(0) == null) {
@@ -285,9 +285,8 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 	}
 
 	public Trait getSingleTraitWithId(Long id) {
-		// TODO Auto-generated method stub
 		Query q;
-		q = getCurrentSession().createQuery("from Trait where id=:id");
+		q = sessionFactory.getCurrentSession().createQuery("from Trait where id=:id");
 		q.setParameter("id", id);
 		Trait results = (Trait) q.getSingleResult();
 		return results;

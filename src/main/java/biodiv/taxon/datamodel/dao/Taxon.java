@@ -380,8 +380,6 @@ public class Taxon implements java.io.Serializable {
 	public String toString() {
 		return "Taxon [id=" + id + ", name=" + name + ", rank=" + rank+"]";
 	}
-
-	
 	
 
 }

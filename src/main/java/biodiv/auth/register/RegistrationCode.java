@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import biodiv.common.AbstractObject;
+import biodiv.common.CommonMethod;
 
 @Entity
 @Table(name = "registration_code")
@@ -30,9 +31,15 @@ public class RegistrationCode extends AbstractObject {
 	private String token;
 	private String username;
 
+	RegistrationCode() {
+		this.dateCreated = new Date();
+		this.token = UUID.randomUUID().toString().replaceAll("-", "");
+		this.username = username;
+	}
+	
 	@AssistedInject
 	public RegistrationCode(SessionFactory sessionFactory, @Assisted String username) {
-		super(sessionFactory);
+		//super(sessionFactory);
 		this.dateCreated = new Date();
 		this.token = UUID.randomUUID().toString().replaceAll("-", "");
 		this.username = username;

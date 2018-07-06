@@ -92,13 +92,20 @@ public class CommentService extends AbstractService<Comment>{
 			}
 			Comment c = null;
 			if(commentId == null){
-				if(parentId != null){
-					c = new Comment(lang,user,commentBody.trim(),commentHolderId,commentHolderType,dateCreated,lastUpdated,
-							rootHolderId,rootHolderType,mainParentId,parentId,subject);
-				}else{
-					c = new Comment(lang,user,commentBody.trim(),commentHolderId,commentHolderType,dateCreated,lastUpdated,rootHolderId,
-							 rootHolderType);
-				}
+				//for updating reco comment
+				//when cnName situation remains as it is
+				//	c = commentDao.findByAuthorCommentHolderAndRootHolder(lang,user,commentBody,commentHolderType,commentHolderId,rootHolderType,rootHolderId);
+				//for updating reco comment
+				//if( (c !=null && !commentHolderType.equals("species.participation.Recommendation")) || c==null )	{
+					if(parentId != null){
+						c = new Comment(lang,user,commentBody.trim(),commentHolderId,commentHolderType,dateCreated,lastUpdated,
+								rootHolderId,rootHolderType,mainParentId,parentId,subject);
+					}else{
+						c = new Comment(lang,user,commentBody.trim(),commentHolderId,commentHolderType,dateCreated,lastUpdated,rootHolderId,
+								 rootHolderType);
+					}
+				//}
+				
 			 
 			}else{
 				c = findById(commentId);

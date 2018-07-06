@@ -13,11 +13,11 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.glassfish.hk2.api.Descriptor;
 import org.glassfish.hk2.api.Filter;
 import org.jvnet.hk2.annotations.Service;
-
+import org.glassfish.hk2.api.InterceptionService;
 import com.google.common.collect.Lists;
 
 @Service
-public class MyInterceptionService implements org.glassfish.hk2.api.InterceptionService {
+public class MyInterceptionService implements InterceptionService {
 
 	@Inject
 	private Provider<ResourceInterceptor> interceptorProvider;
