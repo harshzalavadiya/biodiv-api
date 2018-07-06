@@ -96,6 +96,7 @@ public class ObservationListMapper {
 	private List<String> urlresource;
 	private List<String> featuredgroups;
 	private List<String> featurednotes;
+	private List<Object> observationlikes;
 	
 	
 	
@@ -818,6 +819,16 @@ public class ObservationListMapper {
 
 	public void setCustom_fields(Map<String, Object> custom_fields) {
 		this.custom_fields = custom_fields;
+	}
+
+
+	public List<Object> getObservationlikes() {
+		return observationlikes;
+	}
+
+
+	public void setObservationlikes(List<Object> observationlikes) {
+		this.observationlikes = observationlikes;
 	}
 
 
