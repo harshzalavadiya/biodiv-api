@@ -1,6 +1,10 @@
 package biodiv.admin;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -13,7 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.Transactional;
+import biodiv.observation.Observation;
 import biodiv.observation.ObservationListService;
+import biodiv.observation.ObservationService;
 import biodiv.user.UserController;
 
 @Path("/admin")
@@ -25,6 +31,8 @@ public class AdminController {
 	ObservationListService observationListService;
 	@Inject
 	AdminService adminService;
+	@Inject
+	ObservationService observationService;
 
 	/**
 	 * 
@@ -45,5 +53,25 @@ public class AdminController {
 		}
 
 	}
+	@GET 
+	@Path("publishObservationSearchIndex")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public void publishObservationSearchIndex(@QueryParam("obvIds") String obvIds){
+		List<Observation> obvs=new ArrayList<Observation>();
+		
+		List<Long> longObvIds=Stream.of(obvIds.split(",")).map(Long::parseLong).collect(Collectors.toList());
+		for(Long id:longObvIds){
+			obvs.add(observationService.show(id));
+		}
+		
+		try {
+			adminService.publishObservationSearchIndex(obvs);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 
 }
