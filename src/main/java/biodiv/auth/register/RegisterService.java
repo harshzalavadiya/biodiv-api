@@ -150,7 +150,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 	}
 
 	@Transactional
-	private RegistrationCode registerAndEmail(User user, HttpServletRequest request) {
+	public RegistrationCode registerAndEmail(User user, HttpServletRequest request) {
 
 		RegistrationCode registrationCode = register(user.getEmail());
 
@@ -172,13 +172,13 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 
 		return null;
 	}
-
+    
 	private RegistrationCode register(String email) {
 		if (email == null)
 			return null;
 		try {
 			log.info("Generating registration code for the user {} ", email);
-			RegistrationCode registrationCode = registrationCodeFactory.create(email);
+			RegistrationCode registrationCode = new RegistrationCode(email);//registrationCodeFactory.create(email);
 			if (registrationCode.save(sessionFactory) == null) {
 				log.error("Coudn't save registrationCode");
 			} else {
