@@ -119,6 +119,9 @@ public class TokenService extends AbstractService<Token> {
 				tokenDao.save(rToken);
 
 				result.put("refresh_token", refreshToken);
+				
+				user.setLastLoginDate(new Date());
+				userService.save(user);
 			}
 			return result;
 		} catch (Exception e) {
