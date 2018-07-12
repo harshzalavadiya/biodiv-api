@@ -20,7 +20,9 @@ import biodiv.Transactional;
 import biodiv.observation.Observation;
 import biodiv.observation.ObservationListService;
 import biodiv.observation.ObservationService;
+import biodiv.user.User;
 import biodiv.user.UserController;
+import biodiv.user.UserService;
 
 @Path("/admin")
 public class AdminController {
@@ -33,6 +35,9 @@ public class AdminController {
 	AdminService adminService;
 	@Inject
 	ObservationService observationService;
+	
+	@Inject
+	UserService userService;
 
 	/**
 	 * 
@@ -67,6 +72,25 @@ public class AdminController {
 		
 		try {
 			adminService.publishObservationSearchIndex(obvs);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	@GET 
+	@Path("publishUserSearchIndex")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public void publishUserSearchIndex(@QueryParam("userIds") String userIds){
+		List<User> userId=new ArrayList<User>();
+		
+		List<Long> longUserIds=Stream.of(userIds.split(",")).map(Long::parseLong).collect(Collectors.toList());
+		for(Long id:longUserIds){
+			userId.add(userService.findById(id));
+		}
+		
+		try {
+			adminService.publishUserSearchIndex(userId);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

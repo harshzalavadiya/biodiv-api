@@ -283,6 +283,16 @@ public class AdminDao {
 			return traits_json;
 			
 		}
+
+		public List<Map<String, Object>> getObservationLike(String observationLikeQuery) {
+			// TODO Auto-generated method stub
+			SQLQuery query=sessionFactory.getCurrentSession().createSQLQuery(observationLikeQuery);
+			
+			query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+			List result=query.getResultList();
+		
+			return result;
+		}
 		
 		
 }

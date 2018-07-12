@@ -20,6 +20,7 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
 import biodiv.userGroup.UserGroup;
 import biodiv.userGroup.UserGroupService;
@@ -37,6 +38,7 @@ public class UserController {
 
 	@GET
 	@Path("/list")
+	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> list() {
 		List<User> users = userService.findAll(10, 0);
@@ -45,6 +47,7 @@ public class UserController {
 
 	@GET
 	@Path("/{id}")
+	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	public User show(@PathParam("id") long id) {
 		User user = userService.findById(Long.valueOf(id));
@@ -54,6 +57,7 @@ public class UserController {
 	@GET
 	@Path("/currentUserUserGroups")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	@Pac4JSecurity(clients = "cookieClient,headerClient", authorizers = "isAuthenticated")
 	public List<UserGroup> currentUserUserGroups(@Context HttpServletRequest request) {
 		CommonProfile profile = AuthUtils.currentUser(request);
