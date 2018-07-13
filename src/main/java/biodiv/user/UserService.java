@@ -1,6 +1,7 @@
 package biodiv.user;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.Transactional;
+import biodiv.admin.AdminService;
 import biodiv.auth.AuthUtils;
 import biodiv.common.AbstractService;
 
@@ -30,6 +32,9 @@ public class UserService extends AbstractService<User> {
 	@Inject
 	private RoleService roleService;
 
+	@Inject
+	private AdminService adminService;
+	
 	@Inject
 	public UserService(UserDao userDao) {
 		super(userDao);
@@ -96,6 +101,7 @@ public class UserService extends AbstractService<User> {
 	@Transactional
 	public void save(User user) {
 		userDao.save(user);
+		adminService.publishUserSearchIndex(Arrays.asList(user));
 	}
 
 }

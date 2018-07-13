@@ -244,7 +244,7 @@ public class RegisterService extends AbstractService<RegistrationCode> {
 		String url;
 		try {
 			url = Utils.generateLink("user", "show", linkParams, request);
-			params.put("userProfileUrl", Utils.generateLink("user", "show", linkParams, request));
+			params.put("userProfileUrl", Utils.generateLink("user", "show", linkParams, request, false));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
