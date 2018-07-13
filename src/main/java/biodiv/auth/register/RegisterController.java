@@ -82,9 +82,9 @@ public class RegisterController {
 					User user = registerService.create(registerCommand, webaddress, request);
 					Map<String, Object> result = new HashMap<String, Object>();
 					result.put("success", true);
-					String msg = "Welcome !!!";
+					String msg = "Welcome!!!";
 					if(registerCommand.openId == null) {
-						msg += "An activation email has been sent to your email. Please click the confirmation link to activate your account.";
+						msg += " An activation email has been sent to your email. Please click the confirmation link to activate your account.";
 					}
 					result.put("msg", msg);
 					return Response.ok(result).entity(result).build();

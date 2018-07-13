@@ -815,7 +815,7 @@ public class AdminService {
 
 			doc.put("createdon", createdon);
 			doc.put("updateon", updatedon);
-			doc.put("lastlogindate", lastLoginDate);
+			doc.put("lastlogindate", lastlogindate);
 			
 			eDocs.add(doc);
 
