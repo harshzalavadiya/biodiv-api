@@ -37,8 +37,8 @@ public class RegistrationCode extends AbstractObject {
 		this.username = username;
 	}
 	
-	@AssistedInject
-	public RegistrationCode(SessionFactory sessionFactory, @Assisted String username) {
+	//@AssistedInject
+	public RegistrationCode(/*SessionFactory sessionFactory, @Assisted*/ String username) {
 		//super(sessionFactory);
 		this.dateCreated = new Date();
 		this.token = UUID.randomUUID().toString().replaceAll("-", "");

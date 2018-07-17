@@ -13,7 +13,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +22,6 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 import javax.inject.Inject;
 
@@ -39,47 +38,41 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stringtemplate.v4.compiler.STParser.singleElement_return;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biodiv.Transactional;
-
 import biodiv.common.ZipService;
 import biodiv.customField.CustomField;
 import biodiv.customField.CustomFieldService;
-import biodiv.maps.MapIntegrationService;
 import biodiv.observation.Observation;
 import biodiv.observation.ObservationListMapper;
 import biodiv.observation.ObservationService;
 import biodiv.scheduler.CSVUtils;
 import biodiv.traits.Trait;
 import biodiv.traits.TraitService;
+import biodiv.user.User;
 
 public class AdminService {
-	
-	private final ObjectMapper objectMapper = new ObjectMapper(); 
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final Logger logger = LoggerFactory.getLogger(AdminService.class);
-	
-	
-	
-	
+
 	@Inject
 	private TraitService traitService;
 	@Inject
 	private CustomFieldService customFieldService;
 	@Inject
 	private ObservationService observationService;
-	
+
 	@Inject
 	private AdminDao adminDao;
-	
+
 	@Inject
 	Configuration config;
 	private HttpClientContext context;
-	
-	
+
 	@Transactional
 	public String downloadFile(String fileName) throws IOException {
 		// TODO Auto-generated method stub
@@ -360,195 +353,206 @@ public class AdminService {
 			ex1.printStackTrace();
 		}
 		String zipFileName = ZipService.zipFile(arr[0]);
-		
+
 		return zipFileName;
 
 	}
 
-	
-
-
-
-
 	public void publishObservationSearchIndex(List<Observation> obvs) {
 		// TODO Auto-generated method stub
-		for(Observation obv:obvs){
-			List<Map<String,Object>> data_to_elastic=new ArrayList<Map<String,Object>>();
-			Map<String, Object> traits=new HashMap<String,Object>();
-			Map<String, Object> traits_json=new HashMap<String,Object>();
-			Map<String, Object> traits_season=new HashMap<String,Object>();
-			Map<String, Object> custom_fields=new HashMap<String,Object>();
-			Map<String,String> pathClassificationData=new HashMap<String,String>();
-			List<String> customFieldUserGroupArray=new ArrayList<String>();
-			
-			  String observationJoinQuery=getObservationJoinQuery(obv.getId());
-			  Map<String,Object> singleObv=adminDao.getObservationObject(observationJoinQuery);
-			
-			  String customFieldTableQuery=getCustomFieldTableQuery(obv.getId());
-			  customFieldUserGroupArray =adminDao.getCustomFieldUserGroupArray(customFieldTableQuery);
-			  
-			  String queryForPathAndClassification=getQueryForPathAndClassification(obv.getId());
-			  pathClassificationData=adminDao.getPathClassificationData(queryForPathAndClassification);
-			  
-			  
-			  String traitKeyValueQuery=getTraitKeyValueQuery(obv.getId());
-			  traits=adminDao.getTraitKeyValue(traitKeyValueQuery);
-			  
-			  String traitRangeQuery=getTraitRangeQueryString(obv.getId());
-			  traits= adminDao.getTraitRangeValue(traitRangeQuery,traits);
-			  
-			  String traitDateQuery=getTraitDateQuery(obv.getId());
-			  traits= adminDao.getTraitDateValue(traitDateQuery,traits);
-			  
-			  String traitColorQuery=getTraitColorQuery(obv.getId());
-			  traits_json=adminDao.getTraitColorValue(traitColorQuery);
-			  
-			  String traitSeasonDateQuery=traitSeasonDate(obv.getId());
-			  traits_season=adminDao.getTraitSeasonDateValue(traitSeasonDateQuery);
-			 
-			  List<Map<String, Object>> custom_fields_one_obv =observationService.getCustomFields(obv.getId());
-			  custom_fields=getCustomFieldsMap(custom_fields_one_obv);
-			 
-			  	List<Object> location=new ArrayList<Object>();
-			  	
-			  	location.add(singleObv.get("longitude"));
-			  	location.add(singleObv.get("latitude"));
-			  	
-			  	singleObv.put("location", location);
-			  	
-			  	if(singleObv.get("fromdate")!=null){
-			  		singleObv.put("frommonth",new SimpleDateFormat("M").format(singleObv.get("fromdate")));
-			  		singleObv.put("fromdate",new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(singleObv.get("fromdate")));
-			  		
-			  	}
-			  	if(singleObv.get("lastrevised")!=null){
-			  		singleObv.put("lastrevised",new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(singleObv.get("lastrevised")));
-			  	}
-			  	if(singleObv.get("createdon")!=null){
-			  		singleObv.put("createdon",new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(singleObv.get("createdon")));
-			  	}
-			  	if(singleObv.get("todate")!=null){
-			  		singleObv.put("todate",new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(singleObv.get("todate")));
-			  	}
-				singleObv.put("checklistannotations",null);
-			  
-			  if(pathClassificationData.size()>0){
-				  singleObv.put("path", pathClassificationData.get("path"));
-				  singleObv.put("classificationid", pathClassificationData.get("classificationid"));
-				  
-			  }
-			  else{
-				  singleObv.put("path", null);
-				  singleObv.put("classificationid", null);
-			  }
-			  
-			  String noofaudio=singleObv.get("noofaudio").toString();
-			  String noofimages=singleObv.get("noofimages").toString();
-			  String noofvideos=singleObv.get("noofvideos").toString();
-			  
-			  if(noofaudio.equalsIgnoreCase("0") && noofimages.equalsIgnoreCase("0") && noofvideos.equalsIgnoreCase("0")){
-				  singleObv.put("nomedia", "1");
-			  }else{
-				  singleObv.put("nomedia", "0");
-			  }
-			  
-			  singleObv.put("traits", traits);
-			  singleObv.put("traits_season", traits_season);
-			  singleObv.put("traits_json",traits_json );
-			  singleObv.put("custom_fields", custom_fields);
-			  
-			  String imageresource=singleObv.get("imageresource").toString();
-			  String usergroupname=singleObv.get("usergroupname").toString();
-			  String usergroupid=singleObv.get("usergroupid").toString();
-			  String urlresource=singleObv.get("urlresource").toString();
-			  String featurednotes=singleObv.get("featurednotes").toString();
-			  String featuredgroups=singleObv.get("featuredgroups").toString();
-			  
-			  imageresource=imageresource.substring(1, imageresource.length()-1);
-			  singleObv.put("imageresource", imageresource.split(","));
-			  
-			  usergroupname=usergroupname.substring(1, usergroupname.length()-1);
-			  singleObv.put("usergroupname", usergroupname.split(","));
-			  
-			  usergroupid=usergroupid.substring(1, usergroupid.length()-1);
-			  singleObv.put("usergroupid", usergroupid.split(","));
-			  
-			  urlresource=urlresource.substring(1, urlresource.length()-1);
-			  singleObv.put("urlresource", urlresource.split(","));
-			  
-			  featurednotes=featurednotes.substring(1, featurednotes.length()-1);
-			  singleObv.put("featurednotes", featurednotes.split(","));
-			  
-			  featuredgroups=featuredgroups.substring(1, featuredgroups.length()-1);
-			  singleObv.put("featuredgroups", featuredgroups.split(","));
-			  
-			  String isdeletd=singleObv.get("isdeleted").toString();
-			  
-			  if(isdeletd.equalsIgnoreCase("f")){
-				  singleObv.put("isdeleted", "false");
-			  }
-			  if(isdeletd.equalsIgnoreCase("t")){
-				  singleObv.put("isdeleted", "true");
-			  }
-			  
-			  String ischecklist=singleObv.get("ischecklist").toString();
-			  if(ischecklist.equalsIgnoreCase("f")){
-				  singleObv.put("ischecklist", "false");
-			  }
-			  if(ischecklist.equalsIgnoreCase("t")){
-				  singleObv.put("ischecklist", "true");
-			  }
-			  
-			  String isshowable=singleObv.get("isshowable").toString();
-			  if(isshowable.equalsIgnoreCase("f")){
-				  singleObv.put("isshowable", "false");
-			  }
-			  if(isshowable.equalsIgnoreCase("t")){
-				  singleObv.put("isshowable", "true");
-			  }
-			  
-			  String agreeterms=singleObv.get("agreeterms").toString();
-			  if(agreeterms.equalsIgnoreCase("f")){
-				  singleObv.put("agreeterms", "false");
-			  }
-			  if(agreeterms.equalsIgnoreCase("t")){
-				  singleObv.put("agreeterms", "true");
-			  }
-			  
-			  String geoprivacy=singleObv.get("geoprivacy").toString();
-			  if(geoprivacy.equalsIgnoreCase("f")){
-				  singleObv.put("geoprivacy", "false");
-			  }
-			  if(geoprivacy.equalsIgnoreCase("t")){
-				  singleObv.put("geoprivacy", "true");
-			  }
-			  
-			  String islocked=singleObv.get("islocked").toString();
-			  if(islocked.equalsIgnoreCase("f")){
-				  singleObv.put("islocked", "false");
-			  }
-			  if(islocked.equalsIgnoreCase("t")){
-				  singleObv.put("islocked", "true");
-			  }
-			  
-			  
-			  data_to_elastic.add(singleObv);
-			  postToElastic(data_to_elastic);
-			
+		for (Observation obv : obvs) {
+			List<Map<String, Object>> data_to_elastic = new ArrayList<Map<String, Object>>();
+			Map<String, Object> traits = new HashMap<String, Object>();
+			Map<String, Object> traits_json = new HashMap<String, Object>();
+			Map<String, Object> traits_season = new HashMap<String, Object>();
+			Map<String, Object> custom_fields = new HashMap<String, Object>();
+			Map<String, String> pathClassificationData = new HashMap<String, String>();
+			List<String> customFieldUserGroupArray = new ArrayList<String>();
+			List<Map<String, Object>> observationlikes = new ArrayList<Map<String, Object>>();
+
+			String observationJoinQuery = getObservationJoinQuery(obv.getId());
+			Map<String, Object> singleObv = adminDao.getObservationObject(observationJoinQuery);
+
+			String customFieldTableQuery = getCustomFieldTableQuery(obv.getId());
+			customFieldUserGroupArray = adminDao.getCustomFieldUserGroupArray(customFieldTableQuery);
+
+			String queryForPathAndClassification = getQueryForPathAndClassification(obv.getId());
+			pathClassificationData = adminDao.getPathClassificationData(queryForPathAndClassification);
+
+			String traitKeyValueQuery = getTraitKeyValueQuery(obv.getId());
+			traits = adminDao.getTraitKeyValue(traitKeyValueQuery);
+
+			String traitRangeQuery = getTraitRangeQueryString(obv.getId());
+			traits = adminDao.getTraitRangeValue(traitRangeQuery, traits);
+
+			String traitDateQuery = getTraitDateQuery(obv.getId());
+			traits = adminDao.getTraitDateValue(traitDateQuery, traits);
+
+			String traitColorQuery = getTraitColorQuery(obv.getId());
+			traits_json = adminDao.getTraitColorValue(traitColorQuery);
+
+			String traitSeasonDateQuery = traitSeasonDate(obv.getId());
+			traits_season = adminDao.getTraitSeasonDateValue(traitSeasonDateQuery);
+
+			List<Map<String, Object>> custom_fields_one_obv = observationService.getCustomFields(obv.getId());
+			custom_fields = getCustomFieldsMap(custom_fields_one_obv);
+
+			String observationLikeQuery = getObservationLikeQuery(obv.getId());
+			observationlikes = adminDao.getObservationLike(observationLikeQuery);
+
+			Map<String, Object> observationLike = observationlikes.get(0);
+			singleObv.put("observationlikes", observationLike.get("values"));
+
+			List<Object> location = new ArrayList<Object>();
+
+			location.add(singleObv.get("longitude"));
+			location.add(singleObv.get("latitude"));
+
+			singleObv.put("location", location);
+
+			if (singleObv.get("fromdate") != null) {
+				singleObv.put("frommonth", new SimpleDateFormat("M").format(singleObv.get("fromdate")));
+				singleObv.put("fromdate",
+						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(singleObv.get("fromdate")));
+
+			}
+			if (singleObv.get("lastrevised") != null) {
+				singleObv.put("lastrevised",
+						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(singleObv.get("lastrevised")));
+			}
+			if (singleObv.get("createdon") != null) {
+				singleObv.put("createdon",
+						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(singleObv.get("createdon")));
+			}
+			if (singleObv.get("todate") != null) {
+				singleObv.put("todate", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(singleObv.get("todate")));
+			}
+			singleObv.put("checklistannotations", null);
+
+			if (pathClassificationData.size() > 0) {
+				singleObv.put("path", pathClassificationData.get("path"));
+				singleObv.put("classificationid", pathClassificationData.get("classificationid"));
+
+			} else {
+				singleObv.put("path", null);
+				singleObv.put("classificationid", null);
+			}
+
+			String noofaudio = singleObv.get("noofaudio").toString();
+			String noofimages = singleObv.get("noofimages").toString();
+			String noofvideos = singleObv.get("noofvideos").toString();
+
+			if (noofaudio.equalsIgnoreCase("0") && noofimages.equalsIgnoreCase("0")
+					&& noofvideos.equalsIgnoreCase("0")) {
+				singleObv.put("nomedia", "1");
+			} else {
+				singleObv.put("nomedia", "0");
+			}
+
+			singleObv.put("traits", traits);
+			singleObv.put("traits_season", traits_season);
+			singleObv.put("traits_json", traits_json);
+			singleObv.put("custom_fields", custom_fields);
+
+			String imageresource = singleObv.get("imageresource").toString();
+			String usergroupname = singleObv.get("usergroupname").toString();
+			System.out.println(usergroupname);
+			String usergroupid = singleObv.get("usergroupid").toString();
+			String urlresource = singleObv.get("urlresource").toString();
+			String featurednotes = singleObv.get("featurednotes").toString();
+			String featuredgroups = singleObv.get("featuredgroups").toString();
+
+			imageresource = imageresource.substring(1, imageresource.length() - 1);
+			singleObv.put("imageresource", imageresource.split(","));
+
+			usergroupname = usergroupname.substring(1, usergroupname.length() - 1);
+			singleObv.put("usergroupname", usergroupname.split(","));
+
+			usergroupid = usergroupid.substring(1, usergroupid.length() - 1);
+			singleObv.put("usergroupid", usergroupid.split(","));
+
+			urlresource = urlresource.substring(1, urlresource.length() - 1);
+			singleObv.put("urlresource", urlresource.split(","));
+
+			featurednotes = featurednotes.substring(1, featurednotes.length() - 1);
+			singleObv.put("featurednotes", featurednotes.split(","));
+
+			featuredgroups = featuredgroups.substring(1, featuredgroups.length() - 1);
+			singleObv.put("featuredgroups", featuredgroups.split(","));
+
+			String isdeletd = singleObv.get("isdeleted").toString();
+
+			if (isdeletd.equalsIgnoreCase("f")) {
+				singleObv.put("isdeleted", "false");
+			}
+			if (isdeletd.equalsIgnoreCase("t")) {
+				singleObv.put("isdeleted", "true");
+			}
+
+			String ischecklist = singleObv.get("ischecklist").toString();
+			if (ischecklist.equalsIgnoreCase("f")) {
+				singleObv.put("ischecklist", "false");
+			}
+			if (ischecklist.equalsIgnoreCase("t")) {
+				singleObv.put("ischecklist", "true");
+			}
+
+			String isshowable = singleObv.get("isshowable").toString();
+			if (isshowable.equalsIgnoreCase("f")) {
+				singleObv.put("isshowable", "false");
+			}
+			if (isshowable.equalsIgnoreCase("t")) {
+				singleObv.put("isshowable", "true");
+			}
+
+			String agreeterms = singleObv.get("agreeterms").toString();
+			if (agreeterms.equalsIgnoreCase("f")) {
+				singleObv.put("agreeterms", "false");
+			}
+			if (agreeterms.equalsIgnoreCase("t")) {
+				singleObv.put("agreeterms", "true");
+			}
+
+			String geoprivacy = singleObv.get("geoprivacy").toString();
+			if (geoprivacy.equalsIgnoreCase("f")) {
+				singleObv.put("geoprivacy", "false");
+			}
+			if (geoprivacy.equalsIgnoreCase("t")) {
+				singleObv.put("geoprivacy", "true");
+			}
+
+			String islocked = singleObv.get("islocked").toString();
+			if (islocked.equalsIgnoreCase("f")) {
+				singleObv.put("islocked", "false");
+			}
+			if (islocked.equalsIgnoreCase("t")) {
+				singleObv.put("islocked", "true");
+			}
+
+			data_to_elastic.add(singleObv);
+			postToElastic(data_to_elastic,"observation");
+
 		}
-		
-		
-		
+
 	}
 
-	private void postToElastic(List<Map<String, Object>> data_to_elastic) {
+	private String getObservationLikeQuery(Long id) {
 		// TODO Auto-generated method stub
-		  CloseableHttpResponse response = null;
-		  String url=config.getString("nakshaUrl")+"/services/bulk-upload/observation/observation";
-		  try {
+
+		String observationLikeQuery = "select row.rating_ref as key,  '[' || string_agg(format('%s',to_json(row_to_json(row)) ), ',')  || ']' as values from (select  rl.rating_ref,r.rater_id ,su.name , case when su.icon is not null  then su.icon else coalesce(su.profile_pic,'') end as icon "
+				+ " from rating as r inner join suser  as su on r.rater_id=su.id inner join  rating_link as rl on r.id=rl.rating_id "
+				+ " where rl.rating_ref =" + id + "and  rl.type='observation') row group by row.rating_ref";
+
+		return observationLikeQuery;
+	}
+
+	private void postToElastic(List<Map<String, Object>> data_to_elastic, String index) {
+		// TODO Auto-generated method stub
+		CloseableHttpResponse response = null;
+		String url = config.getString("nakshaUrl") + "/services/bulk-upload/"+index+"/"+index;
+		try {
 			HttpPost post = new HttpPost(url);
 			String jsonData = objectMapper.writeValueAsString(data_to_elastic);
-			System.out.println(jsonData);
 			StringEntity entity = new StringEntity(jsonData, ContentType.APPLICATION_JSON);
 			post.setEntity(entity);
 			CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -558,295 +562,267 @@ public class AdminService {
 				HttpEntity entity1 = response.getEntity();
 
 				String responseString = EntityUtils.toString(entity1);
-				
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				logger.error("Error while trying to send request at URL {}", url);
 				e.printStackTrace();
 			}
-			
+
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			logger.error("Error while trying to send request at URL {}", url);
 			e.printStackTrace();
 		}
-		
+
 	}
 
-
-
-
-
-
 	private String getObservationJoinQuery(Long id) {
-		
-		String observationSql="SELECT obs.id AS id,"+
-	            "obs.version AS version,"+
-	            "obs.author_id AS authorid,"+
-	            "su.name AS authorname,"+
-	                "CASE "+
-	                    "WHEN su.icon IS NULL THEN su.profile_pic "+
-	                    "ELSE su.icon "+
-	               "END AS authorprofilepic,"+
-	            "obs.created_on AS createdon,"+
-	            "obs.group_id AS speciesgroupid,"+
-	            "sg.name AS speciesgroupname,"+
-	            "obs.latitude AS latitude,"+
-	            "obs.longitude AS longitude,"+
-	            "obs.notes AS notes,"+
-	            "obs.from_date AS fromdate,"+
-	            "obs.place_name AS placename,"+
-	            "obs.rating AS rating,"+
-	            "obs.reverse_geocoded_name AS reversegeocodedname,"+
-	            "obs.flag_count AS flagcount,"+
-	            "obs.geo_privacy AS geoprivacy,"+
-	            "obs.habitat_id AS habitatid,"+
-	            "h.name AS habitatname,"+
-	            "obs.is_deleted AS isdeleted,"+
-	            "obs.last_revised AS lastrevised,"+
-	            "obs.location_accuracy AS locationaccuracy,"+
-	            "obs.visit_count AS visitcount,"+
-	            "obs.search_text AS searchtext,"+
-	            "obs.max_voted_reco_id AS maxvotedrecoid,"+
-	            "obs.agree_terms AS agreeterms,"+
-	            "obs.is_checklist AS ischecklist,"+
-	            "obs.is_showable AS isshowable,"+
-	            "obs.source_id AS sourceid,"+
-	            "obs.to_date AS todate,"+
-	            "obs.topology AS topology,"+
-	            "obs.checklist_annotations AS checklistannotations,"+
-	            "obs.feature_count AS featurecount,"+
-	            "obs.is_locked AS islocked,"+
-	            "obs.license_id AS licenseid,"+
-	            "ll.name AS licensename,"+
-	            "obs.language_id AS languageid,"+
-	            "l.name AS languagename,"+
-	            "obs.location_scale AS locationscale,"+
-	            "obs.access_rights AS accessrights,"+
-	            "obs.catalog_number AS catalognumber,"+
-	            "obs.dataset_id AS datasetid,"+
-	            "obs.external_dataset_key AS externaldatasetkey,"+
-	            "obs.external_id AS externalid,"+
-	            "obs.external_url AS externalurl,"+
-	            "obs.information_withheld AS informationwithheld,"+
-	            "obs.last_crawled AS lastcrawled,"+
-	            "obs.last_interpreted AS lastinterpreted,"+
-	            "obs.original_author AS originalauthor,"+
-	            "obs.publishing_country AS publishingcountry,"+
-	            "obs.repr_image_id AS reprimageid,"+
-	            "obs.via_code AS viacode,"+
-	            "obs.via_id AS viaid,"+
-	            "obs.protocol AS protocol,"+
-	            "obs.basis_of_record AS basisofrecord,"+
-	            "obs.no_of_images AS noofimages,"+
-	            "obs.no_of_videos AS noofvideos,"+
-	            "obs.no_of_audio AS noofaudio,"+
-	            "obs.no_of_identifications AS noofidentifications,"+
-	            "r.taxon_concept_id AS taxonconceptid,"+
-	            "r.accepted_name_id AS acceptednameid,"+
-	            "t.canonical_form AS taxonomycanonicalform,"+
-	            "t.status as status,"+
-	            	"CASE "+
-	                    " WHEN t. normalized_form IS NULL THEN r.name "+
-	                    "ELSE  t. normalized_form "+
-	                "END AS name,"+
-	            "t.position AS position,"+
-	            "t.rank AS rank,"+
-	            "resp.file_name AS thumbnail, "+
-	            "array_remove(array_agg(DISTINCT ug.id), NULL \\:\\: bigint) AS usergroupid, "+
-	            "array_remove(array_agg(DISTINCT ug.name), NULL \\:\\: character varying) AS usergroupname,"+
-	            "array_remove(array_agg(DISTINCT res.file_name), NULL \\:\\: character varying) AS imageresource,"+
-	            "array_remove(array_agg(DISTINCT res.url), NULL \\:\\: character varying) AS urlresource,"+
-	            "array_remove(array_agg(DISTINCT f.user_group_id), NULL \\:\\: bigint) AS featuredgroups,"+
-	            "array_remove(array_agg(DISTINCT f.notes), NULL \\:\\: character varying) AS featurednotes "+
-	           "FROM observation obs "+
-	           "LEFT JOIN observation_resource obvres ON obs.id = obvres.observation_id "+
-	           "LEFT JOIN resource resp ON obs.repr_image_id = resp.id "+
-	           "LEFT JOIN resource res ON obvres.resource_id = res.id "+
-	           "LEFT JOIN language l ON obs.language_id = l.id "+
-	           "LEFT JOIN suser su ON obs.author_id = su.id "+
-	           "LEFT JOIN habitat h ON obs.habitat_id = h.id "+
-	           "LEFT JOIN species_group sg ON obs.group_id = sg.id "+
-	           "LEFT JOIN license ll ON obs.license_id = ll.id "+
-	           "LEFT JOIN recommendation r ON obs.max_voted_reco_id = r.id "+
-	           "LEFT JOIN taxonomy_definition t ON r.taxon_concept_id = t.id "+
-	           "LEFT JOIN user_group_observations ugo ON obs.id = ugo.observation_id "+
-	           "LEFT JOIN user_group ug ON ug.id = ugo.user_group_id "+
-	           "LEFT JOIN featured f ON f.object_id = obs.id "+
-	           "WHERE obs.is_deleted=false and obs.id="+id +
-	          " GROUP BY obs.id, su.name, su.icon, su.profile_pic, sg.name, h.name, ll.name, l.name, t.canonical_form,t.normalized_form , r.name,r.taxon_concept_id,"+
-	          "r.accepted_name_id,t.status, t.position, t.rank, resp.file_name";
-		
+
+		String observationSql = "SELECT obs.id AS id," + "obs.version AS version," + "obs.author_id AS authorid,"
+				+ "su.name AS authorname," + "CASE " + "WHEN su.icon IS NULL THEN su.profile_pic " + "ELSE su.icon "
+				+ "END AS authorprofilepic," + "obs.created_on AS createdon," + "obs.group_id AS speciesgroupid,"
+				+ "sg.name AS speciesgroupname," + "obs.latitude AS latitude," + "obs.longitude AS longitude,"
+				+ "obs.notes AS notes," + "obs.from_date AS fromdate," + "obs.place_name AS placename,"
+				+ "obs.rating AS rating," + "obs.reverse_geocoded_name AS reversegeocodedname,"
+				+ "obs.flag_count AS flagcount," + "obs.geo_privacy AS geoprivacy," + "obs.habitat_id AS habitatid,"
+				+ "h.name AS habitatname," + "obs.is_deleted AS isdeleted," + "obs.last_revised AS lastrevised,"
+				+ "obs.location_accuracy AS locationaccuracy," + "obs.visit_count AS visitcount,"
+				+ "obs.search_text AS searchtext," + "obs.max_voted_reco_id AS maxvotedrecoid,"
+				+ "obs.agree_terms AS agreeterms," + "obs.is_checklist AS ischecklist,"
+				+ "obs.is_showable AS isshowable," + "obs.source_id AS sourceid," + "obs.to_date AS todate,"
+				+ "obs.topology AS topology," + "obs.checklist_annotations AS checklistannotations,"
+				+ "obs.feature_count AS featurecount," + "obs.is_locked AS islocked," + "obs.license_id AS licenseid,"
+				+ "ll.name AS licensename," + "obs.language_id AS languageid," + "l.name AS languagename,"
+				+ "obs.location_scale AS locationscale," + "obs.access_rights AS accessrights,"
+				+ "obs.catalog_number AS catalognumber," + "obs.dataset_id AS datasetid,"
+				+ "obs.external_dataset_key AS externaldatasetkey," + "obs.external_id AS externalid,"
+				+ "obs.external_url AS externalurl," + "obs.information_withheld AS informationwithheld,"
+				+ "obs.last_crawled AS lastcrawled," + "obs.last_interpreted AS lastinterpreted,"
+				+ "obs.original_author AS originalauthor," + "obs.publishing_country AS publishingcountry,"
+				+ "obs.repr_image_id AS reprimageid," + "obs.via_code AS viacode," + "obs.via_id AS viaid,"
+				+ "obs.protocol AS protocol," + "obs.basis_of_record AS basisofrecord,"
+				+ "obs.no_of_images AS noofimages," + "obs.no_of_videos AS noofvideos,"
+				+ "obs.no_of_audio AS noofaudio," + "obs.no_of_identifications AS noofidentifications,"
+				+ "r.taxon_concept_id AS taxonconceptid," + "r.accepted_name_id AS acceptednameid,"
+				+ "t.canonical_form AS taxonomycanonicalform," + "t.status as status," + "CASE "
+				+ " WHEN t. normalized_form IS NULL THEN r.name " + "ELSE  t. normalized_form " + "END AS name,"
+				+ "t.position AS position," + "t.rank AS rank," + "resp.file_name AS thumbnail, "
+				+ "array_remove(array_agg(DISTINCT ug.id), NULL \\:\\: bigint) AS usergroupid, "
+				+ "array_remove(array_agg(DISTINCT ug.name), NULL \\:\\: character varying) AS usergroupname,"
+				+ "array_remove(array_agg(DISTINCT res.file_name), NULL \\:\\: character varying) AS imageresource,"
+				+ "array_remove(array_agg(DISTINCT res.url), NULL \\:\\: character varying) AS urlresource,"
+				+ "array_remove(array_agg(DISTINCT f.user_group_id), NULL \\:\\: bigint) AS featuredgroups,"
+				+ "array_remove(array_agg(DISTINCT f.notes), NULL \\:\\: character varying) AS featurednotes "
+				+ "FROM observation obs " + "LEFT JOIN observation_resource obvres ON obs.id = obvres.observation_id "
+				+ "LEFT JOIN resource resp ON obs.repr_image_id = resp.id "
+				+ "LEFT JOIN resource res ON obvres.resource_id = res.id "
+				+ "LEFT JOIN language l ON obs.language_id = l.id " + "LEFT JOIN suser su ON obs.author_id = su.id "
+				+ "LEFT JOIN habitat h ON obs.habitat_id = h.id "
+				+ "LEFT JOIN species_group sg ON obs.group_id = sg.id "
+				+ "LEFT JOIN license ll ON obs.license_id = ll.id "
+				+ "LEFT JOIN recommendation r ON obs.max_voted_reco_id = r.id "
+				+ "LEFT JOIN taxonomy_definition t ON r.taxon_concept_id = t.id "
+				+ "LEFT JOIN user_group_observations ugo ON obs.id = ugo.observation_id "
+				+ "LEFT JOIN user_group ug ON ug.id = ugo.user_group_id "
+				+ "LEFT JOIN featured f ON f.object_id = obs.id " + "WHERE obs.is_deleted=false and obs.id=" + id
+				+ " GROUP BY obs.id, su.name, su.icon, su.profile_pic, sg.name, h.name, ll.name, l.name, t.canonical_form,t.normalized_form , r.name,r.taxon_concept_id,"
+				+ "r.accepted_name_id,t.status, t.position, t.rank, resp.file_name";
+
 		return observationSql;
 	}
 
-
-
-
-
-
 	private Map<String, Object> getCustomFieldsMap(List<Map<String, Object>> custom_fields_one_obv) {
-		Map<String, Object> custom_fields=new HashMap<String,Object>();
-		for(Map<String,Object> custom_field:custom_fields_one_obv ){
-			  String allowedMultiple=custom_field.get("allowedMultiple").toString();
-			  String id=custom_field.get("id").toString();
-			  String value=custom_field.get("value").toString();
-			  String options=null;
-			  if(custom_field.get("options")!=null){
-				  System.out.println(custom_field.get("options").toString());
-				 options=custom_field.get("options").toString();
-			  }
-			  String dataType=custom_field.get("dataType").toString();
-			  String key=custom_field.get("key").toString();
-			  if(dataType.equalsIgnoreCase("DATE")){
-				  DateFormat input = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				  DateFormat output = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-				  
-				  try {
-					value= output.format(input.parse(value));
+		Map<String, Object> custom_fields = new HashMap<String, Object>();
+		for (Map<String, Object> custom_field : custom_fields_one_obv) {
+			String allowedMultiple = custom_field.get("allowedMultiple").toString();
+			String id = custom_field.get("id").toString();
+			String value = custom_field.get("value").toString();
+			String options = null;
+			if (custom_field.get("options") != null) {
+				System.out.println(custom_field.get("options").toString());
+				options = custom_field.get("options").toString();
+			}
+			String dataType = custom_field.get("dataType").toString();
+			String key = custom_field.get("key").toString();
+			if (dataType.equalsIgnoreCase("DATE")) {
+				DateFormat input = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				DateFormat output = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+				try {
+					value = output.format(input.parse(value));
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
-			  }
-			  Map<String, Object> keyValues=new HashMap<String,Object>();
-			  
-			  if(allowedMultiple.equalsIgnoreCase("true") && options!=null ){
-					keyValues.put("value",value.split(","));
-				    keyValues.put("key",key);
-				    custom_fields.put(id,keyValues);
-				  
-			  }
-			 else{
-				 	keyValues.put("value",value);
-			        keyValues.put("key",key);
-			        custom_fields.put(id,keyValues);
-				  }
-			  
-		  }
-		
+			}
+			Map<String, Object> keyValues = new HashMap<String, Object>();
+
+			if (allowedMultiple.equalsIgnoreCase("true") && options != null) {
+				keyValues.put("value", value.split(","));
+				keyValues.put("key", key);
+				custom_fields.put(id, keyValues);
+
+			} else {
+				keyValues.put("value", value);
+				keyValues.put("key", key);
+				custom_fields.put(id, keyValues);
+			}
+
+		}
+
 		return custom_fields;
 	}
 
-
-
-
-
-
 	private String traitSeasonDate(Long id) {
 		// TODO Auto-generated method stub
-		 String traitSeasonDateQuery=
-				    "select g.traits from ( "+
-				  	"select "+
-				  	 "x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.dates)), ',') || ']' as traits "+
-				  	 "from ( "+
-				  	 "select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t "+
-				  	 "where f.trait_instance_id = t.id and (t.data_types='DATE') and (t.units='MONTH')  and f.object_type='species.participation.Observation' "+
-				  	 ") x group by x.object_id "+
-				  	 ") g where g.object_id="+id;
+		String traitSeasonDateQuery = "select g.traits from ( " + "select "
+				+ "x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.dates)), ',') || ']' as traits "
+				+ "from ( "
+				+ "select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t "
+				+ "where f.trait_instance_id = t.id and (t.data_types='DATE') and (t.units='MONTH')  and f.object_type='species.participation.Observation' "
+				+ ") x group by x.object_id " + ") g where g.object_id=" + id;
 		return traitSeasonDateQuery;
 	}
 
-
-
-
-
-
 	private String getTraitDateQuery(Long id) {
 		// TODO Auto-generated method stub
-		 String traitDateQuery=
-				  "select g.traits from ( "+
-					"select "+
-					 "x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.dates)), ',') || ']' as traits "+
-					 "from ( "+
-					"select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t "+
-					 "where f.trait_instance_id = t.id and (t.data_types='DATE') and (t.units!='MONTH') and f.object_type='species.participation.Observation' "+
-					") x group by x.object_id "+
-					") g where g.object_id="+id;
+		String traitDateQuery = "select g.traits from ( " + "select "
+				+ "x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.dates)), ',') || ']' as traits "
+				+ "from ( "
+				+ "select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t "
+				+ "where f.trait_instance_id = t.id and (t.data_types='DATE') and (t.units!='MONTH') and f.object_type='species.participation.Observation' "
+				+ ") x group by x.object_id " + ") g where g.object_id=" + id;
 		return traitDateQuery;
 	}
-
-
-
-
-
 
 	private String getTraitColorQuery(Long id) {
 		// TODO Auto-generated method stub
 
-		  String traitColorQuery=
-				  "select g.traits from ( "+
-					"select "+
-					 "x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']'  as traits "+
-					 "from ( "+
-					 "select f.object_id,t.id as tid,  array_agg(DISTINCT f.value) AS tvalues from fact f, trait t "+
-					 "where  f.trait_instance_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation'  group by f.object_id,t.id "+
-				") x group by x.object_id "+
-				") g where g.object_id="+id;
+		String traitColorQuery = "select g.traits from ( " + "select "
+				+ "x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']'  as traits "
+				+ "from ( "
+				+ "select f.object_id,t.id as tid,  array_agg(DISTINCT f.value) AS tvalues from fact f, trait t "
+				+ "where  f.trait_instance_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation'  group by f.object_id,t.id "
+				+ ") x group by x.object_id " + ") g where g.object_id=" + id;
 		return traitColorQuery;
 	}
 
-
-
-
-
-
 	private String getCustomFieldTableQuery(Long id) {
 		// TODO Auto-generated method stub
-		 String customFieldTableQuery="select table_name from information_schema.tables where table_name like 'custom_fields_group%' ";
+		String customFieldTableQuery = "select table_name from information_schema.tables where table_name like 'custom_fields_group%' ";
 		return customFieldTableQuery;
 	}
 
-
-
-
-
-
 	private String getQueryForPathAndClassification(Long id) {
 		// TODO Auto-generated method stub
-		 String queryForPathAndClassification="select obv.id,tres.path,tres.classification_id as classificationid from observation obv "+
-                 "left join recommendation r on obv.max_voted_reco_id=r.id "+
-                 "left join taxonomy_definition t on r.taxon_concept_id=t.id "+
-                 "left join taxonomy_registry tres on tres.taxon_definition_id=t.id "+
-                  "where (tres.classification_id=265799 or tres.classification_id=null) "+
-                  "and obv.id="+id;
+		String queryForPathAndClassification = "select obv.id,tres.path,tres.classification_id as classificationid from observation obv "
+				+ "left join recommendation r on obv.max_voted_reco_id=r.id "
+				+ "left join taxonomy_definition t on r.taxon_concept_id=t.id "
+				+ "left join taxonomy_registry tres on tres.taxon_definition_id=t.id "
+				+ "where (tres.classification_id=265799 or tres.classification_id=null) " + "and obv.id=" + id;
 		return queryForPathAndClassification;
 	}
 
-
-
-
-
-
 	private String getTraitKeyValueQuery(Long id) {
 		// TODO Auto-generated method stub
-		 String traitKeyValueQuery ="select g.traits  from ( "+
-				  	"select "+
-				  	"  x.object_id ,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']'  as traits "+
-				  	"from ( "+
-				  	"select f.object_id, t.id as tid ,json_agg(DISTINCT tv.value) AS tvalues from fact f, trait t, trait_value tv "+
-				        " where f.trait_instance_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation'  group by f.object_id,t.id "+
-				  	" ) x group by x.object_id "+
-				  	") g where g.object_id="+id;
+		String traitKeyValueQuery = "select g.traits  from ( " + "select "
+				+ "  x.object_id ,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']'  as traits "
+				+ "from ( "
+				+ "select f.object_id, t.id as tid ,json_agg(DISTINCT tv.value) AS tvalues from fact f, trait t, trait_value tv "
+				+ " where f.trait_instance_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation'  group by f.object_id,t.id "
+				+ " ) x group by x.object_id " + ") g where g.object_id=" + id;
 		return traitKeyValueQuery;
 	}
 
-
-
-
-
-
 	private String getTraitRangeQueryString(Long id) {
 		// TODO Auto-generated method stub
-		String traitRangeNumericQuery=
-				 " select g.traits from ( "+
-					"select "+
-					" x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']' as traits "+
-					"from ( "+
-					"select  f.object_id, t.id as tid,ARRAY[f.value,f.to_value] as tvalues from fact f, trait t "+
-					"where f.trait_instance_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' "+
-				") x group by x.object_id "+
-				") g where g.object_id="+id;
+		String traitRangeNumericQuery = " select g.traits from ( " + "select "
+				+ " x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']' as traits "
+				+ "from ( "
+				+ "select  f.object_id, t.id as tid,ARRAY[f.value,f.to_value] as tvalues from fact f, trait t "
+				+ "where f.trait_instance_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' "
+				+ ") x group by x.object_id " + ") g where g.object_id=" + id;
 		return traitRangeNumericQuery;
+	}
+
+	public void publishUserSearchIndex(List<User> susers) {
+		// TODO Auto-generated method stub
+		List<Map<String, Object>> eDocs = new ArrayList<Map<String, Object>>();
+
+		for (User suser : susers) {
+			Map<String, Object> doc = new HashMap<String, Object>();
+			String className = "SUser";
+			String elasticIndex = "suser";
+			String name = suser.getName();
+			String email = suser.getEmail();
+			String username = suser.getUsername();
+			String aboutme = suser.getAboutMe();
+			String id = String.valueOf(suser.getId());
+			String location = suser.getLocation();
+
+			String userInfo = suser.getName() + " ### " + suser.getEmail() + " " + suser.getUsername() + " "
+					+ String.valueOf(suser.getId());
+
+			doc.put("id", id);
+			doc.put("object_type", className);
+			doc.put("name", name);
+			doc.put("username", username);
+			doc.put("email", email);
+			doc.put("about_me", aboutme);
+			doc.put("placename", location);
+			doc.put("user", userInfo);
+
+			Map<String, Object> updatedon = new HashMap<String, Object>();
+			Map<String, Object> lastlogindate = new HashMap<String, Object>();
+			Map<String, Object> createdon = new HashMap<String, Object>();
+
+			Date lastLoginDate = suser.getLastLoginDate();
+			Date dateCreated = suser.getDateCreated();
+			Date updatedOn = suser.getLastLoginDate();
+
+			createdon.put("date", dateCreated.getDate());
+			createdon.put("day", dateCreated.getDay());
+			createdon.put("hours", dateCreated.getHours());
+			createdon.put("minutes", dateCreated.getMinutes());
+			createdon.put("month", dateCreated.getMonth());
+			createdon.put("nanos", dateCreated.getSeconds());
+			createdon.put("seconds", dateCreated.getSeconds());
+			createdon.put("time", dateCreated.getTime());
+			createdon.put("timezoneOffset", dateCreated.getTimezoneOffset());
+			createdon.put("year", dateCreated.getYear());
+
+			lastlogindate.put("date", lastLoginDate.getDate());
+			lastlogindate.put("day", lastLoginDate.getDay());
+			lastlogindate.put("hours", lastLoginDate.getHours());
+			lastlogindate.put("minutes", lastLoginDate.getMinutes());
+			lastlogindate.put("month", lastLoginDate.getMonth());
+			lastlogindate.put("nanos", lastLoginDate.getSeconds());
+			lastlogindate.put("seconds", lastLoginDate.getSeconds());
+			lastlogindate.put("time", lastLoginDate.getTime());
+			lastlogindate.put("timezoneOffset", lastLoginDate.getTimezoneOffset());
+			lastlogindate.put("year", lastLoginDate.getYear());
+
+			updatedon.put("date", updatedOn.getDate());
+			updatedon.put("day", updatedOn.getDay());
+			updatedon.put("hours", updatedOn.getHours());
+			updatedon.put("minutes", updatedOn.getMinutes());
+			updatedon.put("month", updatedOn.getMonth());
+			updatedon.put("nanos", updatedOn.getSeconds());
+			updatedon.put("seconds", updatedOn.getSeconds());
+			updatedon.put("time", updatedOn.getTime());
+			updatedon.put("timezoneOffset", updatedOn.getTimezoneOffset());
+			updatedon.put("year", updatedOn.getYear());
+
+			doc.put("createdon", createdon);
+			doc.put("updateon", updatedon);
+			doc.put("lastlogindate", lastlogindate);
+			
+			eDocs.add(doc);
+
+		}
+		
+		postToElastic(eDocs,"suser");
+
 	}
 
 }
