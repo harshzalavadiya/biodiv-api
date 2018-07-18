@@ -73,6 +73,7 @@ public class Recommendation implements java.io.Serializable {
 		this.taxonConcept = taxonConcept;
 		this.isScientificName = isScientificName;
 		this.languageId = languageId;
+		this.isFlagged = false;
 	}
 
 	@Id
