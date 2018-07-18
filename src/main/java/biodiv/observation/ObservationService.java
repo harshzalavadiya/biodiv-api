@@ -588,6 +588,7 @@ public class ObservationService extends AbstractService<Observation> {
 			long[] obvs = Arrays.asList(obvIds.split(",")).stream().map(String::trim).mapToLong(Long::parseLong)
 					.toArray();
 			User author = userService.findById(authorId);
+			String msg = "success";
 			if(obvs.length>0){
 				long i = 1;
 				for(long obvId : obvs){
@@ -636,38 +637,38 @@ public class ObservationService extends AbstractService<Observation> {
 						save(obv);
 						
 						//elastic
-						Long taxonId=maxVotedReco.getTaxonConcept().getId();
-						TaxonomyRegistry taxonomyRegistry=taxonService.getTaxonRegistryWithTaxonConceptId(taxonId);
-
-						String observationmName=maxVotedReco.getTaxonConcept().getNormalizedForm();
-						String lastrevised=obv.getLastRevised().toString();
-						String maxvotedrecoid=obv.getMaxVotedReco().toString();
-						String noofidentifications=String.valueOf(obv.getNoOfIdentifications());
-						String taxonconceptid=String.valueOf(maxVotedReco.getTaxonConcept().getId());
-						String acceptednameid=String.valueOf(maxVotedReco.getAcceptedName().getId());
-						String taxonomycanonicalform=maxVotedReco.getTaxonConcept().getCanonicalForm();
-						String status=maxVotedReco.getTaxonConcept().getStatus();
-						String position=maxVotedReco.getTaxonConcept().getPosition();
-						String rank=String.valueOf(maxVotedReco.getTaxonConcept().getRank());
-						String path=taxonomyRegistry.getPath();
-						String classificationid=String.valueOf(taxonomyRegistry.getClassificationId());
-						
-						JSONObject obj = new JSONObject();
-						
-						
-						obj.put("name", observationmName);
-						obj.put("lastrevised", lastrevised);
-						obj.put("maxvotedrecoid", maxvotedrecoid);
-						obj.put("noofidentifications", noofidentifications);
-						obj.put("taxonconceptid", taxonconceptid);
-						obj.put("acceptednameid", acceptednameid);
-						obj.put("taxonomycanonicalform", taxonomycanonicalform);
-						obj.put("status", status);
-						obj.put("position", position);
-						obj.put("rank", rank);
-						obj.put("path", path);
-						obj.put("classificationid", classificationid);
-						observationListService.update("observation", "observation",obv.getId().toString(),obj.toString());
+//						Long taxonId=maxVotedReco.getTaxonConcept().getId();
+//						TaxonomyRegistry taxonomyRegistry=taxonService.getTaxonRegistryWithTaxonConceptId(taxonId);
+//
+//						String observationmName=maxVotedReco.getTaxonConcept().getNormalizedForm();
+//						String lastrevised=obv.getLastRevised().toString();
+//						String maxvotedrecoid=obv.getMaxVotedReco().toString();
+//						String noofidentifications=String.valueOf(obv.getNoOfIdentifications());
+//						String taxonconceptid=String.valueOf(maxVotedReco.getTaxonConcept().getId());
+//						String acceptednameid=String.valueOf(maxVotedReco.getAcceptedName().getId());
+//						String taxonomycanonicalform=maxVotedReco.getTaxonConcept().getCanonicalForm();
+//						String status=maxVotedReco.getTaxonConcept().getStatus();
+//						String position=maxVotedReco.getTaxonConcept().getPosition();
+//						String rank=String.valueOf(maxVotedReco.getTaxonConcept().getRank());
+//						String path=taxonomyRegistry.getPath();
+//						String classificationid=String.valueOf(taxonomyRegistry.getClassificationId());
+//						
+//						JSONObject obj = new JSONObject();
+//						
+//						
+//						obj.put("name", observationmName);
+//						obj.put("lastrevised", lastrevised);
+//						obj.put("maxvotedrecoid", maxvotedrecoid);
+//						obj.put("noofidentifications", noofidentifications);
+//						obj.put("taxonconceptid", taxonconceptid);
+//						obj.put("acceptednameid", acceptednameid);
+//						obj.put("taxonomycanonicalform", taxonomycanonicalform);
+//						obj.put("status", status);
+//						obj.put("position", position);
+//						obj.put("rank", rank);
+//						obj.put("path", path);
+//						obj.put("classificationid", classificationid);
+//						observationListService.update("observation", "observation",obv.getId().toString(),obj.toString());
 
 						
 						//elastic
@@ -697,6 +698,8 @@ public class ObservationService extends AbstractService<Observation> {
 								name, "species", isScientificName, true, ro_id, dateCreated, lastUpdated);
 						activityFeedService.addActivityFeed(author, afNew, obv, (String) afNew.get("rootHolderType"));
 						//activityFeed
+					}else{
+						msg = "parsing failed";
 					}
 					
 					if (i % 50 == 0) {
@@ -706,7 +709,7 @@ public class ObservationService extends AbstractService<Observation> {
 
 					i++;
 				}
-				String msg = "success";
+				
 				return msg;
 			}else{
 				throw new NotFoundException("No observation id provided");
@@ -720,6 +723,7 @@ public class ObservationService extends AbstractService<Observation> {
 		
 	}
 
+	@Transactional
 	private String funcUpdateChecklistAnnotations(RecommendationVote recoVote) {
 		Observation obv = recoVote.getObservation();
 		org.json.JSONObject m = fetchChecklistAnnotation(obv);
@@ -745,7 +749,8 @@ public class ObservationService extends AbstractService<Observation> {
 		return null;
 		
 	}
-
+	
+	@Transactional
 	private org.json.JSONObject fetchChecklistAnnotation(Observation obv) {
 		org.json.JSONObject m = new org.json.JSONObject();
 		Checklists cl = checklistsService.findById(obv.getSourceId());
@@ -780,12 +785,14 @@ public class ObservationService extends AbstractService<Observation> {
 		
 	}
 
+	@Transactional
 	private Map<String,Object> calculateMaxVotedSpeciesName(Observation obv) {
 		Map<String,Object> maxVotedMap = observationDao.calculateMaxVotedSpeciesName(obv);
 		return maxVotedMap;
 		
 	}
 
+	@Transactional
 	private Map<String, Object> getRecommendationVote(long obvId, User author, Long recoId, String recoName,
 			String commonName, String languageName) {
 		
@@ -895,7 +902,8 @@ public class ObservationService extends AbstractService<Observation> {
 //		}
 		return null;
 	}
-
+	
+	@Transactional
 	private Map<String, Object> getRecommendations(Long recoId, String recoName, String commonName,
 			String languageName) {
 		
@@ -957,6 +965,7 @@ public class ObservationService extends AbstractService<Observation> {
 		
 	}
 
+	@Transactional
 	public List<User> findWhoLiked(long obvId) {
 		List<User> userList = ratingLinkService.findWhoLiked("observation",obvId);
 		return userList;

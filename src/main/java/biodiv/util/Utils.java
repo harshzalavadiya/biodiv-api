@@ -140,9 +140,11 @@ public class Utils {
 				System.out.println(taxdef.getName());
 				return taxdef.getName();
 			}
+			
 		}
 		//have to check whthrer dropdown selected Names which are scientific going through it.
-		return cleanSciName(name);
+		//return cleanSciName(name);
+		return null;
 	
 	}
 
