@@ -6,8 +6,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.omg.PortableInterceptor.NON_EXISTENT;
+
 @Entity
 @Table(name = "habitat", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Cache(region="species.participation.Habitat",usage = CacheConcurrencyStrategy.READ_ONLY,include="non-lazy")
 public class Habitat implements java.io.Serializable {
 
 	private long id;

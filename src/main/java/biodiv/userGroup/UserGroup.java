@@ -50,7 +50,7 @@ import biodiv.observation.Observation;
 @Entity
 @Table(name = "user_group", schema = "public", uniqueConstraints = { @UniqueConstraint(columnNames = "name"),
 		@UniqueConstraint(columnNames = "webaddress") })
-@Cache(region="common", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(region="species.groups.UserGroup",usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE,include="non-lazy")
 public class UserGroup implements java.io.Serializable {
 
 	private long id;

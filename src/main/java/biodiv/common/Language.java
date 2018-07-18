@@ -8,6 +8,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -15,6 +17,8 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 @Entity
 @Table(name = "language", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "three_letter_code"))
+@Cache(region="species.participation.Language",usage = CacheConcurrencyStrategy.READ_ONLY,include="non-lazy")
+
 public class Language {
 
 	public static final String DEFAULT_LANGUAGE = "English";

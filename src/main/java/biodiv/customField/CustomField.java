@@ -19,6 +19,9 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import biodiv.user.User;
 import biodiv.userGroup.UserGroup;
 import biodiv.util.Utils;
@@ -29,6 +32,7 @@ import biodiv.util.Utils;
 @Entity
 @Table(name = "custom_field", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = { "user_group_id",
 		"name" }))
+@Cache(region="species.groups.CustomField",usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE,include="non-lazy")
 public class CustomField implements java.io.Serializable {
 
 	private long id;

@@ -112,7 +112,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 
 					dbProps.setProperty("hibernate.dialect", "org.hibernate.spatial.dialect.postgis.PostgisPG93Dialect");					
 					
-					dbProps.setProperty("hibernate.cache.provider_class", "org.hibernate.cache.EhCacheProvider");
+					//dbProps.setProperty("hibernate.cache.provider_class", "org.hibernate.cache.EhCacheProvider");
 
 					// Hikari configurations
 					dbProps.setProperty("hibernate.connection.provider_class", "com.zaxxer.hikari.hibernate.HikariConnectionProvider");
@@ -131,7 +131,7 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					dbProps.setProperty(Environment.USE_SECOND_LEVEL_CACHE, "true");
 					dbProps.setProperty(Environment.USE_QUERY_CACHE, "true");
 					dbProps.setProperty(Environment.CACHE_REGION_FACTORY, BiodivRedisRegionFactory.class.getName());
-					dbProps.setProperty(Environment.CACHE_REGION_PREFIX, "hibernate");
+					dbProps.setProperty(Environment.CACHE_REGION_PREFIX, "biodivRedis");
 
 					// Optional setting for second level cache statistics
 					dbProps.setProperty(Environment.GENERATE_STATISTICS, "true");

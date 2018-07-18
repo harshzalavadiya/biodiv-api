@@ -48,7 +48,7 @@ import biodiv.userGroup.UserGroup;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Cache(region="common", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(region="species.participation.Observation", usage = CacheConcurrencyStrategy.READ_WRITE,include="non-lazy")
 public class Observation extends DataObject implements java.io.Serializable{
 	
 	public static final String QUERY_SELECT_BY_ID = "Observation.findById";
