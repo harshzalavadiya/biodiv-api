@@ -128,8 +128,8 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 					
 					dbProps.setProperty("show_sql", "true");
 
-					dbProps.setProperty(Environment.USE_SECOND_LEVEL_CACHE, "true");
-					dbProps.setProperty(Environment.USE_QUERY_CACHE, "true");
+					dbProps.setProperty(Environment.USE_SECOND_LEVEL_CACHE, "false");
+					dbProps.setProperty(Environment.USE_QUERY_CACHE, "false");
 					dbProps.setProperty(Environment.CACHE_REGION_FACTORY, BiodivRedisRegionFactory.class.getName());
 					dbProps.setProperty(Environment.CACHE_REGION_PREFIX, "biodivRedis");
 
