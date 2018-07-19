@@ -25,6 +25,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -37,6 +39,7 @@ import biodiv.common.Language;
 
 @Entity
 @Table(name = "suser", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Cache(region="species.auth.SUser",usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE,include="non-lazy")
 public class User extends CommonMethod implements Principal {
 
 	private long id;

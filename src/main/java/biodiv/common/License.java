@@ -5,8 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
 @Table(name = "license", schema = "public")
+@Cache(region="species.License",usage = CacheConcurrencyStrategy.READ_ONLY,include="non-lazy")
 public class License implements java.io.Serializable {
 
 	private long id;

@@ -16,6 +16,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -26,6 +28,7 @@ import biodiv.common.Language;
  */
 @Entity
 @Table(name = "newsletter", schema = "public")
+@Cache(region="utils.Newsletter",usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE,include="non-lazy")
 public class Newsletter implements java.io.Serializable {
 
 	private long id;

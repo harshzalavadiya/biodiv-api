@@ -6,8 +6,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
 @Table(name = "species_group", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Cache(region="species.groups.SpeciesGroup",usage = CacheConcurrencyStrategy.READ_ONLY,include="non-lazy")
+
 public class SpeciesGroup implements java.io.Serializable {
 
 	private long id;
