@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeedService;
 import biodiv.comment.CommentService;
 import biodiv.common.AbstractService;
@@ -39,6 +40,7 @@ public class DataTableService extends AbstractService<DataTable> {
 		this.dataTableDao = dataTableDao;
 	}
 
+	@Transactional
 	public List<List<String>> fetchColumnNames(DataTable dataTable) {
 		
 		List<List<String>> res = new ArrayList<List<String>>();

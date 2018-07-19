@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 
+import org.apache.commons.mail.HtmlEmail;
 import org.hibernate.SessionFactory;
 import org.jvnet.hk2.annotations.Service;
 
@@ -42,6 +43,7 @@ import biodiv.taxon.service.TaxonService;
 import biodiv.user.User;
 import biodiv.user.UserService;
 import biodiv.userGroup.UserGroup;
+import biodiv.userGroup.UserGroupMailingService;
 import biodiv.userGroup.UserGroupService;
 import net.minidev.json.JSONObject;
 
@@ -98,7 +100,7 @@ public class ObservationService extends AbstractService<Observation> {
 	@Inject
 	TaxonService taxonService;
 	
-
+	
 
 	@Inject
 	ObservationService(ObservationDao observationDao) {
@@ -970,6 +972,8 @@ public class ObservationService extends AbstractService<Observation> {
 		List<User> userList = ratingLinkService.findWhoLiked("observation",obvId);
 		return userList;
 	}
+	
+	
 	
 	
 
