@@ -27,7 +27,8 @@ public class ResourceInterceptor implements MethodInterceptor {
     		boolean isActive = (sessionFactory.getCurrentSession().getTransaction() != null) ? sessionFactory.getCurrentSession().getTransaction().isActive() : false; 
     		if ( !isActive) {  
                 log.debug("Starting a new database transaction");  
-                sessionFactory.getCurrentSession().beginTransaction();  
+                sessionFactory.getCurrentSession().beginTransaction();
+                log.debug("SessionId "+ System.identityHashCode(sessionFactory.getCurrentSession()));
              }  else {
             	 log.debug("Using existing database transaction");
              }

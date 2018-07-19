@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.hibernate.SessionFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -39,11 +40,15 @@ public class DataTableService extends AbstractService<DataTable> {
 		super(dataTableDao);
 		this.dataTableDao = dataTableDao;
 	}
+	
+	@Inject
+	SessionFactory sessionFactory;
 
 	@Transactional
 	public List<List<String>> fetchColumnNames(DataTable dataTable) {
 		
 		List<List<String>> res = new ArrayList<List<String>>();
+		System.out.println("session Id "+System.identityHashCode(sessionFactory.getCurrentSession()));
 		if(dataTable.getColumns()!=null){
 			//org.json.JSONObject root = new org.json.JSONObject(dataTable.getColumns());
 			JSONArray root = new JSONArray(dataTable.getColumns());
