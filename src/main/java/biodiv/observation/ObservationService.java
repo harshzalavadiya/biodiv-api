@@ -23,6 +23,7 @@ import biodiv.Transactional;
 import biodiv.Checklists.Checklists;
 import biodiv.Checklists.ChecklistsService;
 import biodiv.activityFeed.ActivityFeedService;
+import biodiv.admin.AdminService;
 import biodiv.comment.CommentService;
 import biodiv.common.AbstractService;
 import biodiv.common.Language;
@@ -100,6 +101,8 @@ public class ObservationService extends AbstractService<Observation> {
 	@Inject
 	TaxonService taxonService;
 	
+	@Inject
+	AdminService adminService;
 	
 
 	@Inject
@@ -612,18 +615,23 @@ public class ObservationService extends AbstractService<Observation> {
 					}
 					
 					if(recommendationVoteInstance != null){
-						Observation obv = findById(obvId);
+						
 						//save(recommendationVoteInstance)
 						recommendationVoteService.save(recommendationVoteInstance);
+						sessionFactory.getCurrentSession().flush();
+						sessionFactory.getCurrentSession().clear();
 						//save
+						Observation obv = findById(obvId);
 						//calculate maxVotedSpeciesName
 						Map<String,Object> maxVotedMap = calculateMaxVotedSpeciesName(obv);
 						Long maxVotedRecoId = (Long) maxVotedMap.get("reco");
-						
+						System.out.println("maxVotedRecoId "+maxVotedRecoId);
 						Recommendation maxVotedReco = recommendationService.findById(maxVotedRecoId);
 						if(maxVotedReco !=null){
+							System.out.println("max voted reeeeee "+maxVotedReco.getId());
 							obv.setMaxVotedReco(maxVotedReco);
 							obv.setNoOfIdentifications((int) maxVotedMap.get("noOfIdentifications"));
+							System.out.println("no of idenications "+(int) maxVotedMap.get("noOfIdentifications"));
 						}
 						
 						Boolean updateChecklistAnnotations = false;
@@ -632,10 +640,14 @@ public class ObservationService extends AbstractService<Observation> {
 						}
 						
 						if(updateChecklistAnnotations == true){
+							System.out.println("inmside updating chercklist");
 							String checkAnno =  funcUpdateChecklistAnnotations((RecommendationVote) maxVotedMap.get("recoVoteForChecklist"));
 							obv.setChecklistAnnotations(checkAnno);
+							System.out.println("inmside updating chercklist after");
 						}
 						//have to save obv
+						System.out.println("version    "+obv.getVersion());
+						System.out.println("max votedn reco id               "+obv.getMaxVotedReco().getId());
 						save(obv);
 						
 						//elastic
@@ -671,7 +683,10 @@ public class ObservationService extends AbstractService<Observation> {
 //						obj.put("path", path);
 //						obj.put("classificationid", classificationid);
 //						observationListService.update("observation", "observation",obv.getId().toString(),obj.toString());
-
+						
+						List<Observation> obvl = new ArrayList<Observation>();
+						obvl.add(obv);
+						adminService.publishObservationSearchIndex(obvl);
 						
 						//elastic
 						
@@ -694,6 +709,7 @@ public class ObservationService extends AbstractService<Observation> {
 						Long ro_id = recommendationVoteInstance.getRecommendationByRecommendationId().getTaxonConcept()!=null? recommendationVoteInstance.getRecommendationByRecommendationId().getTaxonConcept().getId():
 							null;
 						Boolean isScientificName = recommendationVoteInstance.getRecommendationByRecommendationId().getIsScientificName();
+						System.out.println("obvId obvId obvID "+obvId + obv.getId());
 						Map<String, Object> afNew = activityFeedService.createMapforAf("Object", obv.getId(), obv,
 								"species.participation.Observation", "species.participation.RecommendationVote", recommendationVoteInstance.getId(),
 								"Suggested species name", "Suggested species name", null, null,
@@ -767,6 +783,7 @@ public class ObservationService extends AbstractService<Observation> {
 		}else if(obv.getDataTable()!=null){
 			if(obv.getChecklistAnnotations()!=null){
 				org.json.JSONObject root = new org.json.JSONObject(obv.getChecklistAnnotations());
+				//System.out.println("testtttttttttttttttt "+obv.getDataTable().getColumns());
 				List<List<String>> ls = dataTableService.fetchColumnNames(obv.getDataTable());
 				for(List<String> name : ls){
 					m.put(name.get(1), root.get(name.get(1)));	

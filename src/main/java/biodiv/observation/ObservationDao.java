@@ -147,13 +147,16 @@ public class ObservationDao extends AbstractDao<Observation, Long> implements Da
 		
 		
 		//if more than one max_voted,getting the latest one
-		
+		System.out.println("more than one maxVoted");
+		System.out.println("more than one maxVoted");
+		System.out.println("more than one maxVoted");
 		hql = "from RecommendationVote rv where rv.observation =:obv and rv.recommendationByRecommendationId.id in (:ids) order by rv.votedOn desc";
 		Query query1 =  sessionFactory.getCurrentSession().createQuery(hql);
 		query1.setParameter("obv",obv);
 		query1.setParameter("ids",recoIds);
 		List<RecommendationVote> lrr =  query1.getResultList();
 		RecommendationVote rr = lrr.get(0);
+		System.out.println("id "+rr.getRecommendationByRecommendationId().getId());
 		toReturn.put("reco", rr.getRecommendationByRecommendationId().getId());
 		toReturn.put("noOfIdentifications", noOfIdentifications);
 		toReturn.put("haveToUpdateChecklistAnnotation", true);

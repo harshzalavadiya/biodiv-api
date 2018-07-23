@@ -164,6 +164,8 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 				//Follow
 				if(objectToFollow != null || objectToFollowType != null){
 					String objectTyp = objectToFollowType;
+					System.out.println("object to follow before "+(Long)afNew.get("rootHolderId"));
+
 					followService.addFollower(objectToFollow,objectTyp,(Long)afNew.get("rootHolderId"),user);
 				}
 				
@@ -180,6 +182,7 @@ public class ActivityFeedService extends AbstractService<ActivityFeed>{
 			String activityType,String activityPerformed,String activityDescrption,String description ,String name,String ro_type,Boolean isScientificName,Boolean isShowable,Long subRootId,
 			Date dateCreated,Date lastUpdated) {
 		
+		System.out.println("rhid rhid rhid "+rhId);
 		//String activityDescrption;
 	    //Long activityHolderId ;  
 		//String activityHolderType ;

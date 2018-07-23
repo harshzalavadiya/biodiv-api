@@ -32,11 +32,17 @@ public class FollowDao extends AbstractDao<Follow, Long> implements DaoInterface
 		query.setParameter("objectType", objectToFollowType );
 		query.setParameter("id", objectToFollowId );
 		query.setParameter("userId", userId);	
-		Long count = (Long) query.getSingleResult();
-		if(count > (long)0){
-			return true;
+		System.out.println("query follow "+query + hql);
+		List<Long> count =  query.getResultList();
+		if(count.size()>0){
+			System.out.println("count of follow "+count.get(0));
+			if(count.get(0)>0){
+				return true;
+			}else return false;
+		}else{
+			return false;
 		}
-		else return false;
+		
 	
 	}
 

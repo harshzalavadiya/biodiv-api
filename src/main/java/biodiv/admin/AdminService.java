@@ -360,6 +360,7 @@ public class AdminService {
 
 	public void publishObservationSearchIndex(List<Observation> obvs) {
 		// TODO Auto-generated method stub
+		System.out.println("insaidre publish");
 		for (Observation obv : obvs) {
 			List<Map<String, Object>> data_to_elastic = new ArrayList<Map<String, Object>>();
 			Map<String, Object> traits = new HashMap<String, Object>();
@@ -399,9 +400,12 @@ public class AdminService {
 
 			String observationLikeQuery = getObservationLikeQuery(obv.getId());
 			observationlikes = adminDao.getObservationLike(observationLikeQuery);
-
-			Map<String, Object> observationLike = observationlikes.get(0);
-			singleObv.put("observationlikes", observationLike.get("values"));
+			
+			if(observationlikes.size()>0){
+				Map<String, Object> observationLike = observationlikes.get(0);
+				singleObv.put("observationlikes", observationLike.get("values"));
+			}
+			
 
 			List<Object> location = new ArrayList<Object>();
 

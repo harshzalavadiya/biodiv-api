@@ -26,6 +26,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -163,7 +164,7 @@ public class Observation extends DataObject implements java.io.Serializable{
 			}
 		}
 	}
-
+	private long version;
 	private String notes;
 	// boolean isDeleted = false;
 	private String searchText;
@@ -252,6 +253,16 @@ public class Observation extends DataObject implements java.io.Serializable{
 		this.id = id;
 	}
 
+	@Version
+	@Column(name = "version", nullable = false)
+	public long getVersion() {
+		return this.version;
+	}
+
+	public void setVersion(long version) {
+		this.version = version;
+	}
+	
 	@Column(name = "notes", columnDefinition = "text")
 	public String getNotes() {
 		return notes;
