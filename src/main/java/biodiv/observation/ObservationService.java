@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.mail.HtmlEmail;
 import org.hibernate.SessionFactory;
 import org.jvnet.hk2.annotations.Service;
@@ -33,6 +34,7 @@ import biodiv.common.SpeciesGroupService;
 import biodiv.customField.CustomField;
 import biodiv.customField.CustomFieldService;
 import biodiv.dataTable.DataTableService;
+import biodiv.follow.FollowService;
 import biodiv.observation.RecommendationVote.ConfidenceType;
 import biodiv.rating.RatingLinkService;
 import biodiv.speciesPermission.SpeciesPermission;
@@ -103,6 +105,15 @@ public class ObservationService extends AbstractService<Observation> {
 	
 	@Inject
 	AdminService adminService;
+	
+	@Inject
+	ObservationMailingService observationMailingService;
+	
+	@Inject
+	Configuration config;
+	
+	@Inject
+	FollowService followService;
 	
 
 	@Inject
@@ -587,7 +598,7 @@ public class ObservationService extends AbstractService<Observation> {
 	
 	@Transactional
 	public String addRecommendationVote(String obvIds, String commonName, String languageName, String recoName,
-			Long recoId, String recoComment, long authorId) {
+			Long recoId, String recoComment, long authorId) throws Exception {
 		
 		try{
 			long[] obvs = Arrays.asList(obvIds.split(",")).stream().map(String::trim).mapToLong(Long::parseLong)
@@ -716,6 +727,11 @@ public class ObservationService extends AbstractService<Observation> {
 								name, "species", isScientificName, true, ro_id, dateCreated, lastUpdated);
 						activityFeedService.addActivityFeed(author, afNew, obv, (String) afNew.get("rootHolderType"));
 						//activityFeed
+						
+						//mail
+						List<User> allFollowersOfTheObject = followService.findAllFollowersOfObject(obvId,"species.participation.Observation");
+						addToMail(allFollowersOfTheObject,author,obv,recommendationVoteInstance);
+						//mail
 					}else{
 						msg = "parsing failed";
 					}
@@ -738,6 +754,43 @@ public class ObservationService extends AbstractService<Observation> {
 		}finally{
 			
 		}
+		
+	}
+
+	@Transactional
+	private void addToMail(List<User> allFollowersOfTheObject ,User user,Observation obv,RecommendationVote recoVote) throws Exception {
+		
+		List<User> allBccs = observationMailingService.getAllBccPeople();
+		for(User bcc : allBccs){
+			HtmlEmail emailToBcc = observationMailingService.buildSuggestIdMailMessage(bcc.getEmail(),
+					bcc,user,obv,recoVote);
+			
+		}
+		
+		if(user.getSendNotification()){
+			HtmlEmail emailToPostingUser = observationMailingService.buildSuggestIdMailMessage(user.getEmail(),
+					user,user,obv,recoVote);
+			}
+		
+		if(config.getString("mail.sendToFollowers").equalsIgnoreCase("true")){
+			
+			//System.out.println("send to followers");
+			for(User follower : allFollowersOfTheObject){
+				if(!observationMailingService.isTheFollowerInBccList(follower.getEmail())){
+					if(follower.getSendNotification()){
+						HtmlEmail emailToFollowers = observationMailingService.buildSuggestIdMailMessage(follower.getEmail(),
+								follower,user,obv,recoVote);
+					}
+				}	
+			}
+		}
+		
+		if(!observationMailingService.isAnyThreadActive()){
+			System.out.println("no thread is active currently");
+			Thread th = new Thread(observationMailingService);
+			th.start();
+		}
+		
 		
 	}
 
