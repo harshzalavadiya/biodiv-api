@@ -28,12 +28,23 @@
 									<a href="http://indiabiodiversity.org/user/show/${whoPosted.id?c}" ><img src="https://indiabiodiversity.org/biodiv/users/${whoPosted.icon}" style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;max-width:30px;max-height:30px;display:inline-block;vertical-align:middle" class="CToWUd"></a>					
 									
 									<a href="http://indiabiodiversity.org/user/show/${whoPosted.id?c}" > ${whoPosted.name}</a>		
-											<#if submitType == "post">posted<#else>removed </#if> observation <#if submitType == "post">to<#else>from </#if> group 
+											suggested species name <span>${recoVote}</span>
+										
 											
-											<#list wherePosted as where>
-											<a href="https://indiabiodiversity.org/group/${where.webaddress}/show" ><i>${where.name}</i></a>									
-											</#list>
 								</p>
+								
+								<p class="m_4753839120917381476m_8170365137812423757callout" style="margin:0;padding:5px;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;margin-bottom:2px;font-weight:normal;font-size:14px;line-height:1">					
+									Given name is : 
+									<#if givenName.isScientificName == true>
+										<#if givenName.id != 0>
+											<a href="http://indiabiodiversity.org/species/show/${givenName.id?c}" > <i> ${givenName.name} </i></a>
+										<#else>
+											<i> ${givenName.name} </i>	
+										</#if> 
+									<#else>${givenName.name}
+									</#if> 
+								</p>
+								<p></p>
 		
 							</td>
 						</tr>
@@ -68,9 +79,6 @@
 	
 									
 										<b>Name:</b> ${whatPosted.name}<br>
-									
-	
-	
 									
 	                                
 	                                    <b>Location: </b> ${whatPosted.location}<br>

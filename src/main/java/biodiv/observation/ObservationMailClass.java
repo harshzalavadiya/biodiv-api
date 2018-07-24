@@ -6,8 +6,8 @@ import java.util.Set;
 public class ObservationMailClass {
 	
 	private Long id;
-	private String scientificName;
-	private String commonName;
+	private String name;
+	//private String commonName;
 	private String location;
 	private Date observedOn;
 	private String icon;
@@ -25,18 +25,18 @@ public class ObservationMailClass {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getScientificName() {
-		return scientificName;
+	public String getName() {
+		return name;
 	}
-	public void setScientificName(String scientificName) {
-		this.scientificName = scientificName;
+	public void setName(String name) {
+		this.name = name;
 	}
-	public String getCommonName() {
-		return commonName;
-	}
-	public void setCommonName(String commonName) {
-		this.commonName = commonName;
-	}
+//	public String getCommonName() {
+//		return commonName;
+//	}
+//	public void setCommonName(String commonName) {
+//		this.commonName = commonName;
+//	}
 	public String getLocation() {
 		return location;
 	}

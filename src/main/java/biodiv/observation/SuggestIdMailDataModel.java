@@ -1,4 +1,4 @@
-package biodiv.userGroup;
+package biodiv.observation;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,13 +7,12 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import biodiv.observation.Observation;
-import biodiv.observation.ObservationMailClass;
-import biodiv.observation.ObservationService;
 import biodiv.user.User;
+import biodiv.userGroup.UserGroup;
+import biodiv.userGroup.UserGroupService;
 
-public class PostToGroupsMailDataModel {
-
+public class SuggestIdMailDataModel {
+	
 	@Inject
 	UserGroupService userGroupService;
 
@@ -22,8 +21,9 @@ public class PostToGroupsMailDataModel {
 
 	private Map<String, Object> root;
 
-	public PostToGroupsMailDataModel(User followerr, User postingUser, Observation obv,
-			Set<UserGroup> userGroupsToBePostedIn, String submitType) {
+	public SuggestIdMailDataModel(User followerr, User postingUser, Observation obv,
+			Recommendation givenName,String recoVote) {
+		
 		root = new HashMap<>();
 		User follower = new User();
 		follower.setId(followerr.getId());
@@ -49,14 +49,17 @@ public class PostToGroupsMailDataModel {
 			whoPosted.setIcon(postingUser.getIcon());
 		}
 
-		Set<UserGroup> userGroupsToBePosted = new HashSet<UserGroup>();
-		for (UserGroup ug : userGroupsToBePostedIn) {
-			UserGroup u = new UserGroup();
-			u.setId(ug.getId());
-			u.setName(ug.getName());
-			u.setWebaddress(ug.getWebaddress());
-			userGroupsToBePosted.add(u);
-		}
+//		Set<UserGroup> userGroupsToBePosted = new HashSet<UserGroup>();
+//		for (UserGroup ug : userGroupsToBePostedIn) {
+//			UserGroup u = new UserGroup();
+//			u.setId(ug.getId());
+//			u.setName(ug.getName());
+//			u.setWebaddress(ug.getWebaddress());
+//			userGroupsToBePosted.add(u);
+//		}
+		
+//		Recommendation suggestedSpeciesName = new Recommendation();
+//		suggestedSpeciesName.setName(name);
 
 		// List l = new List(userGroupsToBePosted);
 
@@ -102,16 +105,37 @@ public class PostToGroupsMailDataModel {
 		// u.setWebaddress(ug.getWebaddress());
 		// whatPostedUserGroups.add(u);
 		// }
-
+		
+		Recommendation givenBySystem = new Recommendation();
+		
+		if(givenName.getTaxonConcept()!=null){
+			if(givenName.getTaxonConcept().getSpeciesId()!=null){
+				givenBySystem.setId(givenName.getTaxonConcept().getSpeciesId());
+			}
+			if(givenName.getTaxonConcept().getNormalizedForm()!=null){
+				givenBySystem.setName(givenName.getTaxonConcept().getNormalizedForm());
+			}else{
+				givenBySystem.setName(givenName.getTaxonConcept().getName());
+			}
+		}else{
+			givenBySystem.setName(givenName.getName());
+			givenBySystem.setId(0);
+		}
+		
+		givenBySystem.setIsScientificName(givenName.getIsScientificName());
+		
+		
+		
 		root.put("follower", follower);
 		root.put("whoPosted", whoPosted);
-		root.put("wherePosted", userGroupsToBePosted);
 		root.put("whatPosted", obm);
-		root.put("submitType", submitType);
+		root.put("recoVote", recoVote);
+		root.put("givenName",givenBySystem);
 		// root.put("whatPostedUserGroups", whatPostedUserGroups);
 	}
 
 	public Map<String, Object> getRoot() {
 		return this.root;
 	}
+
 }
