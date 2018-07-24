@@ -149,6 +149,7 @@ public class ObservationListController {
 				userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate,
 				traitParams, customParams, classificationid, mapSearchParams, maxvotedrecoid, createdOnMaxDate,
 				createdOnMinDate, status, taxonId, recoName);
+	
 
 		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery, geoAggregationField,
 				geoAggegationPrecision, onlyFilteredAggregation, termsAggregationField);
@@ -191,7 +192,9 @@ public class ObservationListController {
 			@QueryParam("left") Double left,
 			@QueryParam("right") Double right,
 			@QueryParam("location") String location,
-			@QueryParam("recom") String maxvotedrecoid, @Context HttpServletRequest request, @Context UriInfo uriInfo,
+			@QueryParam("recom") String maxvotedrecoid,
+			@QueryParam("onlyFilteredAggregation") Boolean onlyFilteredAggregation,
+			@QueryParam("termsAggregationField") String termsAggregationField,@Context HttpServletRequest request, @Context UriInfo uriInfo,
 			String allParams
 
 	) {
@@ -229,7 +232,9 @@ public class ObservationListController {
 				userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate,
 				traitParams, customParams, classificationid, mapSearchParams, maxvotedrecoid, createdOnMaxDate,
 				createdOnMinDate, status, taxonId, recoName);
-
+	
+		
+		
 		return schedulerService.scheduleNow(index, type, suser, mapSearchQuery, geoField, notes, getFullURL(request));
 	}
 
