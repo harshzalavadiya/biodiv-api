@@ -629,6 +629,10 @@ public class ObservationService extends AbstractService<Observation> {
 						
 						//save(recommendationVoteInstance)
 						recommendationVoteService.save(recommendationVoteInstance);
+						System.out.println("recvoteIdOriginal "+recommendationVoteInstance.getId());
+						
+						Long recoVoteForMail = recommendationVoteInstance.getId();
+						System.out.println("recvoteIdbefotre "+recoVoteForMail);
 						sessionFactory.getCurrentSession().flush();
 						sessionFactory.getCurrentSession().clear();
 						//save
@@ -695,9 +699,7 @@ public class ObservationService extends AbstractService<Observation> {
 //						obj.put("classificationid", classificationid);
 //						observationListService.update("observation", "observation",obv.getId().toString(),obj.toString());
 						
-						List<Observation> obvl = new ArrayList<Observation>();
-						obvl.add(obv);
-						adminService.publishObservationSearchIndex(obvl);
+						
 						
 						//elastic
 						
@@ -729,9 +731,21 @@ public class ObservationService extends AbstractService<Observation> {
 						//activityFeed
 						
 						//mail
+						System.out.println("recvoteId "+recoVoteForMail);
+						RecommendationVote rv = recommendationVoteService.findById(recoVoteForMail);
 						List<User> allFollowersOfTheObject = followService.findAllFollowersOfObject(obvId,"species.participation.Observation");
-						addToMail(allFollowersOfTheObject,author,obv,recommendationVoteInstance);
+						addToMail(allFollowersOfTheObject,author,obv,rv);
 						//mail
+						//elastic
+						List<Observation> obvl = new ArrayList<Observation>();
+						obvl.add(obv);
+						//elastgic
+						sessionFactory.getCurrentSession().flush();
+						sessionFactory.getCurrentSession().clear();
+						
+						//elastic
+						adminService.publishObservationSearchIndex(obvl);
+						//elastic
 					}else{
 						msg = "parsing failed";
 					}
