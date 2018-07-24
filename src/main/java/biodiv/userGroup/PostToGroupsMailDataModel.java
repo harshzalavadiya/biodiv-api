@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.configuration2.Configuration;
+
 import biodiv.observation.Observation;
 import biodiv.observation.ObservationMailClass;
 import biodiv.observation.ObservationService;
@@ -23,7 +25,7 @@ public class PostToGroupsMailDataModel {
 	private Map<String, Object> root;
 
 	public PostToGroupsMailDataModel(User followerr, User postingUser, Observation obv,
-			Set<UserGroup> userGroupsToBePostedIn, String submitType) {
+			Set<UserGroup> userGroupsToBePostedIn, String submitType,Configuration config) {
 		root = new HashMap<>();
 		User follower = new User();
 		follower.setId(followerr.getId());
@@ -84,12 +86,12 @@ public class PostToGroupsMailDataModel {
 			String group = obv.getGroup().getName().toLowerCase();
 
 			System.out.println("no image for obv");
-			obm.setIcon("http://indiabiodiversity.org/biodiv/group_icons/speciesGroups/" + group + "_th1.png");
+			obm.setIcon(config.getString("serverUrl")+"/biodiv/group_icons/speciesGroups/" + group + "_th1.png");
 		} else {
 			String[] file = obv.getReprImage().getFileName().split("\\.");
 			System.out.println(file);
 			System.out.println(file[0] + "_th1.jpg");
-			obm.setIcon("http://indiabiodiversity.org/biodiv/observations/" + file[0] + "_th1.jpg");
+			obm.setIcon(config.getString("serverUrl")+"/biodiv/observations/" + file[0] + "_th1.jpg");
 		}
 
 		// Set<UserGroup> obvUserGroups = obv.getUserGroups();
@@ -108,6 +110,8 @@ public class PostToGroupsMailDataModel {
 		root.put("wherePosted", userGroupsToBePosted);
 		root.put("whatPosted", obm);
 		root.put("submitType", submitType);
+		root.put("serverUrl", config.getString("serverUrl"));
+		root.put("siteName", config.getString("siteName"));
 		// root.put("whatPostedUserGroups", whatPostedUserGroups);
 	}
 
