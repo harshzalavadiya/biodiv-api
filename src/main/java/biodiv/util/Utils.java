@@ -110,8 +110,8 @@ public class Utils {
 	}
 
 	public static String getTitleCase(String str) {
-		org.apache.commons.lang3.text.WordUtils.capitalizeFully(str, " (/".toCharArray());
-		return null;
+		return org.apache.commons.lang3.text.WordUtils.capitalizeFully(str, " (/".toCharArray());
+		//return null;
 	}
 
 

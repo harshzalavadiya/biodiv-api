@@ -25,6 +25,9 @@ public class ObservationMailingService extends AbstractHtmlMailingService{
 		super(mailProvider, config, "mail.download.subject", "mail.download.message");
 	}
 	
+	@Inject
+	Configuration config;
+	
 	public HtmlEmail buildSuggestIdMailMessage(String toEmail,User follower,User postingUser,Observation obv,
 			RecommendationVote recoVote) throws Exception{
 		
@@ -43,7 +46,7 @@ public class ObservationMailingService extends AbstractHtmlMailingService{
 			}else{
 				recovote = recoVote.getGivenCommonName();
 			}
-			SuggestIdMailDataModel dm = new SuggestIdMailDataModel(follower,postingUser,obv,givenName,recovote);
+			SuggestIdMailDataModel dm = new SuggestIdMailDataModel(follower,postingUser,obv,givenName,recovote,config);
 			Map<String,Object> root = dm.getRoot();
 			HtmlEmail email = buildMessage(subject,this.message,toEmail,temp,root);
 			return email;

@@ -4,7 +4,7 @@
 		<td class="header container" style="margin: 0 auto;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;display: block;max-width: 600px;clear: both;">
 			
 			<div class="content" style="margin: 0 auto;padding: 2px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block; text-align:center;">
-                            <a style="margin: 0;padding: 0;font-family: &quot;HelveticaNeue-Light&quot;, &quot;Helvetica Neue Light&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial, &quot;Lucida Grande&quot;, sans-serif;line-height: 1;color: #000;font-weight: 200;font-size: 20px; text-decoration:none;">India Biodiversity Portal</a>
+                            <a style="margin: 0;padding: 0;font-family: &quot;HelveticaNeue-Light&quot;, &quot;Helvetica Neue Light&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial, &quot;Lucida Grande&quot;, sans-serif;line-height: 1;color: #000;font-weight: 200;font-size: 20px; text-decoration:none;">${siteName}</a>
 			</div>
 			
 		</td>
@@ -25,13 +25,13 @@
 								<p class="m_-9081882762390516907m_5602930087336413147lead" style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;margin-bottom:10px;font-weight:normal;font-size:14px;line-height:1">
 									Hi ${follower.name},<br><br>
 	
-									<a href="http://indiabiodiversity.org/user/show/${whoPosted.id?c}" ><img src="https://indiabiodiversity.org/biodiv/users/${whoPosted.icon}" style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;max-width:30px;max-height:30px;display:inline-block;vertical-align:middle" class="CToWUd"></a>					
+									<a href="${serverUrl}/user/show/${whoPosted.id?c}" ><img src="${serverUrl}/biodiv/users/${whoPosted.icon}" style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;max-width:30px;max-height:30px;display:inline-block;vertical-align:middle" class="CToWUd"></a>					
 									
-									<a href="http://indiabiodiversity.org/user/show/${whoPosted.id?c}" > ${whoPosted.name}</a>		
+									<a href="${serverUrl}/user/show/${whoPosted.id?c}" > ${whoPosted.name}</a>		
 											<#if submitType == "post">posted<#else>removed </#if> observation <#if submitType == "post">to<#else>from </#if> group 
 											
 											<#list wherePosted as where>
-											<a href="https://indiabiodiversity.org/group/${where.webaddress}/show" ><i>${where.name}</i></a>									
+											<a href="${serverUrl}/group/${where.webaddress}/show" ><i>${where.name}</i></a>									
 											</#list>
 								</p>
 		
@@ -49,7 +49,7 @@
 						<tbody><tr style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif">
 							<td style="margin:0;padding:2px;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif">				
 
-								<a href="https://indiabiodiversity.org/observation/show/${whatPosted.id?c}" ><img src=${whatPosted.icon} style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;max-width:130px;max-height:130px;display:inline-block;vertical-align:middle"></a>
+								<a href="${serverUrl}/observation/show/${whatPosted.id?c}" ><img src=${whatPosted.icon} style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;max-width:130px;max-height:130px;display:inline-block;vertical-align:middle"></a>
 							</td>
 						</tr>
 					</tbody></table>
@@ -92,7 +92,7 @@
 							
 							<p class="m_-9081882762390516907m_5602930087336413147callout" style="margin:0;padding:0 5px;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;margin-bottom:2px;font-weight:normal;font-size:14px;line-height:1;background-color:#d4ece3">
 
-									For more information, please visit the page <a href="http://indiabiodiversity.org/observation/show/${whatPosted.id?c}" style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;color:#2ba6cb;font-weight:bold" target="_blank" data-saferedirecturl="https://www.google.com/url?hl=en&amp;q=http://indiabiodiversity.org/observation/show/1770256&amp;source=gmail&amp;ust=1521876944507000&amp;usg=AFQjCNHfSiPtayrlu3f6rjTjXtG-1Hr4eg">here »</a>							
+									For more information, please visit the page <a href="${serverUrl}/observation/show/${whatPosted.id?c}" style="margin:0;padding:0;font-family:&quot;Helvetica Neue&quot;,&quot;Helvetica&quot;,Helvetica,Arial,sans-serif;color:#2ba6cb;font-weight:bold" target="_blank" data-saferedirecturl="https://www.google.com/url?hl=en&amp;q=http://indiabiodiversity.org/observation/show/1770256&amp;source=gmail&amp;ust=1521876944507000&amp;usg=AFQjCNHfSiPtayrlu3f6rjTjXtG-1Hr4eg">here »</a>							
 							</p>
 				</div>
 			</div>	
@@ -104,8 +104,8 @@
 							</a>
 						<#list whatPosted.userGroups as memberOf>
 							<div style="height:30px;width:186px;border:1px solid #a1a376;background-color:#d4ece3;float:left;margin:2px 6px">
-							    <a href="https://indiabiodiversity.org/group/${memberOf.webaddress}/show" style="text-decoration:none;color:#222222"> 
-								<img src="https://indiabiodiversity.org/biodiv/userGroups/${memberOf.icon}" style="width:30px;height:30px;vertical-align:middle" class="CToWUd">
+							    <a href="${serverUrl}/group/${memberOf.webaddress}/show" style="text-decoration:none;color:#222222"> 
+								<img src="${serverUrl}/biodiv/userGroups/${memberOf.icon}" style="width:30px;height:30px;vertical-align:middle" class="CToWUd">
 
 									
 
@@ -156,7 +156,7 @@
 						<tr style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 							<td align="left" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 								<p style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 10px;font-weight: normal;font-size: 12px;line-height: 1;">
-									If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="http://indiabiodiversity.org/user/show/${follower.id?c}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;"><unsubscribe style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;"> your profile</unsubscribe></a>
+									If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${serverUrl}/user/show/${follower.id?c}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;"><unsubscribe style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;"> your profile</unsubscribe></a>
 								</p>
 							</td>
 						</tr>

@@ -24,6 +24,9 @@ public class UserGroupMailingService extends AbstractHtmlMailingService {
 	@Inject
 	freemarker.template.Configuration cfg;
 	
+	@Inject
+	Configuration config;
+	
 	//final String subject = "Download request";
 	final String message = "Your data download request has been processed. The download link will be visible once you log in to your profile."; 
 	@Inject
@@ -44,7 +47,7 @@ public class UserGroupMailingService extends AbstractHtmlMailingService {
 			subject = "Removed observation from group";
 		}
 		freemarker.template.Template temp = cfg.getTemplate("postToGroupMailTemp.ftlh");
-		PostToGroupsMailDataModel dm = new PostToGroupsMailDataModel(follower,postingUser,obv,userGroupsToBePostedIn,submitType);
+		PostToGroupsMailDataModel dm = new PostToGroupsMailDataModel(follower,postingUser,obv,userGroupsToBePostedIn,submitType,config);
 		Map<String,Object> root = dm.getRoot();
 		HtmlEmail email = buildMessage(subject,this.message,toEmail,temp,root);
 		return email;
