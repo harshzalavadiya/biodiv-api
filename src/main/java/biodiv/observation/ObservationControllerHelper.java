@@ -181,14 +181,9 @@ public class ObservationControllerHelper {
 		String maxDateValue = null;
 
 		Date date = new Date();
-		SimpleDateFormat in = new SimpleDateFormat("EEE MMM dd YYYY HH:mm:ss");
-		SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");
-		String minDates = null;
-		String maxDates = null;
+		SimpleDateFormat out = new SimpleDateFormat("YYYY-MM-dd");
 		try {
-
 			if (minDate != null) {
-
 				minDateValue = minDate;
 			}
 			if (maxDate != null) {
@@ -219,8 +214,6 @@ public class ObservationControllerHelper {
 		
 		String createdOnMaxDateValue = null;
 		String createdOnMinDateValue = null;
-		String creattedOnMinDates = null;
-		String creattedOnMaxDates = null;
 		try {
 
 			if (createdOnMinDate != null) {
