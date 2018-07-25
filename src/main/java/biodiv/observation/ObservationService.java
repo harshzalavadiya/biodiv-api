@@ -284,7 +284,7 @@ public class ObservationService extends AbstractService<Observation> {
 				query = "select * from reco_vote_details rv where rv.observation_id in (" + obvs
 						+ ")  order by rv.observation_id";
 			}
-
+			//Long maxVotedRecoIdForObv = null;
 			List<Object[]> rv = observationDao.getRecommendationVotes(query, singleObv, obvIds[0], obvs);
 
 			// return rv;
@@ -317,7 +317,8 @@ public class ObservationService extends AbstractService<Observation> {
 			}
 
 			// trying
-
+			//Long maxVotedRecoIdForObv = null;
+					
 			Map<String, Object> recoMaps = new HashMap<String, Object>();
 			for (Map<String, Object> recoVote : recoVotes) {
 				// System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
@@ -448,6 +449,13 @@ public class ObservationService extends AbstractService<Observation> {
 				
 				int totalVotes = 0;
 				Map<String, Object> obvRecoVotesResult = (Map<String, Object>) entry.getValue();
+				
+				
+				//if(findById(Long.parseLong(entry.getKey())).getMaxVotedReco()!=null){
+					Long maxVotedRecoIdForObv = findMaxVotedRecoIdForObv(Long.parseLong(entry.getKey()));
+					//findById(Long.parseLong(entry.getKey())).getMaxVotedReco().getId();
+				//}
+				
 				System.out.println("testing recoVotes");
 				System.out.println(obvRecoVotesResult.get("recoVotes"));
 				List<Map<String, Object>> a = (List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes");
@@ -472,16 +480,23 @@ public class ObservationService extends AbstractService<Observation> {
 				obvRecoVotesResult.put("totalVotes", totalVotes);
 				obvRecoVotesResult.put("uniqueVotes",
 						((List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes")).size());
-
+				
 				List<Map<String, Object>> finalRecos = (List<Map<String, Object>>) obvRecoVotesResult.get("recoVotes");
 				Collections.sort(finalRecos, new Comparator<Map<String, Object>>() {
 					@Override
 					public int compare(Map<String, Object> map1, Map<String, Object> map2) {
+						
 						if ((Integer) map1.get("noOfVotes") > (Integer) map2.get("noOfVotes")) {
 							return -1;
 						} else if ((Integer) map1.get("noOfVotes") < (Integer) map2.get("noOfVotes")) {
 							return +1;
-						} else {
+						} else if(map1.get("noOfVotes").equals(map2.get("noOfVotes")) && !maxVotedRecoIdForObv.equals(null) && ((Long) map1.get("recoId")).equals(maxVotedRecoIdForObv) ){
+							
+							return -1;
+						} else if(map1.get("noOfVotes").equals(map2.get("noOfVotes")) && !maxVotedRecoIdForObv.equals(null) && ((Long) map2.get("recoId")).equals(maxVotedRecoIdForObv)){
+							
+							return +1;
+						} else{
 							return 0;
 						}
 					}
@@ -505,6 +520,15 @@ public class ObservationService extends AbstractService<Observation> {
 		} finally {
 			//
 		}
+	}
+
+	@Transactional
+	private Long findMaxVotedRecoIdForObv(Long obvId) {
+		Observation obv = findById(obvId);
+		if(obv.getMaxVotedReco()!=null){
+			return obv.getMaxVotedReco().getId();
+		}
+		return null;
 	}
 
 	private Boolean hasObvLockPerm(Long obvId, Long recoId,Long loggedInUserId,Boolean isAdmin,Boolean isSpeciesAdmin) {
@@ -1005,6 +1029,7 @@ public class ObservationService extends AbstractService<Observation> {
 				if(r.getIsScientificName()){
 					scientificNameReco = r;
 					if(commonName!=null){
+						System.out.println("inside scientific vrom dropdwon and new random common");
 						commonNameReco = recommendationService.findReco(commonName, false, lang.getId(), scientificNameReco.getTaxonConcept(), true, false);
 					}
 				}else{
