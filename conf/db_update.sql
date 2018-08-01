@@ -203,3 +203,6 @@ select filter_rule from user_group where id=4256157;
 vim /tmp/4256157_geometry.txt
 \set content `cat /tmp/4256157_geometry.txt`
 update user_group set filter_rule=:'content' where id=4256157;
+
+#Remove size limit on filter_rule as spatial co-ordinates can be very long
+ALTER table download_log ALTER COLUMN filter_url TYPE varchar;
