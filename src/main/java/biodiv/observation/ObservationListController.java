@@ -186,7 +186,7 @@ public class ObservationListController {
 			@DefaultValue("10") @QueryParam("max") Integer max,
 			@DefaultValue("0") @QueryParam("offset") Integer offset,
 			@QueryParam("notes") String notes, 
-			@QueryParam("geoField") String geoField, 
+			@DefaultValue("location") @QueryParam("geoField") String geoField, 
 			@QueryParam("top") Double top,
 			@QueryParam("bottom") Double bottom,
 			@QueryParam("left") Double left,
@@ -219,14 +219,14 @@ public class ObservationListController {
 		if(location!=null){
 			double[] point=Stream.of(location.split(",")).mapToDouble(Double::parseDouble).toArray();
 			for(int i=0;i<point.length;i=i+2){
-				String singlePoint=point[i]+","+point[i+1];
+				String singlePoint=point[i+1]+","+point[i];
 				polygon.add(new MapGeoPoint(singlePoint));
 			}
 		}
 		
 		MapBoundParams mapBoundsParams = new MapBoundParams(bounds, polygon);
 
-		MapSearchParams mapSearchParams = new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,
+		MapSearchParams mapSearchParams = new MapSearchParams(0, 1000000, sortOn.toLowerCase(), sortType.DESC,
 				mapBoundsParams);
 		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user,
 				userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate,

@@ -21,7 +21,7 @@ public class RegisterCommand {
 	
 	@NotBlank
 	@FormParam("password")
-	@Length(min = 6)
+	@Length(min = 8)
 	//blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 	public String password;
 	

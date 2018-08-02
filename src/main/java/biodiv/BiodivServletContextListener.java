@@ -87,8 +87,8 @@ public class BiodivServletContextListener extends GuiceServletContextListener {
 				Configuration config = null;
 				try {
 					String ENV_NAME = "BIODIV_API_CONFIG";
-					log.info("Reading configuration from : {}", System.getenv(ENV_NAME));
-					config = configs.properties(new File(System.getenv(ENV_NAME)));
+					log.info("Reading configuration from : {}", System.getProperty(ENV_NAME));
+					config = configs.properties(new File(System.getProperty(ENV_NAME)));
 					bind(Configuration.class).toInstance(config);
 				} catch (ConfigurationException cex) {
 					cex.printStackTrace();
