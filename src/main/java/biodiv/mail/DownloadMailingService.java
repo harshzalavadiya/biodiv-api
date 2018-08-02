@@ -17,6 +17,9 @@ public class DownloadMailingService extends AbstractHtmlMailingService {
 	@Inject
 	freemarker.template.Configuration cfg;
 	
+	@Inject
+	Configuration config;
+	
 	final String subject = "Download request";
 	final String message = "Your data download request has been processed. The download link will be visible once you log in to your profile."; 
 	@Inject
@@ -30,7 +33,7 @@ public class DownloadMailingService extends AbstractHtmlMailingService {
 		
 		try{
 		freemarker.template.Template temp = cfg.getTemplate("downloadMailTemp.ftlh");
-		DownloadMailDataModel dm = new DownloadMailDataModel(id,name);
+		DownloadMailDataModel dm = new DownloadMailDataModel(id,name,config);
 		Map<String,Object> root = dm.getRoot();
 		HtmlEmail email = buildMessage(this.subject,this.message,toEmail,temp,root);
 		return email;
