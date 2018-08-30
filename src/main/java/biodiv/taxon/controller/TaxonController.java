@@ -29,7 +29,7 @@ public class TaxonController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	private static final String IBP = "IBP Taxonomy Hierarchy";
+	private static final String WIKWIO = "WIKWIO Taxonomy Hierarchy";
 
 	@Inject
 	private TaxonService taxonService;
@@ -65,7 +65,7 @@ public class TaxonController {
 		}
 		if (classificationId == null) {
 
-			classificationId = taxonService.classificationIdByName(IBP);
+			classificationId = taxonService.classificationIdByName(WIKWIO);
 		}
 		List<TaxonRelation> taxons = new ArrayList<TaxonRelation>();
 		if (parent != null) {
@@ -115,7 +115,7 @@ public class TaxonController {
 	public Set<String> specificSearch(@QueryParam("term") String term,
 			@QueryParam("classification") Long classificationId, @QueryParam("taxonid") Long taxonid) {
 		if (classificationId == null) {
-			classificationId = taxonService.classificationIdByName(IBP);
+			classificationId = taxonService.classificationIdByName(WIKWIO);
 		}
 		if (taxonid == null) {
 			Set<String> data = taxonService.specificSearch(classificationId, term, null);

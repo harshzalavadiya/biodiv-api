@@ -97,9 +97,6 @@ public class ObservationListService implements MapService {
 		String newurl = config.getString("nakshaUrl")+"/services/data/"+index + "/" + type+"/"+documentId;
 		MapIntegrationService mapIntegrationService = new MapIntegrationService();
 			MapResponse mapResponse=mapIntegrationService.updateSingleDocument(newurl,document);
-			
-
-		
 		return null;
 	}
 

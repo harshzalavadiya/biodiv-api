@@ -1,23 +1,21 @@
 package biodiv.observation;
 
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.inject.Inject;
 
 import biodiv.common.CommonMethod;
+import biodiv.common.Language;
+import biodiv.common.LanguageService;
 import biodiv.maps.MapAndBoolQuery;
 import biodiv.maps.MapAndMatchPhraseQuery;
 import biodiv.maps.MapAndRangeQuery;
@@ -27,13 +25,18 @@ import biodiv.maps.MapOrMatchPhraseQuery;
 import biodiv.maps.MapOrRangeQuery;
 import biodiv.maps.MapSearchParams;
 import biodiv.maps.MapSearchQuery;
+import biodiv.traits.Fact;
+import biodiv.traits.TraitService;
+import biodiv.traits.TraitValue;
+import biodiv.traits.TraitValueTranslation;
 
 public class ObservationControllerHelper {
+
 
 	
 	public static final String custom_fields="custom_fields";
 	
-	public static MapSearchQuery getMapSearchQuery(
+	public  MapSearchQuery getMapSearchQuery(
 			String sGroup,
 			String taxon,
 			String user,
@@ -55,7 +58,9 @@ public class ObservationControllerHelper {
 			String createdOnMinDate,
 			String status,
 			String taxonId,
-			String recoName
+			String recoName,
+			TraitService traitService,
+			Long langId
 ) {
 		List<MapAndBoolQuery> boolAndLists = new ArrayList<MapAndBoolQuery>();
 
@@ -69,12 +74,12 @@ public class ObservationControllerHelper {
 
 		List<MapOrMatchPhraseQuery> orMatchPhraseQueriesnew =new ArrayList<MapOrMatchPhraseQuery>();
 		
-		
 
 	
 		if(classificationid == null) {
 			classificationid = "265799";
 		}
+		
 		
 		CommonMethod commonMethod = new CommonMethod();
 
@@ -150,7 +155,7 @@ public class ObservationControllerHelper {
 		if(!taxonStatus.isEmpty()){
 			boolAndLists.add(new MapAndBoolQuery("status", taxonStatus));
 		}
-		
+
 		Set<Object> taxonIdsArray=commonMethod.cSTSOT(taxonId);
 		if(!taxonIdsArray.isEmpty()){
 				if (taxonIdsArray.size() < 2) {
@@ -393,11 +398,19 @@ public class ObservationControllerHelper {
 					if(value.equalsIgnoreCase("string")){
 						String key=entry.getKey().split("\\.")[0];
 						String Ids=entry.getValue().get(0);
-						System.out.println(Ids);
 						Set<String> listOfIds = commonMethod.cSTSOT(Ids);
 						Set<Object> listOfIdsWithObject=listOfIds.stream().map(String::toLowerCase).collect(Collectors.toSet());
-						key="traits."+key;
-						boolAndLists.add(new MapAndBoolQuery(key,listOfIdsWithObject));
+						String newkey=key;
+						key="traits."+key;						
+						Set<Object> lisOfTaxonIds=new HashSet<Object>();
+						for(String traitValueName: listOfIds){
+							TraitValueTranslation traitValue= traitService.getTraitValueIdForGivenTraitName(traitValueName,langId);
+							List<Fact> listOfFacts=traitService.getFactForGivenTraitValueId(traitValue.getTraitValue().getId());
+							for(Fact fact:listOfFacts){
+								lisOfTaxonIds.add(fact.getTaxonomyDefinition().getId());
+							}
+						} 
+						boolAndLists.add(new MapAndBoolQuery("taxonconceptid",lisOfTaxonIds));
 					}
 					
 					

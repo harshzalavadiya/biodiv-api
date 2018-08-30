@@ -27,6 +27,8 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
+import biodiv.common.Language;
+import biodiv.common.LanguageService;
 import biodiv.maps.MapBiodivResponse;
 import biodiv.maps.MapBoundParams;
 import biodiv.maps.MapBounds;
@@ -38,6 +40,7 @@ import biodiv.maps.MapSearchQuery;
 import biodiv.maps.MapSortType;
 import biodiv.scheduler.SchedulerService;
 import biodiv.scheduler.SchedulerStatus;
+import biodiv.traits.TraitService;
 import biodiv.user.User;
 import biodiv.user.UserService;
 
@@ -50,6 +53,11 @@ public class ObservationListController {
 	UserService userService;
 	@Inject
 	SchedulerService schedulerService;
+	@Inject
+	private  TraitService traitService;
+	
+	@Inject
+	private LanguageService languageService;
 
 	@POST
 	@Path("/{index}/{type}/{documentId}")
@@ -90,6 +98,7 @@ public class ObservationListController {
 	@GET
 	@Path("/search/{index}/{type}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public MapBiodivResponse list(@PathParam("index") String index, @PathParam("type") String type,
 			@DefaultValue("") @QueryParam("sGroup") String sGroup, @DefaultValue("") @QueryParam("taxon") String taxon,
 			@DefaultValue("") @QueryParam("user") String user,
@@ -106,13 +115,15 @@ public class ObservationListController {
 			@QueryParam("taxonId") String taxonId, @QueryParam("validate") String validate,
 			@QueryParam("recoName") String recoName,
 			@DefaultValue("265799") @QueryParam("classifdication") String classificationid,
-			@DefaultValue("10") @QueryParam("max") Integer max, @DefaultValue("0") @QueryParam("offset") Integer offset,
+			@DefaultValue("10") @QueryParam("max") Integer max, 
+			@DefaultValue("0") @QueryParam("offset") Integer offset,
 			@DefaultValue("location") @QueryParam("geoAggregationField") String geoAggregationField,
 			@DefaultValue("1") @QueryParam("geoAggegationPrecision") Integer geoAggegationPrecision,
 			@QueryParam("left") Double left, @QueryParam("right") Double right, @QueryParam("top") Double top,
 			@QueryParam("bottom") Double bottom, @QueryParam("recom") String maxvotedrecoid,
 			@QueryParam("onlyFilteredAggregation") Boolean onlyFilteredAggregation,
 			@QueryParam("termsAggregationField") String termsAggregationField,
+			@DefaultValue("en") @QueryParam("lan") String lan,
 			@Context UriInfo uriInfo, String allParams
 
 	) {
@@ -138,17 +149,28 @@ public class ObservationListController {
 				polygon.add(new MapGeoPoint(singlePoint));
 			}
 		}
-		
+		   
+        int length=lan.length();
+		Language language=new Language();
+		if(length==2){
+			 language=languageService.findByTwoLetterCode(lan);
+		}
+		else if(length==3){
+			language=languageService.findByThreeLetterCode(lan);
+		}
+		else{
+		System.out.println("invalid size");
+		}
 		
 		MapBoundParams mapBoundsParams = new MapBoundParams(bounds, polygon);
 
 		MapSearchParams mapSearchParams = new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,
 				mapBoundsParams);
-
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user,
+		ObservationControllerHelper observationControllerHelper=new ObservationControllerHelper();
+		MapSearchQuery mapSearchQuery = observationControllerHelper.getMapSearchQuery(sGroup, taxon, user,
 				userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate,
 				traitParams, customParams, classificationid, mapSearchParams, maxvotedrecoid, createdOnMaxDate,
-				createdOnMinDate, status, taxonId, recoName);
+				createdOnMinDate, status, taxonId, recoName,traitService,language.getId());
 	
 
 		MapBiodivResponse mapResponse = observationListService.search(index, type, mapSearchQuery, geoAggregationField,
@@ -193,6 +215,7 @@ public class ObservationListController {
 			@QueryParam("right") Double right,
 			@QueryParam("location") String location,
 			@QueryParam("recom") String maxvotedrecoid,
+			@DefaultValue("en") @QueryParam("lan") String lan,
 			@QueryParam("onlyFilteredAggregation") Boolean onlyFilteredAggregation,
 			@QueryParam("termsAggregationField") String termsAggregationField,@Context HttpServletRequest request, @Context UriInfo uriInfo,
 			String allParams
@@ -216,6 +239,19 @@ public class ObservationListController {
                 bounds = new MapBounds(top, left, bottom, right);
         List<MapGeoPoint> polygon = new ArrayList<MapGeoPoint>();
 		
+        
+        int length=lan.length();
+		Language language=new Language();
+		if(length==2){
+			 language=languageService.findByTwoLetterCode(lan);
+		}
+		else if(length==3){
+			language=languageService.findByThreeLetterCode(lan);
+		}
+		else{
+		System.out.println("invalid size");
+		}
+		
 		if(location!=null){
 			double[] point=Stream.of(location.split(",")).mapToDouble(Double::parseDouble).toArray();
 			for(int i=0;i<point.length;i=i+2){
@@ -226,12 +262,13 @@ public class ObservationListController {
 		
 		MapBoundParams mapBoundsParams = new MapBoundParams(bounds, polygon);
 
-		MapSearchParams mapSearchParams = new MapSearchParams(0, 1000000, sortOn.toLowerCase(), sortType.DESC,
+		MapSearchParams mapSearchParams = new MapSearchParams(offset, max, sortOn.toLowerCase(), sortType.DESC,
 				mapBoundsParams);
-		MapSearchQuery mapSearchQuery = ObservationControllerHelper.getMapSearchQuery(sGroup, taxon, user,
+		ObservationControllerHelper observationControllerHelper=new ObservationControllerHelper();
+		MapSearchQuery mapSearchQuery = observationControllerHelper.getMapSearchQuery(sGroup, taxon, user,
 				userGroupList, webaddress, speciesName, mediaFilter, months, isFlagged, minDate, maxDate, validate,
 				traitParams, customParams, classificationid, mapSearchParams, maxvotedrecoid, createdOnMaxDate,
-				createdOnMinDate, status, taxonId, recoName);
+				createdOnMinDate, status, taxonId, recoName,traitService,language.getId());
 	
 		
 		

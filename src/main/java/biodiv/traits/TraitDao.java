@@ -13,13 +13,16 @@ import javax.inject.Inject;
 import javax.persistence.Query;
 
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biodiv.common.AbstractDao;
 import biodiv.common.DaoInterface;
 
 public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<Trait, Long> {
-
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	@Inject
 	public TraitDao(SessionFactory sessionFactory) {
 		super(sessionFactory);
@@ -252,12 +255,12 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 		return results;
 	}
 
-	public List<TraitValue> getTraitValueWithTraitId(Long id) {
+	public List<TraitValueTranslation> getTraitValueWithTraitId(Long id,long lan) {
 		Query q;
-
-		q = sessionFactory.getCurrentSession().createQuery("from TraitValue where traitId=:id");
+		q = sessionFactory.getCurrentSession().createQuery("from TraitValueTranslation where traitValue.traitId=:id and language.id=:lan");
 		q.setParameter("id", id);
-		List<TraitValue> results = q.getResultList();
+		q.setParameter("lan", lan);
+		List<TraitValueTranslation> results = q.getResultList();
 		return results;
 
 	}
@@ -292,4 +295,52 @@ public class TraitDao extends AbstractDao<Trait, Long> implements DaoInterface<T
 		return results;
 	}
 
+	public List<TraitTranslation> getAllTraits(long l) {
+		// TODO Auto-generated method stub
+		Query q;
+		q = sessionFactory.getCurrentSession().createQuery("from TraitTranslation where language.id=:id");
+		q.setParameter("id", l);
+		List<TraitTranslation> results = q.getResultList();
+		return results;
+	}
+
+	public TraitValueTranslation getTraitValueIdForGivenTraitName(String traitValueName, Long langId) {
+		// TODO Auto-generated method stub
+		Query q;
+		q = sessionFactory.getCurrentSession().createQuery("from TraitValueTranslation where language.id=:langId and value=:traitValueName");
+		q.setParameter("traitValueName", traitValueName);
+		q.setParameter("langId", langId);
+
+		List<TraitValueTranslation> results =  q.getResultList();
+		System.out.println(results.get(0));
+		if(results.size()>0){
+			return results.get(0);
+		}
+		else{
+				log.error("no result found");
+				return null;
+			}
+	
+
+}
+	
+	public List<Fact> getFactForGivenTraitValueId(long traitValueId) {
+		// TODO Auto-generated method stub
+		Query q;
+		
+		q = sessionFactory.getCurrentSession().createQuery("from Fact where traitValue.id=:traitValueId");
+		q.setParameter("traitValueId", traitValueId);
+
+		List<Fact> results =  q.getResultList();
+		if(results.size()>0){
+			System.out.println(results);
+			return results;
+		}
+		else{
+				log.error("no result found in fact table for taritValueId {}",traitValueId);
+				
+				return null;
+			}
+	}
+	
 }

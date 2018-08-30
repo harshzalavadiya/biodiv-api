@@ -16,15 +16,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import biodiv.Transactional;
 import biodiv.auth.AuthUtils;
+import biodiv.common.Language;
+import biodiv.common.LanguageService;
 import biodiv.taxon.service.TaxonService;
 
 @Path("/trait")
@@ -33,13 +35,18 @@ public class TraitController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	private static final String IBP = "IBP Taxonomy Hierarchy";
+	private static final String WIKWIO = "WIKWIO Taxonomy Hierarchy";
 
 	@Inject
 	private TraitService traitService;
 
 	@Inject
 	private TaxonService taxonService;
+	
+	@Inject 
+	private LanguageService languageService;
+	
+	
 
 	/**
 	 * 
@@ -68,7 +75,7 @@ public class TraitController {
 			@DefaultValue("true") @QueryParam("showInObservation") Boolean showInObservation,
 			@QueryParam("objectType") String objectType, @QueryParam("objectId") Long objectId) {
 		if (classificationId == null) {
-			classificationId = taxonService.classificationIdByName(IBP);
+			classificationId = taxonService.classificationIdByName(WIKWIO);
 		}
 		List<TraitFactUi> traitList = traitService.list(objectId, objectType, sGroup, classificationId,
 				isNotObservationTrait, showInObservation);
@@ -178,9 +185,53 @@ public class TraitController {
 	@Path("/traitvalue/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public List<TraitValue> getTraitValue(@PathParam("id") Long id) {
-		List<TraitValue> results = traitService.getTraitValue(id);
-		return results;
+	public List<TraitValueTranslation> getTraitValue(@PathParam("id") Long id,@QueryParam("lan") String lan) {
+		int length=lan.length();
+		Language language=new Language();
+		if(length==2){
+			 language=languageService.findByTwoLetterCode(lan);
+		}
+		else if(length==3){
+			language=languageService.findByThreeLetterCode(lan);
+		}
+		else{
+			log.error("invalid size of string lenght");
+		}
+		
+		if(language!=null){
+			List<TraitValueTranslation> results = traitService.getTraitValue(id,language.getId());
+			return results;
+		}
+		return null;
+		
+	}
+	@GET
+	@Path("/species/list")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response getAllTraits(@QueryParam("lan") String lan) {
+		int length=lan.length();
+		Language language=new Language();
+		if(length==2){
+			 language=languageService.findByTwoLetterCode(lan);
+		}
+		else if(length==3){
+			language=languageService.findByThreeLetterCode(lan);
+		}
+		else{
+			log.error("invalid size of string lenght");
+		}
+		
+		if(language!=null){
+			List<TraitTranslation> results = traitService.getAllTraits(language.getId());
+			return Response.ok(results).build();
+		}
+
+			return Response.status(Response.Status.NOT_FOUND).entity("langauge not found for 3 char status code "+ lan).build();
+			
+	
+		
+		
 	}
 
 }

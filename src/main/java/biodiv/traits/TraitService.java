@@ -354,9 +354,9 @@ public class TraitService extends AbstractService<Trait> {
 		return results;
 	}
 
-	public List<TraitValue> getTraitValue(Long id) {
+	public List<TraitValueTranslation> getTraitValue(Long id,long lan) {
 		// TODO Auto-generated method stub
-		List<TraitValue> results = traitDao.getTraitValueWithTraitId(id);
+		List<TraitValueTranslation> results = traitDao.getTraitValueWithTraitId(id,lan);
 		return results;
 	}
 
@@ -369,6 +369,24 @@ public class TraitService extends AbstractService<Trait> {
 	public Trait getSingleTrait(Long id) {
 		// TODO Auto-generated method stub
 		Trait result = traitDao.getSingleTraitWithId(id);
+		return result;
+	}
+
+	public List<TraitTranslation> getAllTraits(long l) {
+		// TODO Auto-generated method stub
+		List<TraitTranslation> result = traitDao.getAllTraits(l);
+		return result;
+	}
+
+	public TraitValueTranslation getTraitValueIdForGivenTraitName(String traitValueName, Long langId) {
+	
+		TraitValueTranslation traitValue=traitDao.getTraitValueIdForGivenTraitName(traitValueName,langId);
+		return traitValue;
+	}
+
+	public List<Fact> getFactForGivenTraitValueId(long traitValueId) {
+		// TODO Auto-generated method stub
+		List<Fact> result=traitDao.getFactForGivenTraitValueId(traitValueId);
 		return result;
 	}
 
