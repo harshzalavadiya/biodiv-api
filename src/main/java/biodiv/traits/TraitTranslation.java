@@ -81,7 +81,7 @@ public class TraitTranslation implements java.io.Serializable  {
 	}
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "trait_id", nullable = false)
+	@JoinColumn(name = "trait_instance_id", nullable = false)
 	public Trait getTrait() {
 		return trait;
 	}
