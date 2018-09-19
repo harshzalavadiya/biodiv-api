@@ -9,6 +9,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.mail.HtmlEmail;
+
 import biodiv.Transactional;
 import biodiv.activityFeed.ActivityFeed;
 import biodiv.activityFeed.ActivityFeedService;
@@ -21,6 +24,7 @@ import biodiv.observation.ObservationListService;
 import biodiv.observation.ObservationService;
 import biodiv.user.User;
 import biodiv.user.UserService;
+import biodiv.userGroup.UserGroupMailingService;
 import net.minidev.json.JSONObject;
 
 public class CommentService extends AbstractService<Comment>{
@@ -39,6 +43,12 @@ public class CommentService extends AbstractService<Comment>{
 	private ObservationService observationService;
 	@Inject
 	private ObservationListService observationListService;
+	
+	@Inject
+	private CommentMailingService commentMailingService;
+	
+	@Inject
+	Configuration config;
 	
 	@Inject
 	CommentService(CommentDao commentDao){
@@ -65,7 +75,7 @@ public class CommentService extends AbstractService<Comment>{
 	@Transactional
 	public String addComment(Long commentId,String commentBody, String tagUserId, Long commentHolderId, String commentHolderType,
 			Long rootHolderId, String rootHolderType,Long mainParentId,Long parentId,String subject, String commentType, Long newerTimeRef, String commentPostUrl,
-			String userLang,long userId) {
+			String userLang,long userId) throws Exception {
 		
 		try{
 			Language lang = languageService.findByTwoLetterCode(userLang);
@@ -133,10 +143,11 @@ public class CommentService extends AbstractService<Comment>{
 			// activityFeed end
 			 if(tagUserIds != null){
 				 if(tagUserIds.length > 0){
-					 userTagNotify(rootHolderType,rootHolderId,tagUserIds);
+					 userTagNotify(rootHolderType,rootHolderId,tagUserIds,user,commentBody);
 				 }
 			 }
-			 
+			 List<User> allFollowersOfTheObject = findFollowersOfObject(rootHolderId,"species.participation.Observation");
+			 addToCommentMail(allFollowersOfTheObject,user,commentBody,rootHolderId);
 			
 			return "success";
 		}catch(Exception e){
@@ -146,17 +157,81 @@ public class CommentService extends AbstractService<Comment>{
 		}
 	}
 
+	private List<User> findFollowersOfObject(Long objectId, String objectToFollowType) {
+		try{
+			List<User> followers = followService.findAllFollowersOfObject(objectId,objectToFollowType);
+			return followers;
+		}catch(Exception e){
+			throw e;
+		}
+	}
+
+	
+
 	private Long fetchMainThreadId(Comment comment) {
 		return comment.getMainParentId();
 	}
 
-	private void userTagNotify(String objectType,Long objectToFollowId,long[] tagUserIds) {
+	private void userTagNotify(String objectType,Long objectToFollowId,long[] tagUserIds,User whoTaggedThem,String comment) throws Exception {
 		
 		for(long tagUserId : tagUserIds){
 			User taggedUser = userService.findById(tagUserId);
+			Observation obv = observationService.findById(objectToFollowId);
+			addToTagMail(whoTaggedThem,taggedUser,comment,obv);
 			followService.addFollower(null,objectType,objectToFollowId,taggedUser);
 		}
 		
+		
+	}
+	private void addToCommentMail(List<User> allFollowersOfTheObject, User user, String commentBody, Long rootHolderId) throws Exception {
+		Observation obv = observationService.findById(rootHolderId);
+		List<User> allBccs = commentMailingService.getAllBccPeople();
+		for(User bcc : allBccs){
+			HtmlEmail emailToBcc = commentMailingService.buildCommentPostMailMessage(bcc.getEmail(),
+					bcc,user,obv,commentBody);
+		}
+		if(user.getSendNotification()){
+			HtmlEmail emailToPostingUser = commentMailingService.buildCommentPostMailMessage(user.getEmail(),
+					user,user,obv,commentBody);
+		}
+		if(config.getString("mail.sendToFollowers").equalsIgnoreCase("true")){
+			
+			//System.out.println("send to followers");
+			for(User follower : allFollowersOfTheObject){
+				if(!commentMailingService.isTheFollowerInBccList(follower.getEmail())){
+					if(follower.getSendNotification()){
+						HtmlEmail emailToFollowers = commentMailingService.buildCommentPostMailMessage(follower.getEmail(),
+								follower,user,obv,commentBody);
+					}
+				}	
+			}
+		}
+		
+			
+		if(!commentMailingService.isAnyThreadActive()){
+			System.out.println("no thread is active currently");
+			Thread th = new Thread(commentMailingService);
+			th.start();
+		}
+			
+		
+	}
+	
+	private void addToTagMail(User whoTaggedThem, User taggedUser, String comment,Observation obv) throws Exception {
+		List<User> allBccs = commentMailingService.getAllBccPeople();
+		for(User bcc : allBccs){
+			HtmlEmail emailToBcc = commentMailingService.buildTaggingMailMessage(bcc.getEmail(),
+					taggedUser,whoTaggedThem,obv,comment);
+		}
+		if(taggedUser.getSendNotification()){
+			HtmlEmail emailToTagged = commentMailingService.buildTaggingMailMessage(taggedUser.getEmail(),
+					taggedUser,whoTaggedThem,obv,comment);
+		}
+		if(!commentMailingService.isAnyThreadActive()){
+			System.out.println("no thread is active currently");
+			Thread th = new Thread(commentMailingService);
+			th.start();
+		}
 		
 	}
 
