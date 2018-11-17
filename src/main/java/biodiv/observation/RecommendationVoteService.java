@@ -71,7 +71,7 @@ public class RecommendationVoteService extends AbstractService<RecommendationVot
 
 	public void addRecoComment(Long commentId,String commentBody, String tagUserId, Long commentHolderId, String commentHolderType,
 			Long rootHolderId, String rootHolderType,Long mainParentId,Long parentId,String subject, String commentType, Long newerTimeRef, String commentPostUrl,
-			String userLang,long userId) {
+			String userLang,long userId) throws Exception {
 		
 		if (commentBody != null && commentBody.trim().length() > 0) {
 			        commentService.addComment(commentId, commentBody, tagUserId, commentHolderId, commentHolderType,
