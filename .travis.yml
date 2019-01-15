@@ -1,5 +1,10 @@
 language: java
 
+branches:
+  only:
+  - master
+  - stable
+
 jdk:
     - openjdk8
 
@@ -9,3 +14,12 @@ install:
 script:
     - './gradlew build'
     - 'ls build/libs/*.war'
+
+deploy:
+  provider: releases
+  api_key: $AUTH_TOKEN
+  file:
+    - "build/libs/*.war"
+  skip_cleanup: true
+  on:
+    tags: true
