@@ -19,5 +19,5 @@ deploy:
   provider: releases
   api_key: $AUTH_TOKEN
   file:
-    - "build/libs/*.war"
+    - "build/libs/biodiv-api.war"
   skip_cleanup: true
