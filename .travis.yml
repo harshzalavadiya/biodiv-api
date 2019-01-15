@@ -21,5 +21,3 @@ deploy:
   file:
     - "build/libs/*.war"
   skip_cleanup: true
-  on:
-    tags: true
